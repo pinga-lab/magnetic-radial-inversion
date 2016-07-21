@@ -270,9 +270,10 @@ def tf_sphere(x,y,z,model,inc,dec):
     return tf
 
 
-def sm_sphere(x,y,z,model,inc,dec):
+#def sm_sphere(x,y,z,model,inc,dec):
+def sm_sphere(x, y, z, xs, ys, zs, inc, dec, incs, decs):
     '''
-    This function calculates the sensibility matrix and the parameters vectors
+    This function calculates the sensibility matrix and the parameter vectors
 	of a total field anomaly foward problem with magnetized shperes.
     
     input
@@ -280,25 +281,34 @@ def sm_sphere(x,y,z,model,inc,dec):
     x: float/array - number of points in x
     y: float/array - number of poitns in y
     z: float/array - number of poitns in z
-    model: [x0,y0,z0,R,magnetization] - list of spheres
-	inc: float - inclination angle
-	dec: float - declination angle
+    #model: [x0,y0,z0,R,magnetization] - list of spheres
+	inc: float - inclination of the local-geomagnetic field
+	dec: float - declination of the local-geomagnetic field
+    incs: float - inclination of the sources
+	decs: float - declination of the sources
 
     output
     
     A: float/array - sensibility matrix of foward problem
-	vp: float/array - parameters vector
+	#vp: float/array - parameter vector
     '''
     
-    A = np.zeros((len(x),len(model)))
-    vp = np.ones(len(model))
-
-    fx, fy, fz = utils.ang2vec(1.,inc,dec) # regional direction
-    
     assert x.size == y.size == z.size, 'The number of points in x, y and z must be equal'
+    assert xs.size == ys.size == zs.size, 'The number of points in xs, ys and zs must be equal'
+    
+    #A = np.zeros((len(x),len(model)))
+    A = np.empty((x.size,xs.size))
+    #vp = np.ones(len(model))
+    
+    fx, fy, fz = utils.ang2vec(1.,inc,dec) # regional direction
+    mx, my, mz = utils.ang2vec(1.,incs,decs) # regional direction
+    R = (3./(4.*np.pi))**(1./3)
 
-    for j, m in enumerate (model):
-        mx, my, mz = m[4]['magnetization']/np.linalg.norm(m[4]['magnetization'])
+    #for j, m in enumerate (model):
+    for j, (xf, yf, zf) in enumerate(zip(xs,ys,zs)):
+        #mx, my, mz = m[4]['magnetization']/np.linalg.norm(m[4]['magnetization'])
+        #m = [xf, yf, zf, R, 1.]
+        m = [xf, yf, zf, 1., 1.]
     
         A[:,j] = kernelxx_sphere(x,y,z,m)*(fx*mx - fz*mz) + \
                  kernelxy_sphere(x,y,z,m)*(fy*mx + fx*my) + \
@@ -306,8 +316,9 @@ def sm_sphere(x,y,z,model,inc,dec):
              	 kernelyy_sphere(x,y,z,m)*(fy*my - fz*mz) + \
                  kernelyz_sphere(x,y,z,m)*(fz*my + fy*mz)
         
-        vp[j] = vp[j]*np.linalg.norm(m[4]['magnetization']) 
+        #vp[j] = vp[j]*np.linalg.norm(m[4]['magnetization']) 
 
     A *= CM*T2NT
 	
-    return A, vp
+    #return A, vp
+    return A
