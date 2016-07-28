@@ -273,7 +273,7 @@ def tf_sphere(x,y,z,model,inc,dec):
 def sm_sphere(x, y, z, xs, ys, zs, inc, dec, incs, decs):
     '''
     This function calculates the sensibility matrix and the parameter vectors
-	of a total field anomaly foward problem with magnetized shperes.
+    of a total field anomaly foward problem with magnetized shperes.
     
     input
     
@@ -281,10 +281,10 @@ def sm_sphere(x, y, z, xs, ys, zs, inc, dec, incs, decs):
     y: float/array - number of poitns in y
     z: float/array - number of poitns in z
     #model: [x0,y0,z0,R,magnetization] - list of spheres
-	inc: float - inclination of the local-geomagnetic field
-	dec: float - declination of the local-geomagnetic field
+    inc: float - inclination of the local-geomagnetic field
+    dec: float - declination of the local-geomagnetic field
     incs: float - inclination of the sources
-	decs: float - declination of the sources
+    decs: float - declination of the sources
 
     output
     
@@ -305,8 +305,8 @@ def sm_sphere(x, y, z, xs, ys, zs, inc, dec, incs, decs):
     
         A[:,j] = kernelxx_sphere(x,y,z,m)*(fx*mx - fz*mz) + \
                  kernelxy_sphere(x,y,z,m)*(fy*mx + fx*my) + \
-             	 kernelxz_sphere(x,y,z,m)*(fz*mx + fx*mz) + \
-             	 kernelyy_sphere(x,y,z,m)*(fy*my - fz*mz) + \
+                 kernelxz_sphere(x,y,z,m)*(fz*mx + fx*mz) + \
+                 kernelyy_sphere(x,y,z,m)*(fy*my - fz*mz) + \
                  kernelyz_sphere(x,y,z,m)*(fz*my + fy*mz)
         
     A *= CM*T2NT
@@ -316,7 +316,7 @@ def sm_sphere(x, y, z, xs, ys, zs, inc, dec, incs, decs):
 def sm_bx_sphere(x, y, z, xs, ys, zs, incs, decs):
     '''
     This function calculates the sensibility matrix
-	of the x component from the magnetic induction field
+    of the x component from the magnetic induction field
     for the foward problem with magnetic spheres.
     
     input
@@ -326,7 +326,7 @@ def sm_bx_sphere(x, y, z, xs, ys, zs, incs, decs):
     z: float/array - number of poitns in z
     #model: [x0,y0,z0,R,magnetization] - list of spheres
     incs: float - inclination of the sources
-	decs: float - declination of the sources
+    decs: float - declination of the sources
 
     output
     
@@ -346,14 +346,14 @@ def sm_bx_sphere(x, y, z, xs, ys, zs, incs, decs):
     
         A[:,j] = kernelxx_sphere(x,y,z,m)*mx + \
                  kernelxy_sphere(x,y,z,m)*my + \
-             	 kernelxz_sphere(x,y,z,m)*mz
+                 kernelxz_sphere(x,y,z,m)*mz
     A *= CM*T2NT
     return A
 
 def sm_by_sphere(x, y, z, xs, ys, zs, incs, decs):
     '''
     This function calculates the sensibility matrix
-	of the y component from the magnetic induction field
+    of the y component from the magnetic induction field
     for the foward problem with magnetic spheres.
     
     input
@@ -363,7 +363,7 @@ def sm_by_sphere(x, y, z, xs, ys, zs, incs, decs):
     z: float/array - number of poitns in z
     #model: [x0,y0,z0,R,magnetization] - list of spheres
     incs: float - inclination of the sources
-	decs: float - declination of the sources
+    decs: float - declination of the sources
 
     output
     
@@ -384,14 +384,14 @@ def sm_by_sphere(x, y, z, xs, ys, zs, incs, decs):
                 
         A[:,j] = kernelxy_sphere(x,y,z,m)*mx + \
                  kernelyy_sphere(x,y,z,m)*my + \
-             	 kernelyz_sphere(x,y,z,m)*mz
+                 kernelyz_sphere(x,y,z,m)*mz
     A *= CM*T2NT
     return A
 
 def sm_bz_sphere(x, y, z, xs, ys, zs, incs, decs):
     '''
     This function calculates the sensibility matrix
-	of the z component from the magnetic induction field
+    of the z component from the magnetic induction field
     for the foward problem with magnetic spheres.
     
     input
@@ -401,7 +401,7 @@ def sm_bz_sphere(x, y, z, xs, ys, zs, incs, decs):
     z: float/array - number of poitns in z
     #model: [x0,y0,z0,R,magnetization] - list of spheres
     incs: float - inclination of the sources
-	decs: float - declination of the sources
+    decs: float - declination of the sources
 
     output
     
@@ -419,9 +419,9 @@ def sm_bz_sphere(x, y, z, xs, ys, zs, incs, decs):
     for j, (xf, yf, zf) in enumerate(zip(xs,ys,zs)):
         m = [xf, yf, zf, R, 1.]
                 
-        A[:,j] = kernelxy_sphere(x,y,z,m)*mx + \
+        A[:,j] = kernelxz_sphere(x,y,z,m)*mx + \
                  kernelyz_sphere(x,y,z,m)*my + \
-             	 kernelzz_sphere(x,y,z,m)*mz
+                 kernelzz_sphere(x,y,z,m)*mz
         
     A *= CM*T2NT
     return A
