@@ -270,7 +270,7 @@ def tf_sphere(x,y,z,model,inc,dec):
     return tf
 
 
-def sm_sphere(x, y, z, xs, ys, zs, inc, dec, incs, decs):
+def sm_tf_sphere(x, y, z, xs, ys, zs, inc, dec, incs, decs):
     '''
     This function calculates the sensibility matrix and the parameter vectors
     of a total field anomaly foward problem with magnetized shperes.
@@ -424,4 +424,55 @@ def sm_bz_sphere(x, y, z, xs, ys, zs, incs, decs):
                  kernelzz_sphere(x,y,z,m)*mz
         
     A *= CM*T2NT
+    return A
+
+def sm_btb_sphere(x, y, z, xs, ys, zs, incs, decs):
+    '''
+    This function calculates the sensibility matrix
+    of the magnetic induction field amplitude
+    for the foward problem with magnetic spheres.
+    
+    input
+    
+    x: float/array - number of points in x
+    y: float/array - number of poitns in y
+    z: float/array - number of poitns in z
+    #model: [x0,y0,z0,R,magnetization] - list of spheres
+    incs: float - inclination of the sources
+    decs: float - declination of the sources
+
+    output
+    
+    A: float/array - sensibility matrix of foward problem
+    '''
+    
+    assert x.size == y.size == z.size, 'The number of points in x, y and z must be equal'
+    assert xs.size == ys.size == zs.size, 'The number of points in xs, ys and zs must be equal'
+    
+    A = np.empty((x.size,xs.size))
+    
+    mx, my, mz = utils.ang2vec(1.,incs,decs) # sources direction
+    R = (3./(4.*np.pi))**(1./3)
+
+    
+#    A = np.sqrt(
+#                sm_bx_sphere(x, y, z, xs, ys, zs, incs, decs)**2 + \
+#                sm_by_sphere(x, y, z, xs, ys, zs, incs, decs)**2 + \
+#                sm_by_sphere(x, y, z, xs, ys, zs, incs, decs)**2
+#                )
+    
+    for j, (xf, yf, zf) in enumerate(zip(xs,ys,zs)):
+        m = [xf, yf, zf, R, 1.]
+                
+        A[:,j] =        (kernelxx_sphere(x,y,z,m)*mx + \
+                         kernelxy_sphere(x,y,z,m)*my + \
+                         kernelxz_sphere(x,y,z,m)*mz)**2 + \
+                        (kernelxy_sphere(x,y,z,m)*mx + \
+                         kernelyy_sphere(x,y,z,m)*my + \
+                         kernelyz_sphere(x,y,z,m)*mz)**2 + \
+                        (kernelxz_sphere(x,y,z,m)*mx + \
+                         kernelyz_sphere(x,y,z,m)*my + \
+                         kernelzz_sphere(x,y,z,m)*mz)**2
+        
+    A *= CM*T2NT**2
     return A
