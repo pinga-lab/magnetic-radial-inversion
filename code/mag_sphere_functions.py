@@ -457,16 +457,24 @@ def sm_btb_sphere(x, y, z, xs, ys, zs, incs, decs):
     for j, (xf, yf, zf) in enumerate(zip(xs,ys,zs)):
         m = [xf, yf, zf, R, 1.]
                 
-        A[:,j] = np.sqrt( 
-                        (kernelxx_sphere(x,y,z,m)*mx + \
-                         kernelxy_sphere(x,y,z,m)*my + \
-                         kernelxz_sphere(x,y,z,m)*mz)**2 + \
-                        (kernelxy_sphere(x,y,z,m)*mx + \
-                         kernelyy_sphere(x,y,z,m)*my + \
-                         kernelyz_sphere(x,y,z,m)*mz)**2 + \
-                        (kernelxz_sphere(x,y,z,m)*mx + \
-                         kernelyz_sphere(x,y,z,m)*my + \
-                         kernelzz_sphere(x,y,z,m)*mz)**2
-                         )
-    A *= CM*T2NT
+        A[:,j] = (kernelxx_sphere(x,y,z,m)*mx + \
+                  kernelxy_sphere(x,y,z,m)*my + \
+                  kernelxz_sphere(x,y,z,m)*mz)* \
+                 (kernelxx_sphere(x,y,z,m)*mx + \
+                  kernelxy_sphere(x,y,z,m)*my + \
+                  kernelxz_sphere(x,y,z,m)*mz)+ \
+                 (kernelxy_sphere(x,y,z,m)*mx + \
+                  kernelyy_sphere(x,y,z,m)*my + \
+                  kernelyz_sphere(x,y,z,m)*mz)* \
+                 (kernelxy_sphere(x,y,z,m)*mx + \
+                  kernelyy_sphere(x,y,z,m)*my + \
+                  kernelyz_sphere(x,y,z,m)*mz)+ \
+                 (kernelxz_sphere(x,y,z,m)*mx + \
+                  kernelyz_sphere(x,y,z,m)*my + \
+                  kernelzz_sphere(x,y,z,m)*mz)* \
+                 (kernelxz_sphere(x,y,z,m)*mx + \
+                  kernelyz_sphere(x,y,z,m)*my + \
+                  kernelzz_sphere(x,y,z,m)*mz)
+                  
+    A *= (CM*T2NT)**2
     return A
