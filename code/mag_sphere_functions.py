@@ -452,7 +452,7 @@ def sm_btb_sphere(x, y, z, xs, ys, zs, incs, decs):
     A = np.empty((x.size,xs.size))
     
     mx, my, mz = utils.ang2vec(1.,incs,decs) # sources direction
-    R = (3./(4.*np.pi))**(1./3)
+    R = (3./(4.*np.pi))**(1./3.)
    
     for j, (xf, yf, zf) in enumerate(zip(xs,ys,zs)):
         m = [xf, yf, zf, R, 1.]
@@ -476,5 +476,5 @@ def sm_btb_sphere(x, y, z, xs, ys, zs, incs, decs):
                   kernelyz_sphere(x,y,z,m)*my + \
                   kernelzz_sphere(x,y,z,m)*mz)
                   
-    A *= (CM*T2NT)**2
+    A *= CM*T2NT*CM*T2NT
     return A
