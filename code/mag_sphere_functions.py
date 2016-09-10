@@ -455,7 +455,7 @@ def sm_btb_sphere(x, y, z, xs, ys, zs, incs, decs):
     R = (3./(4.*np.pi))**(1./3.)
    
     for j, (xf, yf, zf) in enumerate(zip(xs,ys,zs)):
-        m = [xf, yf, zf, R, 1.]
+        m = [xf, yf, zf, R]
                 
         A[:,j] = (kernelxx_sphere(x,y,z,m)*mx + \
                   kernelxy_sphere(x,y,z,m)*my + \
