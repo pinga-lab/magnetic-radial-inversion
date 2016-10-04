@@ -254,8 +254,10 @@ def tf_sphere(x,y,z,model,inc,dec):
     x: float - number of points in x
     y: float - number of poitns in y
     z: float - number of poitns in z
-    model: [x0,y0,z0,R,magnetization]    
-
+    model: [x0,y0,z0,R,magnetization]
+    inc: float - inclination of the local-geomagnetic field
+    dec: float - declination of the local-geomagnetic field
+    
     output
     
     tf: float/array - total field anomaly for each observation points
@@ -280,11 +282,13 @@ def sm_tf_sphere(x, y, z, xs, ys, zs, inc, dec, incs, decs):
     x: float/array - number of points in x
     y: float/array - number of poitns in y
     z: float/array - number of poitns in z
-    #model: [x0,y0,z0,R,magnetization] - list of spheres
+    xs: float/array - source position
+    ys: float/array - source position
+    zs: float/array - source position
     inc: float - inclination of the local-geomagnetic field
     dec: float - declination of the local-geomagnetic field
     incs: float - inclination of the sources
-    decs: float - declination of the sources
+    decs: float - declination of the sourcesces
 
     output
     
@@ -324,7 +328,9 @@ def sm_bx_sphere(x, y, z, xs, ys, zs, incs, decs):
     x: float/array - number of points in x
     y: float/array - number of poitns in y
     z: float/array - number of poitns in z
-    #model: [x0,y0,z0,R,magnetization] - list of spheres
+    xs: float/array - source position
+    ys: float/array - source position
+    zs: float/array - source position
     incs: float - inclination of the sources
     decs: float - declination of the sources
 
@@ -361,9 +367,11 @@ def sm_by_sphere(x, y, z, xs, ys, zs, incs, decs):
     x: float/array - number of points in x
     y: float/array - number of poitns in y
     z: float/array - number of poitns in z
-    #model: [x0,y0,z0,R,magnetization] - list of spheres
+    xs: float/array - source position
+    ys: float/array - source position
+    zs: float/array - source position
     incs: float - inclination of the sources
-    decs: float - declination of the sources
+    decs: float - declination of the sourceses
 
     output
     
@@ -399,9 +407,11 @@ def sm_bz_sphere(x, y, z, xs, ys, zs, incs, decs):
     x: float/array - number of points in x
     y: float/array - number of poitns in y
     z: float/array - number of poitns in z
-    #model: [x0,y0,z0,R,magnetization] - list of spheres
+    xs: float/array - source position
+    ys: float/array - source position
+    zs: float/array - source position
     incs: float - inclination of the sources
-    decs: float - declination of the sources
+    decs: float - declination of the sourcess
 
     output
     
@@ -437,7 +447,9 @@ def sm_btb_sphere(x, y, z, xs, ys, zs, incs, decs):
     x: float/array - number of points in x
     y: float/array - number of poitns in y
     z: float/array - number of poitns in z
-    #model: [x0,y0,z0,R,magnetization] - list of spheres
+    xs: float/array - source position
+    ys: float/array - source position
+    zs: float/array - source position
     incs: float - inclination of the sources
     decs: float - declination of the sources
 
