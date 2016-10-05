@@ -37,7 +37,7 @@ def pol2cart(m, x0, y0, Np, Nv):
     for mv in m:
         assert len(mv[0]) == Nv, 'All prisms must have Nv vertices'
         
-    assert len(m) = x0.size ...
+    assert len(m) == x0.size == y0.size, 'Each prism must have an origin coordinates'
 
     for i, mv in enumerate(m):
         verts = mv[0]
