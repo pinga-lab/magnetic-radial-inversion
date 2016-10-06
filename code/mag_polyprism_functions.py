@@ -9,7 +9,7 @@ from fatiando.constants import CM, T2NT
 
 ### Functions for the foward problem using fatiando
 
-def pol2cart(m, x0, y0, Np, Nv):
+def pol2cart(m, Np, Nv):
     '''
     This function transforms polar coordinates of the prisms
     into Cartesian coordinates and return a list of polygonal
@@ -17,8 +17,11 @@ def pol2cart(m, x0, y0, Np, Nv):
     
     input
     
-    m: list - each element is a list [verts,z0,R,magnetization] 
-    containing the vertices in polar coordinates
+    m: list - each element is a list [r, x0, y0, z1, z2, 'magnetization'],
+              whrere r is an array with the radial distances of the vertices,
+              x0 and y0 are the origin cartesian coordinates of each prism,
+              z1 and z2 are the top and bottom of each prism and
+              magnetization is physical property
     Np: int - number of prisms
     Nv: int - number of vertices per prism
     
@@ -29,21 +32,22 @@ def pol2cart(m, x0, y0, Np, Nv):
     '''
     
     mk = []
-    verts = []  # it contains vertices in polar coordinates
-    vertsk = [] # it contains vertices in Cartesian coordinates
+    r = np.zeros(Nv)  # it contains radial distances of the vertices in polar coordinates
+    verts = [] # it contains radial distances of the vertices in Cartesian coordinates
  
     assert len(m) == Np, 'The size of m and the number of prisms must be equal'
     
     for mv in m:
         assert len(mv[0]) == Nv, 'All prisms must have Nv vertices'
         
-    assert len(m) == x0.size == y0.size, 'Each prism must have an origin coordinates'
+    #assert len(m) == x0.size == y0.size, 'Each prism must have an origin coordinates'
+    
+    ang = 2*np.pi/Nv # angle between two vertices
 
-    for i, mv in enumerate(m):
-        verts = mv[0]
-        for v in verts:
-            vertsk.append([v[0]*np.cos(v[1]) + x0[i], v[0]*np.sin(v[1]) + y0[i]])
-        mk.append(PolygonalPrism(vertsk, mv[1], mv[2], mv[3]))
-        
+    for mv in m:
+        r = mv[0]
+        for i in range(Nv):
+            verts.append([r[i]*np.cos(i*ang) + mv[1], r[i]*np.sin(i*ang) + mv[2]])
+        mk.append(PolygonalPrism(verts, mv[3], mv[4], mv[5]))
         
     return mk
