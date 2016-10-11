@@ -108,4 +108,4 @@ def test_tfa_data():
     
     tfat_recprism = prism.tf(xp, yp, zp, model_recprism, inc, dec)
 
-    assert tfat_polyprism == tfat_recprism
+    assert tfat_polyprism.all == tfat_recprism.all, 'The data from small rectangular prisms must be equal to a big rectangular prism'
