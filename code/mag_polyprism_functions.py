@@ -53,9 +53,8 @@ def pol2cart(m, Np, Nv):
 
 def pol2cart(m, Np, Nv):
     '''
-    This function transforms polar coordinates of the prisms
-    into Cartesian coordinates and return a list of polygonal
-    prisms of the Fatiando a Terra.
+    This function calculates the derivative for total field anomaly
+    from a model of polygonal prisms.
     
     input
     
@@ -69,6 +68,7 @@ def pol2cart(m, Np, Nv):
     
     output
     
-    mk: list - list of objects of the class
-    fatiando.mesher.PolygonalPrism
+    df: array - derivative for each prism
     '''
+    
+    
