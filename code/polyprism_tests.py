@@ -107,5 +107,9 @@ def test_tfa_data():
     model_recprism = [mesher.Prism(-1000, 1000, -1000, 1000, 100, 1100, props)]
     
     tfat_recprism = prism.tf(xp, yp, zp, model_recprism, inc, dec)
+    
+    verdade = np.allclose(tfat_polyprism, tfat_recprism, atol=1e-05)
 
-    assert tfat_polyprism.all == tfat_recprism.all, 'The data from small rectangular prisms must be equal to a big rectangular prism'
+    #assert np.max(tfat_polyprism - tfat_recprism) <= 1e-06, 'The data from small rectangular prisms must be equal to a big rectangular prism'
+    
+    return verdade
