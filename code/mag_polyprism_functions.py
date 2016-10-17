@@ -65,18 +65,14 @@ def fd_plyprism(m, Np, Nv, delta):
               magnetization is physical property
     Np: int - number of prisms
     Nv: int - number of vertices per prism
-    delta: float - variation for finite difference
+    delta: float - variation for finite difference in meters
     
     output
     
-    df: array - derivative for each prism
+    mu: list - model updated
     '''
+    for mv in m:
+        assert len(mv) == Nv + 5, 'The number of parameter must be Np*(Nv + 5)'
     
-    assert vp.size == Np*(Nv + 2), 'The number of parameter must be Np*(Nv + 2)'
-    
-    deltax0 = 10. # 10 meters
-    
-    pp = np.zeros_like(p) # vector plus deltax0
-    pm = np.zeros_like(p) # vector minus deltax0
     
     
