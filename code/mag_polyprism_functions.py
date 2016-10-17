@@ -51,10 +51,10 @@ def pol2cart(m, Np, Nv):
         
     return mk
 
-def fd_plyprism(m, vp, Np, Nv):
+def fd_plyprism(m, Np, Nv, delta):
     '''
     This function calculates the derivative for total field anomaly
-    from a model of polygonal prisms.
+    from a model of polygonal prisms using finite difference.
     
     input
     
@@ -63,9 +63,9 @@ def fd_plyprism(m, vp, Np, Nv):
               x0 and y0 are the origin cartesian coordinates of each prism,
               z1 and z2 are the top and bottom of each prism and
               magnetization is physical property
-    vp: array - parameter vector
     Np: int - number of prisms
     Nv: int - number of vertices per prism
+    delta: float - variation for finite difference
     
     output
     
