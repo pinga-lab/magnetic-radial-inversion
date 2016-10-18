@@ -51,7 +51,7 @@ def pol2cart(m, Np, Nv):
         
     return mk
 
-def fd_plyprism(m, Np, Nv, delta):
+def fd_tf_x0_polyprism(xp, yp, zp, m, Np, Nv, delta, inc, dec):
     '''
     This function calculates the derivative for total field anomaly
     from a model of polygonal prisms using finite difference.
@@ -69,10 +69,24 @@ def fd_plyprism(m, Np, Nv, delta):
     
     output
     
-    mu: list - model updated
+    df: array - derivative
     '''
     for mv in m:
-        assert len(mv) == Nv + 5, 'The number of parameter must be Np*(Nv + 5)'
+        assert len(mv[0]) + len(mv[1:]) == Nv + 5, 'The number of parameter must be Nv + 2'
     
+    mp = []  # m + delta
+    mm = []  # m - delta
+    mp_fat = [] # list of objects of the class fatiando.mesher.PolygonalPrism
+    mm_fat = [] # list of objects of the class fatiando.mesher.PolygonalPrism    
+    df = np.zeros(xp.size) # derivative
     
+    for mv in m:
+        mp.append([mv[0], mv[1] + delta, mv[2], mv[3], mv[4], mv[5]])
+        mm.append([mv[0], mv[1] - delta, mv[2], mv[3], mv[4], mv[5]])
     
+    mp_fat = pol2cart(mp, Np, Nv)
+    mm_fat = pol2cart(mm, Np, Nv)
+    
+    df = (polyprism.tf(xp, yp, zp, mp_fat, inc, dec) - polyprism.tf(xp, yp, zp, mm_fat, inc, dec))/2.*delta
+    
+    return df
