@@ -51,28 +51,31 @@ def pol2cart(m, Np, Nv):
         
     return mk
 
-def fd_tf_x0_polyprism(xp, yp, zp, m, Np, Nv, delta, inc, dec):
+def fd_tf_x0_polyprism(xp, yp, zp, m, Nv, delta, inc, dec):
     '''
     This function calculates the derivative for total field anomaly
     from a model of polygonal prisms using finite difference.
     
     input
     
-    m: list - each element is a list [r, x0, y0, z1, z2, 'magnetization'],
+    xp: array - x observation points
+    yp: array - y observation points
+    zp: array - z observation points
+    m: list - [r, x0, y0, z1, z2, 'magnetization'],
               whrere r is an array with the radial distances of the vertices,
               x0 and y0 are the origin cartesian coordinates of each prism,
               z1 and z2 are the top and bottom of each prism and
-              magnetization is physical property
-    Np: int - number of prisms
+              magnetization is the physical property
     Nv: int - number of vertices per prism
     delta: float - variation for finite difference in meters
+    inc: float - inclination
+    dec: declination
     
     output
     
     df: array - derivative
     '''
-    for mv in m:
-        assert len(mv[0]) + len(mv[1:]) == Nv + 5, 'The number of parameter must be Nv + 2'
+    assert len(m[0]) + len(m[1:]) == Nv + 5, 'The number of parameter must be Nv + 2'
     
     mp = []  # m + delta
     mm = []  # m - delta
@@ -80,40 +83,42 @@ def fd_tf_x0_polyprism(xp, yp, zp, m, Np, Nv, delta, inc, dec):
     mm_fat = [] # list of objects of the class fatiando.mesher.PolygonalPrism    
     df = np.zeros(xp.size) # derivative
     
-    for mv in m:
-        mp.append([mv[0], mv[1] + delta, mv[2], mv[3], mv[4], mv[5]])
-        mm.append([mv[0], mv[1] - delta, mv[2], mv[3], mv[4], mv[5]])
+    mp = [[m[0], m[1] + delta, m[2], m[3], m[4], m[5]]]
+    mm = [[m[0], m[1] - delta, m[2], m[3], m[4], m[5]]]
     
-    mp_fat = pol2cart(mp, Np, Nv)
-    mm_fat = pol2cart(mm, Np, Nv)
+    mp_fat = pol2cart(mp, 1, Nv)
+    mm_fat = pol2cart(mm, 1, Nv)
     
     df = (polyprism.tf(xp, yp, zp, mp_fat, inc, dec) - polyprism.tf(xp, yp, zp, mm_fat, inc, dec))/2.*delta
     
     return df
 
 
-def fd_tf_y0_polyprism(xp, yp, zp, m, Np, Nv, delta, inc, dec):
+def fd_tf_y0_polyprism(xp, yp, zp, m, Nv, delta, inc, dec):
     '''
     This function calculates the derivative for total field anomaly
     from a model of polygonal prisms using finite difference.
     
     input
     
-    m: list - each element is a list [r, x0, y0, z1, z2, 'magnetization'],
+    xp: array - x observation points
+    yp: array - y observation points
+    zp: array - z observation points
+    m: list - [r, x0, y0, z1, z2, 'magnetization'],
               whrere r is an array with the radial distances of the vertices,
               x0 and y0 are the origin cartesian coordinates of each prism,
               z1 and z2 are the top and bottom of each prism and
-              magnetization is physical property
-    Np: int - number of prisms
+              magnetization is the physical property
     Nv: int - number of vertices per prism
     delta: float - variation for finite difference in meters
+    inc: float - inclination
+    dec: declination
     
     output
     
     df: array - derivative
     '''
-    for mv in m:
-        assert len(mv[0]) + len(mv[1:]) == Nv + 5, 'The number of parameter must be Nv + 2'
+    assert len(m[0]) + len(m[1:]) == Nv + 5, 'The number of parameter must be Nv + 2'
     
     mp = []  # m + delta
     mm = []  # m - delta
@@ -121,58 +126,61 @@ def fd_tf_y0_polyprism(xp, yp, zp, m, Np, Nv, delta, inc, dec):
     mm_fat = [] # list of objects of the class fatiando.mesher.PolygonalPrism    
     df = np.zeros(xp.size) # derivative
     
-    for mv in m:
-        mp.append([mv[0], mv[1], mv[2] + delta, mv[3], mv[4], mv[5]])
-        mm.append([mv[0], mv[1], mv[2] - delta, mv[3], mv[4], mv[5]])
+    mp = [[m[0], m[1], m[2] + delta, m[3], m[4], m[5]]]
+    mm = [[m[0], m[1], m[2] - delta, m[3], m[4], m[5]]]
     
-    mp_fat = pol2cart(mp, Np, Nv)
-    mm_fat = pol2cart(mm, Np, Nv)
+    mp_fat = pol2cart(mp, 1, Nv)
+    mm_fat = pol2cart(mm, 1, Nv)
     
     df = (polyprism.tf(xp, yp, zp, mp_fat, inc, dec) - polyprism.tf(xp, yp, zp, mm_fat, inc, dec))/2.*delta
     
     return df
 
-def fd_tf_radial_polyprism(xp, yp, zp, m, Np, Nv, nv, delta, inc, dec):
+def fd_tf_radial_polyprism(xp, yp, zp, m, Nv, nv, delta, inc, dec):
     '''
     This function calculates the derivative for total field anomaly
     from a model of polygonal prisms using finite difference.
     
     input
     
-    m: list - each element is a list [r, x0, y0, z1, z2, 'magnetization'],
+    xp: array - x observation points
+    yp: array - y observation points
+    zp: array - z observation points
+    m: list - [r, x0, y0, z1, z2, 'magnetization'],
               whrere r is an array with the radial distances of the vertices,
               x0 and y0 are the origin cartesian coordinates of each prism,
               z1 and z2 are the top and bottom of each prism and
-              magnetization is physical property
-    Np: int - number of prisms
+              magnetization is the physical property
     Nv: int - number of vertices per prism
+    nv: int - number of the vertice for the derivative
     delta: float - variation for finite difference in meters
+    inc: float - inclination
+    dec: declination
     
     output
     
     df: array - derivative
     '''
-    for mv in m:
-        assert len(mv[0]) + len(mv[1:]) == Nv + 5, 'The number of parameter must be Nv + 2'
+    assert len(m[0]) + len(m[1:]) == Nv + 5, 'The number of parameter must be Nv + 2'
+    assert nv <= Nv, 'The vertice number must be minor or equal to the number of vertices'
     
-    rp = np.zeros(3) # radius for the new prism plus delta
-    rm = np.zeros(3) # radius for the new prism minus delta
-    mp = []  # m + delta
-    mm = []  # m - delta
-    mp_fat = [] # list of objects of the class fatiando.mesher.PolygonalPrism
-    mm_fat = [] # list of objects of the class fatiando.mesher.PolygonalPrism    
+    m_fat = [] # list of objects of the class fatiando.mesher.PolygonalPrism
     df = np.zeros(xp.size) # derivative
+    verts = [] # vertices of new prism
+    ang = 2.*np.pi/Nv # angle between two vertices
     
+    if nv == Nv:
+        nvp = -1
+    else:
+        nvp = nv
     
-    for mv in m:
-        rp = [mv[0][nv-1], mv[0][nv] + delta, mv[0][nv+1]]
-        mp.append([rp, mv[1] + delta, mv[2], mv[3], mv[4], mv[5]])
-        rm = [mv[0][nv-1], mv[0][nv] - delta, mv[0][nv+1]]
-        mm.append([rm, mv[1] - delta, mv[2], mv[3], mv[4], mv[5]])
+    verts.append([m[0][nv - 1]*np.cos(ang), m[0][nv - 1]*np.sin(ang)])
+    verts.append([(m[0][nv] + delta)*np.cos(ang), (m[0][nv] + delta)*np.sin(ang)])
+    verts.append([m[0][nvp]*np.cos(ang), m[0][nvp]*np.sin(ang)])
+    verts.append([(m[0][nv] - delta)*np.cos(ang), (m[0][nv] - delta)*np.sin(ang)])
+
+    m_fat = [PolygonalPrism(verts, m[3], m[4], m[5])]
     
-    mp_fat = pol2cart(mp, Np, 3)
-    mm_fat = pol2cart(mm, Np, 3)
-    
-    df = (polyprism.tf(xp, yp, zp, mp_fat, inc, dec) - polyprism.tf(xp, yp, zp, mm_fat, inc, dec))/2.*delta
+    df = polyprism.tf(xp, yp, zp, m_fat, inc, dec)
     
     return df
