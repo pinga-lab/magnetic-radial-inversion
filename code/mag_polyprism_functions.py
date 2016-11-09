@@ -165,22 +165,22 @@ def fd_tf_radial_polyprism(xp, yp, zp, m, Nv, nv, delta, inc, dec):
     '''
     assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
     assert len(m[0]) + len(m[1:]) == Nv + 5, 'The number of parameter must be Nv + 2'
-    assert nv <= Nv, 'The vertice number must be minor or equal to the number of vertices'
+    assert nv < Nv, 'The vertice number must be minor than the number of vertices'
     
     m_fat = [] # list of objects of the class fatiando.mesher.PolygonalPrism
     df = np.zeros(xp.size) # derivative
     verts = [] # vertices of new prism
     ang = 2.*np.pi/Nv # angle between two vertices
     
-    if nv == Nv:
+    if nv == Nv - 1:
         nvp = 0
     else:
-        nvp = nv
+        nvp = nv + 1
     
-    verts.append([m[0][nv - 1]*np.cos(ang), m[0][nv - 1]*np.sin(ang)])
-    verts.append([(m[0][nv] + delta)*np.cos(ang), (m[0][nv] + delta)*np.sin(ang)])
-    verts.append([m[0][nvp]*np.cos(ang), m[0][nvp]*np.sin(ang)])
-    verts.append([(m[0][nv] - delta)*np.cos(ang), (m[0][nv] - delta)*np.sin(ang)])
+    verts.append([m[0][nv - 1]*np.cos((nv - 1)*ang), m[0][nv - 1]*np.sin((nv - 1)*ang)])
+    verts.append([(m[0][nv] + delta)*np.cos(nv*ang), (m[0][nv] + delta)*np.sin(nv*ang)])
+    verts.append([m[0][nvp]*np.cos(nvp*ang), m[0][nvp]*np.sin(nvp*ang)])
+    verts.append([(m[0][nv] - delta)*np.cos(nv*ang), (m[0][nv] - delta)*np.sin(nv*ang)])
 
     m_fat = [PolygonalPrism(verts, m[3], m[4], m[5])]
     
@@ -229,6 +229,4 @@ def fd_tf_sm_polyprism(xp, yp, zp, m, Np, Nv, deltax, deltay, deltar, inc, dec):
         for j in range(Nv):
             G[:, i*pp + j + 2] = fd_tf_radial_polyprism(xp, yp, zp, mv, Nv, j, deltar, inc, dec)
             
-
-    
     return G
