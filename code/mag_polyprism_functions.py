@@ -17,7 +17,7 @@ def pol2cart(m, Np, Nv):
     
     input
     
-    m: list - each element is a list [r, x0, y0, z1, z2, 'magnetization'],
+    m: list - each element is a list of [r, x0, y0, z1, z2, 'magnetization'],
               whrere r is an array with the radial distances of the vertices,
               x0 and y0 are the origin cartesian coordinates of each prism,
               z1 and z2 are the top and bottom of each prism and
@@ -75,6 +75,7 @@ def fd_tf_x0_polyprism(xp, yp, zp, m, Nv, delta, inc, dec):
     
     df: array - derivative
     '''
+    assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
     assert len(m[0]) + len(m[1:]) == Nv + 5, 'The number of parameter must be Nv + 2'
     
     mp = []  # m + delta
@@ -118,6 +119,7 @@ def fd_tf_y0_polyprism(xp, yp, zp, m, Nv, delta, inc, dec):
     
     df: array - derivative
     '''
+    assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
     assert len(m[0]) + len(m[1:]) == Nv + 5, 'The number of parameter must be Nv + 2'
     
     mp = []  # m + delta
@@ -161,6 +163,7 @@ def fd_tf_radial_polyprism(xp, yp, zp, m, Nv, nv, delta, inc, dec):
     
     df: array - derivative
     '''
+    assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
     assert len(m[0]) + len(m[1:]) == Nv + 5, 'The number of parameter must be Nv + 2'
     assert nv <= Nv, 'The vertice number must be minor or equal to the number of vertices'
     
@@ -170,7 +173,7 @@ def fd_tf_radial_polyprism(xp, yp, zp, m, Nv, nv, delta, inc, dec):
     ang = 2.*np.pi/Nv # angle between two vertices
     
     if nv == Nv:
-        nvp = -1
+        nvp = 0
     else:
         nvp = nv
     
@@ -184,3 +187,48 @@ def fd_tf_radial_polyprism(xp, yp, zp, m, Nv, nv, delta, inc, dec):
     df = polyprism.tf(xp, yp, zp, m_fat, inc, dec)
     
     return df
+
+def fd_tf_sm_polyprism(xp, yp, zp, m, Np, Nv, deltax, deltay, deltar, inc, dec):
+    '''
+    This function calculates the derivative for total field anomaly
+    from a model of polygonal prisms using finite difference.
+    
+    input
+    
+    xp: array - x observation points
+    yp: array - y observation points
+    zp: array - z observation points
+    m: list - each element is a list of [r, x0, y0, z1, z2, 'magnetization'],
+              whrere r is an array with the radial distances of the vertices,
+              x0 and y0 are the origin cartesian coordinates of each prism,
+              z1 and z2 are the top and bottom of each prism and
+              magnetization is the physical property
+    Np: int - number of prisms
+    Nv: int - number of vertices per prism
+    deltax: float - variation for finite difference in meters for x coordinate
+    deltay: float - variation for finite difference in meters for y coordinate
+    deltar: float - variation for finite difference in meters for radial coordinate
+    inc: float - inclination
+    dec: declination
+    
+    output
+    
+    G: array - sensibility matrix
+    '''
+    for mv in m:
+        assert len(mv[0]) == Nv, 'All prisms must have Nv vertices'
+    assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
+    
+    pp = 2 + Nv # number of parameters per prism
+    
+    G = np.zeros((xp.size, pp*Np))
+    
+    for i, mv in enumerate(m):
+        G[:, (i + 1)*Nv] = fd_tf_x0_polyprism(xp, yp, zp, mv, Nv, deltax, inc, dec)
+        G[:, (i + 2)*Nv] = fd_tf_y0_polyprism(xp, yp, zp, mv, Nv, deltay, inc, dec)
+        for j in range(Nv):
+            G[:, i*pp + j + 2] = fd_tf_radial_polyprism(xp, yp, zp, mv, Nv, j, deltar, inc, dec)
+            
+
+    
+    return G
