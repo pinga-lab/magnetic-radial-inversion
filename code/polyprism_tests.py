@@ -10,7 +10,6 @@ from fatiando.vis import mpl
 from fatiando.constants import CM, T2NT
 import mag_polyprism_functions as mfun
 
-
 def test_volume():
     '''
     This function tests the volume between pol2cart
@@ -171,7 +170,7 @@ def test_tfa_fd_x0_data():
     # calculating the derivatives
 
     df_m = mfun.fd_tf_x0_polyprism(xp, yp, zp, m[0], r.size, delta, inc, dec)  # derivative from the function
-    df_mp_mm = (mp_fat - mm_fat)/2.*delta  # derivative from difference of data
+    df_mp_mm = (mp_fat - mm_fat)/(2.*delta)  # derivative from difference of data
     
     assert np.allclose(df_m, df_mp_mm), 'The derivative is not correct'
     
@@ -211,8 +210,8 @@ def test_tfa_fd_y0_data():
     props={'magnetization': utils.ang2vec(3, inc, dec)} # physical property
     
     z1 = 100.0    # depth of the top prism
-    z2 = 1100.    # bottom of prism
-    delta = 10.   # increment 
+    z2 = 1100.0    # bottom of prism
+    delta = 10.0   # increment 
 
     # creating vertices
     r = np.zeros(4) + 1000.
@@ -236,6 +235,6 @@ def test_tfa_fd_y0_data():
     # calculating the derivatives
 
     df_m = mfun.fd_tf_y0_polyprism(xp, yp, zp, m[0], r.size, delta, inc, dec)  # derivative from the function
-    df_mp_mm = (mp_fat - mm_fat)/2.*delta  # derivative from difference of data
+    df_mp_mm = (mp_fat - mm_fat)/(2.*delta)  # derivative from difference of data
     
     assert np.allclose(df_m, df_mp_mm), 'The derivative is not correct'

@@ -12,7 +12,7 @@ from fatiando.constants import CM, T2NT
 def pol2cart(m, Np, Nv):
     '''
     This function transforms polar coordinates of the prisms
-    into Cartesian coordinates and return a list of polygonal
+    into Cartesian coordinates and returns a list of polygonal
     prisms of the Fatiando a Terra.
     
     input
@@ -76,7 +76,7 @@ def fd_tf_x0_polyprism(xp, yp, zp, m, Nv, delta, inc, dec):
     df: array - derivative
     '''
     assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
-    assert len(m[0]) + len(m[1:]) == Nv + 5, 'The number of parameter must be Nv + 2'
+    assert m[0].size + len(m[1:]) == Nv + 5, 'The number of parameter must be Nv + 5'
     
     mp = []  # m + delta
     mm = []  # m - delta
@@ -90,7 +90,7 @@ def fd_tf_x0_polyprism(xp, yp, zp, m, Nv, delta, inc, dec):
     mp_fat = pol2cart(mp, 1, Nv)
     mm_fat = pol2cart(mm, 1, Nv)
     
-    df = (polyprism.tf(xp, yp, zp, mp_fat, inc, dec) - polyprism.tf(xp, yp, zp, mm_fat, inc, dec))/2.*delta
+    df = (polyprism.tf(xp, yp, zp, mp_fat, inc, dec) - polyprism.tf(xp, yp, zp, mm_fat, inc, dec))/(2.*delta)
     
     return df
 
@@ -120,7 +120,7 @@ def fd_tf_y0_polyprism(xp, yp, zp, m, Nv, delta, inc, dec):
     df: array - derivative
     '''
     assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
-    assert len(m[0]) + len(m[1:]) == Nv + 5, 'The number of parameter must be Nv + 2'
+    assert len(m[0]) + len(m[1:]) == Nv + 5, 'The number of parameter must be Nv + 5'
     
     mp = []  # m + delta
     mm = []  # m - delta
@@ -134,7 +134,7 @@ def fd_tf_y0_polyprism(xp, yp, zp, m, Nv, delta, inc, dec):
     mp_fat = pol2cart(mp, 1, Nv)
     mm_fat = pol2cart(mm, 1, Nv)
     
-    df = (polyprism.tf(xp, yp, zp, mp_fat, inc, dec) - polyprism.tf(xp, yp, zp, mm_fat, inc, dec))/2.*delta
+    df = (polyprism.tf(xp, yp, zp, mp_fat, inc, dec) - polyprism.tf(xp, yp, zp, mm_fat, inc, dec))/(2.*delta)
     
     return df
 
@@ -164,8 +164,8 @@ def fd_tf_radial_polyprism(xp, yp, zp, m, Nv, nv, delta, inc, dec):
     df: array - derivative
     '''
     assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
-    assert len(m[0]) + len(m[1:]) == Nv + 5, 'The number of parameter must be Nv + 2'
-    assert nv < Nv, 'The vertice number must be minor than the number of vertices'
+    assert len(m[0]) + len(m[1:]) == Nv + 5, 'The number of parameter must be Nv + 5'
+    assert nv < Nv, 'The vertice number must be smaller than the number of vertices'
     
     m_fat = [] # list of objects of the class fatiando.mesher.PolygonalPrism
     df = np.zeros(xp.size) # derivative
@@ -199,7 +199,7 @@ def fd_tf_sm_polyprism(xp, yp, zp, m, Np, Nv, deltax, deltay, deltar, inc, dec):
     yp: array - y observation points
     zp: array - z observation points
     m: list - each element is a list of [r, x0, y0, z1, z2, 'magnetization'],
-              whrere r is an array with the radial distances of the vertices,
+              where r is an array with the radial distances of the vertices,
               x0 and y0 are the origin cartesian coordinates of each prism,
               z1 and z2 are the top and bottom of each prism and
               magnetization is the physical property
@@ -208,8 +208,8 @@ def fd_tf_sm_polyprism(xp, yp, zp, m, Np, Nv, deltax, deltay, deltar, inc, dec):
     deltax: float - variation for finite difference in meters for x coordinate
     deltay: float - variation for finite difference in meters for y coordinate
     deltar: float - variation for finite difference in meters for radial coordinate
-    inc: float - inclination
-    dec: declination
+    inc: float - inclination of the local-geomagnetic field
+    dec: declination of the local-geomagnetic field
     
     output
     
@@ -224,9 +224,13 @@ def fd_tf_sm_polyprism(xp, yp, zp, m, Np, Nv, deltax, deltay, deltar, inc, dec):
     G = np.zeros((xp.size, pp*Np))
     
     for i, mv in enumerate(m):
-        G[:, (i + 1)*Nv] = fd_tf_x0_polyprism(xp, yp, zp, mv, Nv, deltax, inc, dec)
-        G[:, (i + 2)*Nv] = fd_tf_y0_polyprism(xp, yp, zp, mv, Nv, deltay, inc, dec)
+        aux = i*pp
+        #G[:, (i + 1)*Nv] = fd_tf_x0_polyprism(xp, yp, zp, mv, Nv, deltax, inc, dec)
+        G[:, aux + Nv] = fd_tf_x0_polyprism(xp, yp, zp, mv, Nv, deltax, inc, dec)
+        #G[:, (i + 2)*Nv] = fd_tf_y0_polyprism(xp, yp, zp, mv, Nv, deltay, inc, dec)
+        G[:, aux + Nv + 1] = fd_tf_y0_polyprism(xp, yp, zp, mv, Nv, deltay, inc, dec)
         for j in range(Nv):
-            G[:, i*pp + j + 2] = fd_tf_radial_polyprism(xp, yp, zp, mv, Nv, j, deltar, inc, dec)
+            #G[:, i*pp + j + 2] = fd_tf_radial_polyprism(xp, yp, zp, mv, Nv, j, deltar, inc, dec)
+            G[:, aux + j] = fd_tf_radial_polyprism(xp, yp, zp, mv, Nv, j, deltar, inc, dec)
             
     return G
