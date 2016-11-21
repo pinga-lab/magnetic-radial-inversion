@@ -165,7 +165,7 @@ def fd_tf_radial_polyprism(xp, yp, zp, m, Nv, nv, delta, inc, dec):
     '''
     assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
     assert len(m[0]) + len(m[1:]) == Nv + 5, 'The number of parameter must be Nv + 5'
-    assert nv < Nv, 'The vertice number must be smaller than the number of vertices'
+    assert nv < Nv, 'The vertice number must be smaller than the number of vertices (0 - Nv)'
     
     m_fat = [] # list of objects of the class fatiando.mesher.PolygonalPrism
     df = np.zeros(xp.size) # derivative
@@ -185,6 +185,7 @@ def fd_tf_radial_polyprism(xp, yp, zp, m, Nv, nv, delta, inc, dec):
     m_fat = [PolygonalPrism(verts, m[3], m[4], m[5])]
     
     df = polyprism.tf(xp, yp, zp, m_fat, inc, dec)
+    df /= (2.*delta)
     
     return df
 
