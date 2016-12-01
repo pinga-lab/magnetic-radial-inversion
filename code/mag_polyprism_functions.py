@@ -51,6 +51,8 @@ def pol2cart(m, Np, Nv):
         
     return mk
 
+### Functions for the derivatives with finite differences
+
 def fd_tf_x0_polyprism(xp, yp, zp, m, Nv, delta, inc, dec):
     '''
     This function calculates the derivative for total field anomaly
@@ -90,7 +92,10 @@ def fd_tf_x0_polyprism(xp, yp, zp, m, Nv, delta, inc, dec):
     mp_fat = pol2cart(mp, 1, Nv)
     mm_fat = pol2cart(mm, 1, Nv)
     
-    df = (polyprism.tf(xp, yp, zp, mp_fat, inc, dec) - polyprism.tf(xp, yp, zp, mm_fat, inc, dec))/(2.*delta)
+    df = (polyprism.tf(xp, yp, zp, mp_fat, inc, dec)\
+          - polyprism.tf(xp, yp, zp, mm_fat, inc, dec))
+    
+    df /= (2.*delta)
     
     return df
 
@@ -134,7 +139,10 @@ def fd_tf_y0_polyprism(xp, yp, zp, m, Nv, delta, inc, dec):
     mp_fat = pol2cart(mp, 1, Nv)
     mm_fat = pol2cart(mm, 1, Nv)
     
-    df = (polyprism.tf(xp, yp, zp, mp_fat, inc, dec) - polyprism.tf(xp, yp, zp, mm_fat, inc, dec))/(2.*delta)
+    df = (polyprism.tf(xp, yp, zp, mp_fat, inc, dec)\
+          - polyprism.tf(xp, yp, zp, mm_fat, inc, dec))
+    
+    df /= (2.*delta)
     
     return df
 
@@ -176,11 +184,18 @@ def fd_tf_radial_polyprism(xp, yp, zp, m, Nv, nv, delta, inc, dec):
         nvp = 0
     else:
         nvp = nv + 1
+        
+    cos_nvm = np.cos((nv - 1)*ang)
+    sin_nvm = np.sin((nv - 1)*ang)
+    cos_nv = np.cos(nv*ang)
+    sin_nv = np.sin(nv*ang)
+    cos_nvp = np.cos(nvp*ang)
+    sin_nvp = np.sin(nvp*ang)
     
-    verts.append([m[0][nv - 1]*np.cos((nv - 1)*ang), m[0][nv - 1]*np.sin((nv - 1)*ang)])
-    verts.append([(m[0][nv] + delta)*np.cos(nv*ang), (m[0][nv] + delta)*np.sin(nv*ang)])
-    verts.append([m[0][nvp]*np.cos(nvp*ang), m[0][nvp]*np.sin(nvp*ang)])
-    verts.append([(m[0][nv] - delta)*np.cos(nv*ang), (m[0][nv] - delta)*np.sin(nv*ang)])
+    verts.append([m[0][nv - 1]*cos_nvm, m[0][nv - 1]*sin_nv])
+    verts.append([(m[0][nv] + delta)*cos_nv), (m[0][nv] + delta)*sin_nv])
+    verts.append([m[0][nvp]*cos_nvp, m[0][nvp]*sin_nvp])
+    verts.append([(m[0][nv] - delta)*cos_nv, (m[0][nv] - delta)*sin_nv])
 
     m_fat = [PolygonalPrism(verts, m[3], m[4], m[5])]
     
@@ -226,12 +241,9 @@ def fd_tf_sm_polyprism(xp, yp, zp, m, Np, Nv, deltax, deltay, deltar, inc, dec):
     
     for i, mv in enumerate(m):
         aux = i*pp
-        #G[:, (i + 1)*Nv] = fd_tf_x0_polyprism(xp, yp, zp, mv, Nv, deltax, inc, dec)
         G[:, aux + Nv] = fd_tf_x0_polyprism(xp, yp, zp, mv, Nv, deltax, inc, dec)
-        #G[:, (i + 2)*Nv] = fd_tf_y0_polyprism(xp, yp, zp, mv, Nv, deltay, inc, dec)
         G[:, aux + Nv + 1] = fd_tf_y0_polyprism(xp, yp, zp, mv, Nv, deltay, inc, dec)
         for j in range(Nv):
-            #G[:, i*pp + j + 2] = fd_tf_radial_polyprism(xp, yp, zp, mv, Nv, j, deltar, inc, dec)
             G[:, aux + j] = fd_tf_radial_polyprism(xp, yp, zp, mv, Nv, j, deltar, inc, dec)
             
     return G
