@@ -193,7 +193,7 @@ def fd_tf_radial_polyprism(xp, yp, zp, m, Nv, nv, delta, inc, dec):
     sin_nvp = np.sin(nvp*ang)
     
     verts.append([m[0][nv - 1]*cos_nvm, m[0][nv - 1]*sin_nv])
-    verts.append([(m[0][nv] + delta)*cos_nv), (m[0][nv] + delta)*sin_nv])
+    verts.append([(m[0][nv] + delta)*cos_nv, (m[0][nv] + delta)*sin_nv])
     verts.append([m[0][nvp]*cos_nvp, m[0][nvp]*sin_nvp])
     verts.append([(m[0][nv] - delta)*cos_nv, (m[0][nv] - delta)*sin_nv])
 
@@ -247,3 +247,37 @@ def fd_tf_sm_polyprism(xp, yp, zp, m, Np, Nv, deltax, deltay, deltar, inc, dec):
             G[:, aux + j] = fd_tf_radial_polyprism(xp, yp, zp, mv, Nv, j, deltar, inc, dec)
             
     return G
+
+### Functions for the inversion constraints
+
+def phi_1(M, L, H, alpha):
+    '''
+    This function imposes a constraint in the adjacent radial distances
+    in the same prism.
+    
+    input
+    
+    M: integer - number of vertices
+    L: integer - number of prisms
+    H: array - hessian matrix (P, P), where P = L*(M + 2) is the number
+               of parameters
+       
+    output
+    
+    H: array - hessian matrix plus phi_1 constraint
+    '''
+    
+    P = L*(M + 2)
+    
+    assert H.shape == (P, P), 'The hessian shape must be (P, P)'
+    
+    i, j = np.diag_indices(P)
+    
+    for k in range(0,P,M+2):
+        H[i[k:k+M],j[k:k+M]] += 2.*alpha
+        H[i[k:k+M-1], j[k:k+M-1]+1] += -1.*alpha
+        H[i[k:k+M-1]+1, j[k:k+M-1]] += -1.*alpha
+        H[k, k+M-1] += -1.*alpha
+        H[k+M-1, k] += -1.*alpha
+    
+    return H
