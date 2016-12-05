@@ -252,8 +252,8 @@ def fd_tf_sm_polyprism(xp, yp, zp, m, Np, Nv, deltax, deltay, deltar, inc, dec):
 
 def phi_1(M, L, H, alpha):
     '''
-    This function imposes a constraint in the adjacent radial distances
-    in the same prism.
+    This function imposes a smoothness constraint in the inversion
+    for the adjacent radial distances in the same prism.
     
     input
     
@@ -271,7 +271,7 @@ def phi_1(M, L, H, alpha):
     
     assert H.shape == (P, P), 'The hessian shape must be (P, P)'
     
-    i, j = np.diag_indices(P)
+    i, j = np.diag_indices(P) # indices of the diagonal elements
     
     for k in range(0,P,M+2):
         H[i[k:k+M],j[k:k+M]] += 2.*alpha
@@ -279,5 +279,159 @@ def phi_1(M, L, H, alpha):
         H[i[k:k+M-1]+1, j[k:k+M-1]] += -1.*alpha
         H[k, k+M-1] += -1.*alpha
         H[k+M-1, k] += -1.*alpha
+    
+    return H
+
+def phi_2(M, L, H, alpha):
+    '''
+    This function imposes a smoothness constraint in the inversion
+    for the adjacent radial distances in the adjacent prisms.
+    
+    input
+    
+    M: integer - number of vertices
+    L: integer - number of prisms
+    H: array - hessian matrix (P, P), where P = L*(M + 2) is the number
+               of parameters
+       
+    output
+    
+    H: array - hessian matrix plus phi_2 constraint
+    '''
+    
+    P = L*(M + 2)
+    
+    assert H.shape == (P, P), 'The hessian shape must be (P, P)'
+    
+    i, j = np.diag_indices(P) # indices of the diagonal elements
+    
+    for k in range(0,P,M+2):
+        H[i[k:k+M],j[k:k+M]] += alpha
+
+    for k in range(M+2,P-M-2,M+2):
+        H[i[k:k+M],j[k:k+M]] += alpha
+
+    for k in range(0,P-M-2,M+2):
+        H[i[k:k+M], j[k:k+M]+M+2] += -1.*alpha
+        H[i[k:k+M]+M+2, j[k:k+M]] += -1.*alpha
+    
+    return H
+
+def phi_3(M, L, H, alpha):
+    '''
+    This function imposes a smoothness constraint in the inversion
+    between the origin and countour of the outcrop geologycal body
+    and the first prism.
+    
+    input
+    
+    M: integer - number of vertices
+    L: integer - number of prisms
+    H: array - hessian matrix (P, P), where P = L*(M + 2) is the number
+               of parameters
+       
+    output
+    
+    H: array - hessian matrix plus phi_3 constraint
+    '''
+    
+    P = L*(M + 2)
+    
+    assert H.shape == (P, P), 'The hessian shape must be (P, P)'
+    
+    i, j = np.diag_indices(M+2) # indices of the diagonal elements in M + 2
+    
+    H[i,j] = alpha
+    
+    return H
+
+def phi_4(M, L, H, alpha):
+    '''
+    This function imposes a smoothness constraint in the inversion
+    between the origin of the outcrop geologycal body and the first prism.
+    
+    input
+    
+    M: integer - number of vertices
+    L: integer - number of prisms
+    H: array - hessian matrix (P, P), where P = L*(M + 2) is the number
+               of parameters
+       
+    output
+    
+    H: array - hessian matrix plus phi_4 constraint
+    '''
+    
+    P = L*(M + 2)
+    
+    assert H.shape == (P, P), 'The hessian shape must be (P, P)'
+    
+    i, j = np.diag_indices(P) # indices of the diagonal elements
+    
+    H[M,M] = alpha
+    H[M+1,M+1] = alpha
+    
+    return H
+
+def phi_5(M, L, H, alpha):
+    '''
+    This function imposes a smoothness constraint in the inversion
+    for the origins of the adjacent prisms.
+    
+    input
+    
+    M: integer - number of vertices
+    L: integer - number of prisms
+    H: array - hessian matrix (P, P), where P = L*(M + 2) is the number
+               of parameters
+       
+    output
+    
+    H: array - hessian matrix plus phi_5 constraint
+    '''
+    
+    P = L*(M + 2)
+    
+    assert H.shape == (P, P), 'The hessian shape must be (P, P)'
+    
+    i, j = np.diag_indices(P) # indices of the diagonal elements
+
+    for k in range(M,P,M+2):
+        H[i[k:k+2],j[k:k+2]] += alpha
+
+    for k in range(M,P-M-2,M+2):
+        H[i[k:k+2],j[k:k+2]+M+2] += -1.*alpha
+        H[i[k:k+2]+M+2,j[k:k+2]] += -1.*alpha
+
+    for k in range(2*M+2,P-M-2,M+2):
+        H[i[k:k+2],j[k:k+2]] += alpha
+    
+    return H
+
+def phi_6(M, L, H, alpha):
+    '''
+    This function imposes a order zero Tikhonov constraint in the inversion
+    for the radial distances in the prisms.
+    
+    input
+    
+    M: integer - number of vertices
+    L: integer - number of prisms
+    H: array - hessian matrix (P, P), where P = L*(M + 2) is the number
+               of parameters
+       
+    output
+    
+    H: array - hessian matrix plus phi_6 constraint
+    '''
+    
+    P = L*(M + 2)
+    
+    assert H.shape == (P, P), 'The hessian shape must be (P, P)'
+    
+    i, j = np.diag_indices(P) # indices of the diagonal elements
+
+    for k in range(0,P,M+2):
+        H[i[k:k+M],j[k:k+M]] += alpha
     
     return H
