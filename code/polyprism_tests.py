@@ -307,4 +307,173 @@ def test_tfa_fd_radial_data():
     df_m = mfun.fd_tf_radial_polyprism(xp, yp, zp, m[0], r.size, nv, delta, inc, dec)  # derivative from the function
     df_mp_mm = (mp_fat - mm_fat)/(2.*delta)  # derivative from difference of data
     
-    assert np.allclose(df_m, df_mp_mm, atol=1e-06), 'The derivative is not correct'    
+    assert np.allclose(df_m, df_mp_mm, atol=1e-06), 'The derivative is not correct'
+    
+def test_phi_1():
+    '''
+    This function tests the result for the phi_1 function
+    for an empty matrix.
+    
+    output
+    
+    assertion
+    '''
+    
+    M = 5   # number of vertices
+    L = 1   # number of prisms
+    P = L*(M + 2) # number of parameters
+    
+    H = np.zeros((P, P))  # hessian for phi_1
+    H_ref = np.zeros((P,P)) # hessian for comparison
+    
+    alpha = 1.0 # smoothness parameter
+    
+    H = mfun.phi_1(M, L, H, alpha) # building H
+    
+    # building H_ref
+    for i in range(M):
+        H_ref[i,i] = 2.*alpha
+    for i in range(M - 1):
+        H_ref[i,i+1] = -1.*alpha
+        H_ref[i+1,i] = -1.*alpha
+    H_ref[0,M-1] = -1*alpha
+    H_ref[M-1,0] = -1*alpha
+        
+    assert np.allclose(H, H_ref), 'The matrices is not correct'
+
+def test_phi_2():
+    '''
+    This function tests the result for the phi_2 function
+    for an empty matrix.
+    
+    output
+    
+    assertion
+    '''
+    
+    M = 3   # number of vertices
+    L = 3   # number of prisms
+    P = L*(M + 2) # number of parameters
+    
+    H = np.zeros((P, P))  # hessian for phi_1
+    H_ref = np.zeros((P,P)) # hessian for comparison
+    
+    alpha = 1.0 # smoothness parameter
+    
+    H = mfun.phi_2(M, L, H, alpha) # building H
+    
+    for i in range(M):
+        H_ref[i,i] = alpha
+        H_ref[i,i+M+2] = -1.*alpha
+        H_ref[i+M+2,i] = -1.*alpha
+        H_ref[i+M+2,i+M+2] = 2.*alpha
+        H_ref[-i-3,-i-3] = alpha
+        H_ref[-i-3-M-2,-i-3] = -1.*alpha
+        H_ref[-i-3,-i-3-M-2] = -1.*alpha
+        
+    assert np.allclose(H, H_ref), 'The matrices is not correct'
+        
+def test_phi_3():
+    '''
+    This function tests the result for the phi_3 function
+    for an empty matrix.
+    
+    output
+    
+    assertion
+    '''
+    
+    M = 3   # number of vertices
+    L = 1   # number of prisms
+    P = L*(M + 2) # number of parameters
+    
+    H = np.zeros((P, P))  # hessian for phi_1
+    H_ref = np.identity(M + 2) # hessian for comparison
+    
+    alpha = 1.0 # smoothness parameter
+    
+    H = mfun.phi_3(M, L, H, alpha) # building H
+        
+    assert np.allclose(H, H_ref), 'The matrices is not correct'
+    
+def test_phi_4():
+    '''
+    This function tests the result for the phi_4 function
+    for an empty matrix.
+    
+    output
+    
+    assertion
+    '''
+    
+    M = 4   # number of vertices
+    L = 1   # number of prisms
+    P = L*(M + 2) # number of parameters
+    
+    H = np.zeros((P, P))  # hessian for phi_1
+    H_ref = np.zeros((P,P)) # hessian for comparison
+    
+    alpha = 1.0 # smoothness parameter
+    
+    H = mfun.phi_4(M, L, H, alpha) # building H
+    
+    # building H_ref
+    H_ref[-1,-1] = alpha
+    H_ref[-2,-2] = alpha
+        
+    assert np.allclose(H, H_ref), 'The matrices is not correct'
+    
+def test_phi_5():
+    '''
+    This function tests the result for the phi_5 function
+    for an empty matrix.
+    
+    output
+    
+    assertion
+    '''
+    
+    M = 4   # number of vertices
+    L = 1   # number of prisms
+    P = L*(M + 2) # number of parameters
+    
+    H = np.zeros((P, P))  # hessian for phi_1
+    H_ref = np.zeros((P,P)) # hessian for comparison
+    
+    alpha = 1.0 # smoothness parameter
+    
+    H = mfun.phi_5(M, L, H, alpha) # building H
+    
+    # building H_ref
+    H_ref[-1,-1] = alpha
+    H_ref[-2,-2] = alpha
+        
+    assert np.allclose(H, H_ref), 'The matrices is not correct'
+    
+def test_phi_6():
+    '''
+    This function tests the result for the phi_6 function
+    for an empty matrix.
+    
+    output
+    
+    assertion
+    '''
+    
+    M = 4   # number of vertices
+    L = 2   # number of prisms
+    P = L*(M + 2) # number of parameters
+    
+    H = np.zeros((P, P))  # hessian for phi_1
+    H_ref = np.zeros((P,P)) # hessian for comparison
+    
+    alpha = 1.0 # smoothness parameter
+    
+    H = mfun.phi_6(M, L, H, alpha) # building H
+    
+    # building H_ref
+    for i in range(M):
+        H_ref[i,i] = alpha
+        H_ref[i+M+2,i+M+2] = alpha
+        
+    assert np.allclose(H, H_ref), 'The matrices is not correct'
