@@ -281,7 +281,7 @@ def Hessian_phi_1(M, L, H, alpha):
     
     return H
 
-def phi_2(M, L, H, alpha):
+def Hessian_phi_2(M, L, H, alpha):
     '''
     This function imposes a smoothness constraint in the inversion
     for the adjacent radial distances in the adjacent prisms.
@@ -316,10 +316,10 @@ def phi_2(M, L, H, alpha):
     
     return H
 
-def phi_3(M, L, H, alpha):
+def Hessian_phi_3(M, L, H, alpha):
     '''
     This function imposes a smoothness constraint in the inversion
-    between the origin and countour of the outcrop geologycal body
+    between the origin and countour of the outcropping body
     and the first prism.
     
     input
@@ -344,10 +344,10 @@ def phi_3(M, L, H, alpha):
     
     return H
 
-def phi_4(M, L, H, alpha):
+def Hessian_phi_4(M, L, H, alpha):
     '''
     This function imposes a smoothness constraint in the inversion
-    between the origin of the outcropping geological body and the first prism.
+    for the origin of the outcropping body and the first prism.
     
     input
     
@@ -372,7 +372,7 @@ def phi_4(M, L, H, alpha):
     
     return H
 
-def phi_5(M, L, H, alpha):
+def Hessian_phi_5(M, L, H, alpha):
     '''
     This function imposes a smoothness constraint in the inversion
     for the origins of the adjacent prisms.
@@ -407,7 +407,7 @@ def phi_5(M, L, H, alpha):
     
     return H
 
-def phi_6(M, L, H, alpha):
+def Hessian_phi_6(M, L, H, alpha):
     '''
     This function imposes a order zero Tikhonov constraint in the inversion
     for the radial distances in the prisms.

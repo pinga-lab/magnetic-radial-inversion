@@ -308,7 +308,7 @@ def test_tfa_fd_radial_data():
     
     assert np.allclose(df_m, df_mp_mm, atol=1e-06), 'The derivative is not correct'
     
-def test_phi_1():
+def test_Hessian_phi_1():
     '''
     This function tests the result for the phi_1 function
     for an empty matrix.
@@ -340,7 +340,7 @@ def test_phi_1():
         
     assert np.allclose(H, H_ref), 'The matrix H is not correct'
 
-def test_phi_2():
+def test_Hessian_phi_2():
     '''
     This function tests the result for the phi_2 function
     for an empty matrix.
@@ -359,7 +359,7 @@ def test_phi_2():
     
     alpha = 1.0 # smoothness parameter
     
-    H = mfun.phi_2(M, L, H, alpha) # building H
+    H = mfun.Hessian_phi_2(M, L, H, alpha) # building H
     
     for i in range(M):
         H_ref[i,i] = alpha
@@ -372,7 +372,7 @@ def test_phi_2():
         
     assert np.allclose(H, H_ref), 'The matrices is not correct'
         
-def test_phi_3():
+def test_Hessian_phi_3():
     '''
     This function tests the result for the phi_3 function
     for an empty matrix.
@@ -391,11 +391,11 @@ def test_phi_3():
     
     alpha = 1.0 # smoothness parameter
     
-    H = mfun.phi_3(M, L, H, alpha) # building H
+    H = mfun.Hessian_phi_3(M, L, H, alpha) # building H
         
     assert np.allclose(H, H_ref), 'The matrices is not correct'
     
-def test_phi_4():
+def test_Hessian_phi_4():
     '''
     This function tests the result for the phi_4 function
     for an empty matrix.
@@ -414,7 +414,7 @@ def test_phi_4():
     
     alpha = 1.0 # smoothness parameter
     
-    H = mfun.phi_4(M, L, H, alpha) # building H
+    H = mfun.Hessian_phi_4(M, L, H, alpha) # building H
     
     # building H_ref
     H_ref[-1,-1] = alpha
@@ -422,7 +422,7 @@ def test_phi_4():
         
     assert np.allclose(H, H_ref), 'The matrices is not correct'
     
-def test_phi_5():
+def test_Hessian_phi_5():
     '''
     This function tests the result for the phi_5 function
     for an empty matrix.
@@ -441,7 +441,7 @@ def test_phi_5():
     
     alpha = 1.0 # smoothness parameter
     
-    H = mfun.phi_5(M, L, H, alpha) # building H
+    H = mfun.Hessian_phi_5(M, L, H, alpha) # building H
     
     # building H_ref
     H_ref[-1,-1] = alpha
@@ -449,7 +449,7 @@ def test_phi_5():
         
     assert np.allclose(H, H_ref), 'The matrices is not correct'
     
-def test_phi_6():
+def test_Hessian_phi_6():
     '''
     This function tests the result for the phi_6 function
     for an empty matrix.
@@ -468,7 +468,7 @@ def test_phi_6():
     
     alpha = 1.0 # smoothness parameter
     
-    H = mfun.phi_6(M, L, H, alpha) # building H
+    H = mfun.Hessian_phi_6(M, L, H, alpha) # building H
     
     # building H_ref
     for i in range(M):
