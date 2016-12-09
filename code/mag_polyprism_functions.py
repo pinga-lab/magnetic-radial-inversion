@@ -4,7 +4,6 @@ import numpy as np
 from fatiando import mesher, gridder, utils
 from fatiando.gravmag import polyprism
 from fatiando.mesher import PolygonalPrism
-from fatiando.vis import mpl
 from fatiando.constants import CM, T2NT
 
 ### Functions for the foward problem using fatiando
@@ -229,7 +228,7 @@ def fd_tf_sm_polyprism(xp, yp, zp, m, Np, Nv, deltax, deltay, deltar, inc, dec):
     
     output
     
-    G: array - sensibility matrix
+    G: 2D array - sensibility matrix
     '''
     for mv in m:
         assert len(mv[0]) == Nv, 'All prisms must have Nv vertices'
@@ -250,7 +249,7 @@ def fd_tf_sm_polyprism(xp, yp, zp, m, Np, Nv, deltax, deltay, deltar, inc, dec):
 
 ### Functions for the inversion constraints
 
-def phi_1(M, L, H, alpha):
+def Hessian_phi_1(M, L, H, alpha):
     '''
     This function imposes a smoothness constraint in the inversion
     for the adjacent radial distances in the same prism.
@@ -259,12 +258,12 @@ def phi_1(M, L, H, alpha):
     
     M: integer - number of vertices
     L: integer - number of prisms
-    H: array - hessian matrix (P, P), where P = L*(M + 2) is the number
-               of parameters
+    H: 2D array - hessian matrix (P, P), where P = L*(M + 2) is the number
+                  of parameters
        
     output
     
-    H: array - hessian matrix plus phi_1 constraint
+    H: 2D array - hessian matrix plus phi_1 constraint
     '''
     
     P = L*(M + 2)
@@ -291,12 +290,12 @@ def phi_2(M, L, H, alpha):
     
     M: integer - number of vertices
     L: integer - number of prisms
-    H: array - hessian matrix (P, P), where P = L*(M + 2) is the number
-               of parameters
+    H: 2D array - hessian matrix (P, P), where P = L*(M + 2) is the number
+                  of parameters
        
     output
     
-    H: array - hessian matrix plus phi_2 constraint
+    H: 2D array - hessian matrix plus phi_2 constraint
     '''
     
     P = L*(M + 2)
@@ -327,12 +326,12 @@ def phi_3(M, L, H, alpha):
     
     M: integer - number of vertices
     L: integer - number of prisms
-    H: array - hessian matrix (P, P), where P = L*(M + 2) is the number
-               of parameters
+    H: 2D array - hessian matrix (P, P), where P = L*(M + 2) is the number
+                  of parameters
        
     output
     
-    H: array - hessian matrix plus phi_3 constraint
+    H: 2D array - hessian matrix plus phi_3 constraint
     '''
     
     P = L*(M + 2)
@@ -348,18 +347,18 @@ def phi_3(M, L, H, alpha):
 def phi_4(M, L, H, alpha):
     '''
     This function imposes a smoothness constraint in the inversion
-    between the origin of the outcrop geologycal body and the first prism.
+    between the origin of the outcropping geological body and the first prism.
     
     input
     
     M: integer - number of vertices
     L: integer - number of prisms
-    H: array - hessian matrix (P, P), where P = L*(M + 2) is the number
-               of parameters
+    H: 2D array - hessian matrix (P, P), where P = L*(M + 2) is the number
+                  of parameters
        
     output
     
-    H: array - hessian matrix plus phi_4 constraint
+    H: 2D array - hessian matrix plus phi_4 constraint
     '''
     
     P = L*(M + 2)
@@ -382,12 +381,12 @@ def phi_5(M, L, H, alpha):
     
     M: integer - number of vertices
     L: integer - number of prisms
-    H: array - hessian matrix (P, P), where P = L*(M + 2) is the number
-               of parameters
+    H: 2D array - hessian matrix (P, P), where P = L*(M + 2) is the number
+                  of parameters
        
     output
     
-    H: array - hessian matrix plus phi_5 constraint
+    H: 2D array - hessian matrix plus phi_5 constraint
     '''
     
     P = L*(M + 2)
@@ -417,12 +416,12 @@ def phi_6(M, L, H, alpha):
     
     M: integer - number of vertices
     L: integer - number of prisms
-    H: array - hessian matrix (P, P), where P = L*(M + 2) is the number
-               of parameters
+    H: 2D array - hessian matrix (P, P), where P = L*(M + 2) is the number
+                  of parameters
        
     output
     
-    H: array - hessian matrix plus phi_6 constraint
+    H: 2D array - hessian matrix plus phi_6 constraint
     '''
     
     P = L*(M + 2)

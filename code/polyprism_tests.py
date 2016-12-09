@@ -6,7 +6,6 @@ from fatiando.gravmag import polyprism
 from fatiando.mesher import PolygonalPrism
 from fatiando.gravmag import prism
 from fatiando.mesher import Prism
-from fatiando.vis import mpl
 from fatiando.constants import CM, T2NT
 import mag_polyprism_functions as mfun
 
@@ -326,9 +325,9 @@ def test_phi_1():
     H = np.zeros((P, P))  # hessian for phi_1
     H_ref = np.zeros((P,P)) # hessian for comparison
     
-    alpha = 1.0 # smoothness parameter
+    alpha = 1.0 # regularization parameter
     
-    H = mfun.phi_1(M, L, H, alpha) # building H
+    H = mfun.Hessian_phi_1(M, L, H, alpha) # building H
     
     # building H_ref
     for i in range(M):
@@ -339,7 +338,7 @@ def test_phi_1():
     H_ref[0,M-1] = -1*alpha
     H_ref[M-1,0] = -1*alpha
         
-    assert np.allclose(H, H_ref), 'The matrices is not correct'
+    assert np.allclose(H, H_ref), 'The matrix H is not correct'
 
 def test_phi_2():
     '''
