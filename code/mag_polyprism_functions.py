@@ -50,6 +50,38 @@ def pol2cart(m, Np, Nv):
         
     return mk
 
+def param_vec(m, Np, Nv):
+    '''
+    This function receives the model of prisms and returns the vector of parameters
+    
+    input
+    
+    m: list - each element is a list of [r, x0, y0, z1, z2, 'magnetization'],
+              whrere r is an array with the radial distances of the vertices,
+              x0 and y0 are the origin cartesian coordinates of each prism,
+              z1 and z2 are the top and bottom of each prism and
+              magnetization is physical property
+    Np: int - number of prisms
+    Nv: int - number of vertices per prism
+    
+    output
+    
+    pv: 1D array - parameters vector
+    '''
+    
+    pv = np.zeros(0) # parameters vector
+    mv = [] # list for the loop of asserts
+ 
+    assert len(m) == Np, 'The size of m and the number of prisms must be equal'
+    
+    for mv in m:
+        assert len(mv[0]) == Nv, 'All prisms must have Nv vertices'
+    
+    for i in range(Np):
+        pv = np.hstack((pv, m[i][0], m[i][1:3]))
+    
+    return pv
+
 ### Functions for the derivatives with finite differences
 
 def fd_tf_x0_polyprism(xp, yp, zp, m, Nv, delta, inc, dec):
@@ -74,7 +106,7 @@ def fd_tf_x0_polyprism(xp, yp, zp, m, Nv, delta, inc, dec):
     
     output
     
-    df: array - derivative
+    df: 1D array - derivative
     '''
     assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
     assert m[0].size + len(m[1:]) == Nv + 5, 'The number of parameter must be Nv + 5'
@@ -121,7 +153,7 @@ def fd_tf_y0_polyprism(xp, yp, zp, m, Nv, delta, inc, dec):
     
     output
     
-    df: array - derivative
+    df: 1D array - derivative
     '''
     assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
     assert len(m[0]) + len(m[1:]) == Nv + 5, 'The number of parameter must be Nv + 5'
@@ -168,7 +200,7 @@ def fd_tf_radial_polyprism(xp, yp, zp, m, Nv, nv, delta, inc, dec):
     
     output
     
-    df: array - derivative
+    df: 1D array - derivative
     '''
     assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
     assert len(m[0]) + len(m[1:]) == Nv + 5, 'The number of parameter must be Nv + 5'
