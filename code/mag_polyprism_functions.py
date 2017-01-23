@@ -441,7 +441,7 @@ def Hessian_phi_5(M, L, H, alpha):
 
 def Hessian_phi_6(M, L, H, alpha):
     '''
-    This function imposes a order zero Tikhonov constraint in the inversion
+    This function imposes order zero Tikhonov constraint in the inversion
     for the radial distances in the prisms.
     
     input
