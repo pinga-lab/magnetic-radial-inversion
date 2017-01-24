@@ -292,6 +292,7 @@ def Hessian_phi_1(M, L, H, alpha):
     L: integer - number of prisms
     H: 2D array - hessian matrix (P, P), where P = L*(M + 2) is the number
                   of parameters
+    alpha: integer - increment
        
     output
     
@@ -324,6 +325,7 @@ def Hessian_phi_2(M, L, H, alpha):
     L: integer - number of prisms
     H: 2D array - hessian matrix (P, P), where P = L*(M + 2) is the number
                   of parameters
+    alpha: integer - increment
        
     output
     
@@ -360,7 +362,8 @@ def Hessian_phi_3(M, L, H, alpha):
     L: integer - number of prisms
     H: 2D array - hessian matrix (P, P), where P = L*(M + 2) is the number
                   of parameters
-       
+    alpha: integer - increment
+    
     output
     
     H: 2D array - hessian matrix plus phi_3 constraint
@@ -387,7 +390,8 @@ def Hessian_phi_4(M, L, H, alpha):
     L: integer - number of prisms
     H: 2D array - hessian matrix (P, P), where P = L*(M + 2) is the number
                   of parameters
-       
+    alpha: integer - increment
+    
     output
     
     H: 2D array - hessian matrix plus phi_4 constraint
@@ -415,7 +419,8 @@ def Hessian_phi_5(M, L, H, alpha):
     L: integer - number of prisms
     H: 2D array - hessian matrix (P, P), where P = L*(M + 2) is the number
                   of parameters
-       
+    alpha: integer - increment
+    
     output
     
     H: 2D array - hessian matrix plus phi_5 constraint
@@ -450,7 +455,8 @@ def Hessian_phi_6(M, L, H, alpha):
     L: integer - number of prisms
     H: 2D array - hessian matrix (P, P), where P = L*(M + 2) is the number
                   of parameters
-       
+    alpha: integer - increment
+    
     output
     
     H: 2D array - hessian matrix plus phi_6 constraint
@@ -466,3 +472,260 @@ def Hessian_phi_6(M, L, H, alpha):
         H[i[k:k+M],j[k:k+M]] += alpha
     
     return H
+
+def gradient_phi_1(M, L, m, alpha):
+    '''
+    This function calculates the gradient of the smoothness constraint
+    for the redial distances in the same prism.
+    
+    input
+    
+    M: integer - number of vertices
+    L: integer - number of prisms
+    m: 1D array - parameter vector
+    alpha: integer - increment
+    
+    output
+    
+    m: 1D array - parameter vector plus phi_1 constraint
+    '''
+    
+    P = L*(M + 2)
+    
+    assert m.size == P, 'The size of parameter vector must be equal to P'
+    
+    H = np.zeros((P,P))
+    
+    H = Hessian_phi_1(M,L,H,alpha)
+    
+    # extrecting the non-zero diagonals
+    d1 = np.diag(H)
+    d2 = np.diag(H, k=1)
+    d3 = np.diag(H, k=-1)
+    d4 = np.diag(H, k=M-1)
+    d5 = np.diag(H, k=-M+1)
+    
+    # calculating the product between the diagonals and the slices of m
+    m1 = m*d1
+    m2 = m[1:]*d2
+    m3 = m[:P-1]*d3
+    m4 = m[M-1:]*d4
+    m5 = m[:P-M+1]*d5
+    
+    # filling the m's vectors with zeros
+    m2 = np.hstack((m2, np.zeros(1)))
+    m3 = np.hstack((np.zeros(1), m3))
+    m4 = np.hstack((m4, np.zeros(M-1)))
+    m5 = np.hstack((np.zeros(M-1), m5))
+    
+    # the result    
+    m = alpha*(m1 + m2 + m3 + m4 + m5)
+    
+    return m
+
+def gradient_phi_2(M, L, m, alpha):
+    '''
+    This function calculates the gradient of the smoothness constraint
+    for the adjacent radial distances in the adjacent prisms.
+    
+    input
+    
+    M: integer - number of vertices
+    L: integer - number of prisms
+    m: 1D array - parameter vector
+    alpha: integer - increment
+    
+    output
+    
+    m: 1D array - parameter vector plus phi_2 constraint
+    '''
+    
+    P = L*(M + 2)
+    
+    assert m.size == P, 'The size of parameter vector must be equal to P'
+    
+    H = np.zeros((P,P))
+    
+    H = Hessian_phi_2(M,L,H,alpha)
+
+    # extrecting the non-zero diagonals
+    d1 = np.diag(H)
+    d2 = np.diag(H, k=M+2)
+    d3 = np.diag(H, k=-M-2)
+    
+    # calculating the product between the diagonals and the slices of m
+    m1 = m*d1
+    m2 = m[M+2:]*d2
+    m3 = m[:P-M-2]*d3
+    
+    # filling the m's vectors with zeros
+    m2 = np.hstack((m2, np.zeros(M+2)))
+    m3 = np.hstack((np.zeros(M+2), m3))
+    
+    # the result    
+    m = alpha*(m1 + m2 + m3)
+    
+    return m
+
+def gradient_phi_3(M, L, m, m0, alpha):
+    '''
+    This function calculates the gradient of the smoothness constraint
+    between the origin and countour of the outcropping body
+    and the first prism.
+    
+    input
+    
+    M: integer - number of vertices
+    L: integer - number of prisms
+    m: 1D array - parameter vector (P,1)
+    m0: 1D array - parameters of the outcropping body (M+2,1)
+    alpha: integer - increment
+    
+    output
+    
+    m: 1D array - parameter vector plus phi_3 constraint
+    '''
+    
+    P = L*(M + 2)
+    
+    assert m.size == P, 'The size of parameter vector must be equal to P'
+    
+    H = np.zeros((P,P))
+    
+    H = Hessian_phi_3(M,L,H,alpha)
+
+    # extrecting the non-zero diagonals
+    d1 = np.diag(H)
+    
+    # calculating the product between the diagonals and the slices of m
+    m1 = m[:M+2]*d1[:M+2] 
+    m1 -= m0
+    
+    # filling the m's vectors with zeros
+    m1 = np.hstack((m1, np.zeros(P-M-2)))
+    
+    # the result    
+    m = alpha*m1
+    
+    return m
+
+def gradient_phi_4(M, L, m, m0, alpha):
+    '''
+    This function calculates the gradient of the smoothness constraint
+    for the origin of the outcropping body and the first prism.
+    
+    input
+    
+    M: integer - number of vertices
+    L: integer - number of prisms
+    m: 1D array - parameter vector (P,1)
+    m0: 1D array - parameters of the outcropping body (2,1)
+    alpha: integer - increment
+    
+    output
+    
+    m: 1D array - parameter vector plus phi_4 constraint
+    '''
+    
+    P = L*(M + 2)
+    
+    assert m.size == P, 'The size of parameter vector must be equal to P'
+    
+    H = np.zeros((P,P))
+    
+    H = Hessian_phi_4(M,L,H,alpha)
+    
+    # extrecting the non-zero diagonals
+    d1 = np.diag(H)
+    
+    # calculating the product between the diagonals and the slices of m
+    m1 = m[M:M+2]*d1[M:M+2]
+    m1 -= m0
+    
+    # filling the m's vectors with zeros
+    m1 = np.hstack((np.zeros(M), m1, np.zeros(P-M-2)))
+    
+    # the result    
+    m = alpha*m1
+    
+    return m
+
+def gradient_phi_5(M, L, m, alpha):
+    '''
+    This function calculates the gradient of the smoothness constraint
+    for the adjacent radial distances in the adjacent prisms.
+    
+    input
+    
+    M: integer - number of vertices
+    L: integer - number of prisms
+    m: 1D array - parameter vector
+    alpha: integer - increment
+    
+    output
+    
+    m: 1D array - parameter vector plus phi_5 constraint
+    '''
+    
+    P = L*(M + 2)
+    
+    assert m.size == P, 'The size of parameter vector must be equal to P'
+    
+    H = np.zeros((P,P))
+    
+    H = Hessian_phi_5(M,L,H,alpha)
+    
+    # extrecting the non-zero diagonals
+    d1 = np.diag(H)
+    d2 = np.diag(H, k=M+2)
+    d3 = np.diag(H, k=-M-2)
+    
+    # calculating the product between the diagonals and the slices of m
+    m1 = m*d1
+    m2 = m[M+2:]*d2
+    m3 = m[:P-M-2]*d3
+    
+    # filling the m's vectors with zeros
+    m2 = np.hstack((m2, np.zeros(M+2)))
+    m3 = np.hstack((np.zeros(M+2), m3))
+    
+    # the result    
+    m = alpha*(m1 + m2 + m3)
+    
+    return m
+
+def gradient_phi_6(M, L, m, alpha):
+    '''
+    This function calculates the gradient of the smoothness constraint
+    for the the radial distances in the prisms.
+    
+    input
+    
+    M: integer - number of vertices
+    L: integer - number of prisms
+    m: 1D array - parameter vector
+    alpha: integer - increment
+    
+    output
+    
+    m: 1D array - parameter vector plus phi_6 constraint
+    '''
+    
+    P = L*(M + 2)
+    
+    assert m.size == P, 'The size of parameter vector must be equal to P'
+    
+    H = np.zeros((P,P))
+    
+    H = Hessian_phi_6(M,L,H,alpha)
+
+    # extrecting the non-zero diagonals
+    d1 = np.diag(H)
+    
+    # calculating the product between the diagonals and the slices of m
+    m1 = m*d1
+    
+    # the result    
+    m = alpha*m1
+    
+    return m
