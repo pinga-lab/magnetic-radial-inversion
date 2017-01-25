@@ -283,8 +283,8 @@ def fd_tf_sm_polyprism(xp, yp, zp, m, Np, Nv, deltax, deltay, deltar, inc, dec):
 
 def Hessian_phi_1(M, L, H, alpha):
     '''
-    This function imposes a smoothness constraint in the inversion
-    for the adjacent radial distances in the same prism.
+    This function imposes a smoothness constraint on the 
+    adjacent radial distances in the same prism.
     
     input
     
@@ -476,7 +476,7 @@ def Hessian_phi_6(M, L, H, alpha):
 def gradient_phi_1(M, L, m, alpha):
     '''
     This function calculates the gradient of the smoothness constraint
-    for the redial distances in the same prism.
+    on the radial distances in the same prism.
     
     input
     
@@ -498,7 +498,7 @@ def gradient_phi_1(M, L, m, alpha):
     
     H = Hessian_phi_1(M,L,H,alpha)
     
-    # extrecting the non-zero diagonals
+    # extracting the non-zero diagonals
     d1 = np.diag(H)
     d2 = np.diag(H, k=1)
     d3 = np.diag(H, k=-1)
