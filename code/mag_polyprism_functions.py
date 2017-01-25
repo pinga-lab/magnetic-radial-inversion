@@ -475,15 +475,15 @@ def Hessian_phi_6(M, L, H, alpha):
 
 def gradient_phi_1(M, L, m, alpha):
     '''
-    This function calculates the gradient of the smoothness constraint
-    on the radial distances in the same prism.
+    Returns the Hessian matrix constrained by smoothness constraint
+    on the adjacent radial distances within each prism.
     
     input
     
     M: integer - number of vertices
     L: integer - number of prisms
     m: 1D array - parameter vector
-    alpha: integer - increment
+    alpha: float - increment
     
     output
     
@@ -494,33 +494,16 @@ def gradient_phi_1(M, L, m, alpha):
     
     assert m.size == P, 'The size of parameter vector must be equal to P'
     
-    H = np.zeros((P,P))
-    
-    H = Hessian_phi_1(M,L,H,alpha)
-    
     # extracting the non-zero diagonals
-    d1 = np.diag(H)
-    d2 = np.diag(H, k=1)
-    d3 = np.diag(H, k=-1)
-    d4 = np.diag(H, k=M-1)
-    d5 = np.diag(H, k=-M+1)
+    d0, d1, dM = diags_phi_1(M, L, alpha)
     
     # calculating the product between the diagonals and the slices of m
-    m1 = m*d1
-    m2 = m[1:]*d2
-    m3 = m[:P-1]*d3
-    m4 = m[M-1:]*d4
-    m5 = m[:P-M+1]*d5
-    
-    # filling the m's vectors with zeros
-    m2 = np.hstack((m2, np.zeros(1)))
-    m3 = np.hstack((np.zeros(1), m3))
-    m4 = np.hstack((m4, np.zeros(M-1)))
-    m5 = np.hstack((np.zeros(M-1), m5))
-    
-    # the result    
-    m = alpha*(m1 + m2 + m3 + m4 + m5)
-    
+    m *= d0
+    m[1:] *= d1
+    m[:P-1] *= d1
+    m[M-1:] *= dM
+    m[:P-M+1] *= dM
+       
     return m
 
 def gradient_phi_2(M, L, m, alpha):
@@ -729,3 +712,176 @@ def gradient_phi_6(M, L, m, alpha):
     m = alpha*m1
     
     return m
+
+def diags_phi_1(M, L, alpha):
+    '''
+    Returns the non-zero diagonals of hessian matrix for 
+    the smoothness constraint on adjacent radial distances
+    in the same prism.
+    
+    input
+    
+    M: integer - number of vertices
+    L: integer - number of prisms
+    alpha: float - increment
+    
+    output
+    
+    d0, d1, dM: 1D array - diagonals from phi_1 hessian
+    '''
+    
+    P = L*(M + 2)
+    
+    # building the diagonals
+    d0 = np.zeros(M+2)
+    d0[:M] = 2.*alpha
+    d0 = np.resize(d0, P)
+    
+    d1 = np.zeros(M+2)
+    d1[:M-1] = - alpha
+    d1 = np.resize(d1, P-1)
+    
+    dM = np.zeros(M+2)
+    dM[0] = - alpha
+    dM = np.resize(dM, P - M + 1)
+    
+    return d0, d1, dM
+
+def diags_phi_2(M, L, alpha):
+    '''
+    Returns the non-zero diagonals of hessian matrix for 
+    the smoothness constraint on adjacent radial distances
+    in the adjacent prisms.
+    
+    input
+    
+    M: integer - number of vertices
+    L: integer - number of prisms
+    alpha: float - increment
+    
+    output
+    
+    d0, d1: 1D array - diagonals from phi_2 hessian
+    '''
+    
+    P = L*(M + 2)
+    
+    # building the diagonals
+    
+    if M <= 2:
+        d0 = np.zeros(M+2)
+        d0[:M] = alpha
+        d0 = np.resize(d0, P)
+    else:
+        d0 = np.zeros(M+2)
+        d0[:M] = 2*alpha
+        d0 = np.resize(d0, P)
+        d0[:M] = alpha
+        d0[-M-2:-M+1] = alpha        
+    
+    d1 = np.zeros(M+2)
+    d1[:M+2] = - alpha
+    d1 = np.resize(d1, P-M-2)
+    
+    return d0, d1
+
+def diags_phi_3(M, L, alpha):
+    '''
+    Returns the non-zero diagonals of hessian matrix for 
+    the smoothness constraint on adjacent radial distances
+    in the adjacent prisms.
+    
+    input
+    
+    M: integer - number of vertices
+    L: integer - number of prisms
+    alpha: float - increment
+    
+    output
+    
+    d0, d1: 1D array - diagonals from phi_3 hessian
+    '''
+    
+    P = L*(M + 2)
+    
+    # building the diagonals
+    
+    if M <= 2:
+        d0 = np.zeros(M+2)
+        d0[:M] = alpha
+        d0 = np.resize(d0, P)
+    else:
+        d0 = np.zeros(M+2)
+        d0[:M] = 2*alpha
+        d0 = np.resize(d0, P)
+        d0[:M] = alpha
+        d0[-M-2:-M+1] = alpha        
+    
+    d1 = np.zeros(M+2)
+    d1[:M+2] = - alpha
+    d1 = np.resize(d1, P-M-2)
+    
+    return d0, d1
+
+def diags_phi_5(M, L, alpha):
+    '''
+    Returns the non-zero diagonals of hessian matrix for 
+    the smoothness constraint on origin in the adjacent prisms.
+    
+    input
+    
+    M: integer - number of vertices
+    L: integer - number of prisms
+    alpha: float - increment
+    
+    output
+    
+    d0, d1: 1D array - diagonals from phi_5 hessian
+    '''
+    
+    P = L*(M + 2)
+    
+    # building the diagonals
+    
+    if M <= 2:
+        d0 = np.zeros(M+2)
+        d0[M:M+2] = alpha
+        d0 = np.resize(d0, P)
+    else:
+        d0 = np.zeros(M+2)
+        d0[M:M+2] = 2*alpha
+        d0 = np.resize(d0, P)
+        d0[M:M+2] = alpha
+        d0[-2:] = alpha        
+    
+    d1 = np.zeros(M+2)
+    d1[M:M+2] = - alpha
+    d1 = np.resize(d1, P-M-2)
+    
+    return d0, d1
+
+def diags_phi_6(M, L, alpha):
+    '''
+    Returns the non-zero diagonals of hessian matrix for 
+    an order zero Tikhonov on adjacent radial distances
+    in the prisms.
+    
+    input
+    
+    M: integer - number of vertices
+    L: integer - number of prisms
+    alpha: float - increment
+    
+    output
+    
+    d0: 1D array - diagonal from phi_6 hessian
+    '''
+    
+    P = L*(M + 2)
+    
+    # building the diagonal
+    d0 = np.zeros(M+2)
+    d0[:M] = - alpha
+    d0 = np.resize(d1, P)
+    
+    return d0, d1
