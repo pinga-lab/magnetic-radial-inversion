@@ -283,16 +283,15 @@ def fd_tf_sm_polyprism(xp, yp, zp, m, Np, Nv, deltax, deltay, deltar, inc, dec):
 
 def Hessian_phi_1(M, L, H, alpha):
     '''
-    This function imposes a smoothness constraint on the 
-    adjacent radial distances in the same prism.
+    Returns the hessian matrix constrained by smoothness constraint
+    on the adjacent radial distances within each prism.
     
     input
     
     M: integer - number of vertices
     L: integer - number of prisms
-    H: 2D array - hessian matrix (P, P), where P = L*(M + 2) is the number
-                  of parameters
-    alpha: integer - increment
+    H: 2D array - hessian matrix
+    alpha: float - increment
        
     output
     
@@ -303,29 +302,33 @@ def Hessian_phi_1(M, L, H, alpha):
     
     assert H.shape == (P, P), 'The hessian shape must be (P, P)'
     
-    i, j = np.diag_indices(P) # indices of the diagonal elements
+    # extracting the non-zero diagonals
+    d0, d1, dM = diags_phi_1(M, L, alpha)
     
-    for k in range(0,P,M+2):
-        H[i[k:k+M],j[k:k+M]] += 2.*alpha
-        H[i[k:k+M-1], j[k:k+M-1]+1] += -1.*alpha
-        H[i[k:k+M-1]+1, j[k:k+M-1]] += -1.*alpha
-        H[k, k+M-1] += -1.*alpha
-        H[k+M-1, k] += -1.*alpha
+    i, j = np.diag_indices_from(H) # indices of the diagonal elements
+    
+    k = np.full(P-1, 1, dtype=np.int) # array iterable
+    l = np.full(P-M+1, M-1, dtype=np.int) # array iterable    
+    
+    H[i,j] += d0
+    H[i[:P-1],j[:P-1] + k] += d1
+    H[i[:P-1] + k,j[:P-1]] += d1
+    H[i[:P-M+1],j[:P-M+1] + l] += dM
+    H[i[:P-M+1] + l,j[:P-M+1]] += dM
     
     return H
 
 def Hessian_phi_2(M, L, H, alpha):
     '''
-    This function imposes a smoothness constraint in the inversion
-    for the adjacent radial distances in the adjacent prisms.
+    Returns the hessian matrix constrained by smoothness constraint
+    on radial distances of the vertically adjacent prisms.
     
     input
     
     M: integer - number of vertices
     L: integer - number of prisms
-    H: 2D array - hessian matrix (P, P), where P = L*(M + 2) is the number
-                  of parameters
-    alpha: integer - increment
+    H: 2D array - hessian matrix
+    alpha: float - increment
        
     output
     
@@ -336,34 +339,31 @@ def Hessian_phi_2(M, L, H, alpha):
     
     assert H.shape == (P, P), 'The hessian shape must be (P, P)'
     
-    i, j = np.diag_indices(P) # indices of the diagonal elements
+    # extracting the non-zero diagonals
+    d0, d1 = diags_phi_2(M, L, alpha)
     
-    for k in range(0,P,M+2):
-        H[i[k:k+M],j[k:k+M]] += alpha
-
-    for k in range(M+2,P-M-2,M+2):
-        H[i[k:k+M],j[k:k+M]] += alpha
-
-    for k in range(0,P-M-2,M+2):
-        H[i[k:k+M], j[k:k+M]+M+2] += -1.*alpha
-        H[i[k:k+M]+M+2, j[k:k+M]] += -1.*alpha
+    i, j = np.diag_indices_from(H) # indices of the diagonal elements
+    
+    k = np.full(P-M-2, M+2, dtype=np.int) # array iterable
+    
+    H[i,j] += d0
+    H[i[:P-M-2],j[:P-M-2] + k] += d1
+    H[i[:P-M-2] + k,j[:P-M-2]] += d1
     
     return H
 
 def Hessian_phi_3(M, L, H, alpha):
     '''
-    This function imposes a smoothness constraint in the inversion
-    between the origin and countour of the outcropping body
-    and the first prism.
+    Returns the hessian matrix constrained that the estimated cross-section
+    of the shallowest prism must be close to the known outcropping boundary.
     
     input
     
     M: integer - number of vertices
     L: integer - number of prisms
-    H: 2D array - hessian matrix (P, P), where P = L*(M + 2) is the number
-                  of parameters
-    alpha: integer - increment
-    
+    H: 2D array - hessian matrix
+    alpha: float - increment
+       
     output
     
     H: 2D array - hessian matrix plus phi_3 constraint
@@ -375,23 +375,22 @@ def Hessian_phi_3(M, L, H, alpha):
     
     i, j = np.diag_indices(M+2) # indices of the diagonal elements in M + 2
     
-    H[i,j] = alpha
+    H[i,j] += alpha
     
     return H
 
 def Hessian_phi_4(M, L, H, alpha):
     '''
-    This function imposes a smoothness constraint in the inversion
-    for the origin of the outcropping body and the first prism.
+    Returns the hessian matrix constrained that the estimated origin
+    of the shallowest prism must be close to the known outcropping origin.
     
     input
     
     M: integer - number of vertices
     L: integer - number of prisms
-    H: 2D array - hessian matrix (P, P), where P = L*(M + 2) is the number
-                  of parameters
-    alpha: integer - increment
-    
+    H: 2D array - hessian matrix
+    alpha: float - increment
+       
     output
     
     H: 2D array - hessian matrix plus phi_4 constraint
@@ -403,24 +402,23 @@ def Hessian_phi_4(M, L, H, alpha):
     
     i, j = np.diag_indices(P) # indices of the diagonal elements
     
-    H[M,M] = alpha
-    H[M+1,M+1] = alpha
+    H[M,M] += alpha
+    H[M+1,M+1] += alpha
     
     return H
 
 def Hessian_phi_5(M, L, H, alpha):
     '''
-    This function imposes a smoothness constraint in the inversion
-    for the origins of the adjacent prisms.
+    Returns the hessian matrix constrained by smoothness constraint
+    on the origins vertically adjacent prisms.
     
     input
     
     M: integer - number of vertices
     L: integer - number of prisms
-    H: 2D array - hessian matrix (P, P), where P = L*(M + 2) is the number
-                  of parameters
-    alpha: integer - increment
-    
+    H: 2D array - hessian matrix
+    alpha: float - increment
+       
     output
     
     H: 2D array - hessian matrix plus phi_5 constraint
@@ -430,33 +428,32 @@ def Hessian_phi_5(M, L, H, alpha):
     
     assert H.shape == (P, P), 'The hessian shape must be (P, P)'
     
-    i, j = np.diag_indices(P) # indices of the diagonal elements
-
-    for k in range(M,P,M+2):
-        H[i[k:k+2],j[k:k+2]] += alpha
-
-    for k in range(M,P-M-2,M+2):
-        H[i[k:k+2],j[k:k+2]+M+2] += -1.*alpha
-        H[i[k:k+2]+M+2,j[k:k+2]] += -1.*alpha
-
-    for k in range(2*M+2,P-M-2,M+2):
-        H[i[k:k+2],j[k:k+2]] += alpha
+    # extracting the non-zero diagonals
+    d0, d1 = diags_phi_5(M, L, alpha)
+    
+    i, j = np.diag_indices_from(H) # indices of the diagonal elements
+    
+    k = np.full(P-1, 1, dtype=np.int) # array iterable
+    l = np.full(P-M-2, M+2, dtype=np.int) # array iterable
+    
+    H[i,j] += d0
+    H[i[:P-M-2],j[:P-M-2] + l] += d1
+    H[i[:P-M-2] + l,j[:P-M-2]] += d1
     
     return H
 
 def Hessian_phi_6(M, L, H, alpha):
     '''
-    This function imposes order zero Tikhonov constraint in the inversion
-    for the radial distances in the prisms.
+    Returns the hessian matrix constrained that radial distances
+    within each prism must be close to null values.
     
     input
     
     M: integer - number of vertices
     L: integer - number of prisms
-    H: 2D array - hessian matrix (P, P), where P = L*(M + 2) is the number
-                  of parameters
-    alpha: integer - increment
-    
+    H: 2D array - hessian matrix
+    alpha: float - increment
+       
     output
     
     H: 2D array - hessian matrix plus phi_6 constraint
@@ -466,28 +463,30 @@ def Hessian_phi_6(M, L, H, alpha):
     
     assert H.shape == (P, P), 'The hessian shape must be (P, P)'
     
-    i, j = np.diag_indices(P) # indices of the diagonal elements
-
-    for k in range(0,P,M+2):
-        H[i[k:k+M],j[k:k+M]] += alpha
+    # extracting the non-zero diagonals
+    d0 = diags_phi_6(M, L, alpha)
+    
+    i, j = np.diag_indices_from(H) # indices of the diagonal elements
+    
+    H[i,j] += d0
     
     return H
 
 def gradient_phi_1(M, L, m, alpha):
     '''
-    Returns the Hessian matrix constrained by smoothness constraint
+    Returns the gradient vector constrained by smoothness constraint
     on the adjacent radial distances within each prism.
     
     input
     
     M: integer - number of vertices
     L: integer - number of prisms
-    m: 1D array - parameter vector
+    m: 1D array - gradient of parameter vector
     alpha: float - increment
     
     output
     
-    m: 1D array - parameter vector plus phi_1 constraint
+    m: 1D array - gradient vector plus phi_1 constraint
     '''
     
     P = L*(M + 2)
@@ -498,218 +497,159 @@ def gradient_phi_1(M, L, m, alpha):
     d0, d1, dM = diags_phi_1(M, L, alpha)
     
     # calculating the product between the diagonals and the slices of m
-    m *= d0
-    m[1:] *= d1
-    m[:P-1] *= d1
-    m[M-1:] *= dM
-    m[:P-M+1] *= dM
+    m += m*d0
+    m[1:] += m[1:]*d1
+    m[:P-1] += m[:P-1]*d1
+    m[M-1:] += m[M-1:]*dM
+    m[:P-M+1] += m[:P-M+1]*dM
        
     return m
 
 def gradient_phi_2(M, L, m, alpha):
     '''
-    This function calculates the gradient of the smoothness constraint
-    for the adjacent radial distances in the adjacent prisms.
+    Returns the gradient vector constrained by smoothness constraint
+    on radial distances of the vertically adjacent prisms.
     
     input
     
     M: integer - number of vertices
     L: integer - number of prisms
-    m: 1D array - parameter vector
-    alpha: integer - increment
+    m: 1D array - gradient of parameter vector
+    alpha: float - increment
     
     output
     
-    m: 1D array - parameter vector plus phi_2 constraint
+    m: 1D array - gradient vector plus phi_2 constraint
     '''
     
     P = L*(M + 2)
     
     assert m.size == P, 'The size of parameter vector must be equal to P'
     
-    H = np.zeros((P,P))
-    
-    H = Hessian_phi_2(M,L,H,alpha)
-
-    # extrecting the non-zero diagonals
-    d1 = np.diag(H)
-    d2 = np.diag(H, k=M+2)
-    d3 = np.diag(H, k=-M-2)
+    # extracting the non-zero diagonals
+    d0, d1 = diags_phi_2(M, L, alpha)
     
     # calculating the product between the diagonals and the slices of m
-    m1 = m*d1
-    m2 = m[M+2:]*d2
-    m3 = m[:P-M-2]*d3
-    
-    # filling the m's vectors with zeros
-    m2 = np.hstack((m2, np.zeros(M+2)))
-    m3 = np.hstack((np.zeros(M+2), m3))
-    
-    # the result    
-    m = alpha*(m1 + m2 + m3)
+    m += m*d0
+    m[M+2:] += m[M+2:]*d1
+    m[:P-M-2] += m[:P-M-2]*d1
     
     return m
 
 def gradient_phi_3(M, L, m, m0, alpha):
     '''
-    This function calculates the gradient of the smoothness constraint
-    between the origin and countour of the outcropping body
-    and the first prism.
+    Returns the gradient vector constrained that the estimated cross-section
+    of the shallowest prism must be close to the known outcropping boundary.
     
     input
     
     M: integer - number of vertices
     L: integer - number of prisms
-    m: 1D array - parameter vector (P,1)
-    m0: 1D array - parameters of the outcropping body (M+2,1)
-    alpha: integer - increment
+    m: 1D array - gradient of parameter vector
+    m0: 1D array - parameters of the outcropping body
+    alpha: float - increment
     
     output
     
-    m: 1D array - parameter vector plus phi_3 constraint
+    m: 1D array - gradient vector plus phi_3 constraint
     '''
     
     P = L*(M + 2)
     
     assert m.size == P, 'The size of parameter vector must be equal to P'
-    
-    H = np.zeros((P,P))
-    
-    H = Hessian_phi_3(M,L,H,alpha)
+    assert m0.size == M+2, 'The size of parameter vector must be equal to M + 2'
 
-    # extrecting the non-zero diagonals
-    d1 = np.diag(H)
     
     # calculating the product between the diagonals and the slices of m
-    m1 = m[:M+2]*d1[:M+2] 
-    m1 -= m0
-    
-    # filling the m's vectors with zeros
-    m1 = np.hstack((m1, np.zeros(P-M-2)))
-    
-    # the result    
-    m = alpha*m1
-    
+    m[:M+2] += m[:M+2] - m0
+        
     return m
 
 def gradient_phi_4(M, L, m, m0, alpha):
     '''
-    This function calculates the gradient of the smoothness constraint
-    for the origin of the outcropping body and the first prism.
+    Returns the gradient vector constrained that the estimated origin
+    of the shallowest prism must be close to the known outcropping origin.
     
     input
     
     M: integer - number of vertices
     L: integer - number of prisms
-    m: 1D array - parameter vector (P,1)
-    m0: 1D array - parameters of the outcropping body (2,1)
-    alpha: integer - increment
+    m: 1D array - gradient of parameter vector
+    m0: 1D array - origin (x0,y0) of the outcropping body
+    alpha: float - increment
     
     output
     
-    m: 1D array - parameter vector plus phi_4 constraint
+    m: 1D array - gradient vector plus phi_4 constraint
     '''
     
     P = L*(M + 2)
     
     assert m.size == P, 'The size of parameter vector must be equal to P'
-    
-    H = np.zeros((P,P))
-    
-    H = Hessian_phi_4(M,L,H,alpha)
-    
-    # extrecting the non-zero diagonals
-    d1 = np.diag(H)
+    assert m0.size == 2, 'The size of parameter vector must be equal to 2'
     
     # calculating the product between the diagonals and the slices of m
-    m1 = m[M:M+2]*d1[M:M+2]
-    m1 -= m0
-    
-    # filling the m's vectors with zeros
-    m1 = np.hstack((np.zeros(M), m1, np.zeros(P-M-2)))
-    
-    # the result    
-    m = alpha*m1
+    m[M:M+2] += m[M:M+2] - m0
     
     return m
 
 def gradient_phi_5(M, L, m, alpha):
     '''
-    This function calculates the gradient of the smoothness constraint
-    for the adjacent radial distances in the adjacent prisms.
+    Returns the gradient vector constrained by smoothness constraint
+    on the origins vertically adjacent prisms.
     
     input
     
     M: integer - number of vertices
     L: integer - number of prisms
-    m: 1D array - parameter vector
-    alpha: integer - increment
+    m: 1D array - gradient of parameter vector
+    alpha: float - increment
     
     output
     
-    m: 1D array - parameter vector plus phi_5 constraint
+    m: 1D array - gradient vector plus phi_5 constraint
     '''
     
     P = L*(M + 2)
     
     assert m.size == P, 'The size of parameter vector must be equal to P'
     
-    H = np.zeros((P,P))
-    
-    H = Hessian_phi_5(M,L,H,alpha)
-    
-    # extrecting the non-zero diagonals
-    d1 = np.diag(H)
-    d2 = np.diag(H, k=M+2)
-    d3 = np.diag(H, k=-M-2)
+    # extracting the non-zero diagonals
+    d0, d1 = diags_phi_5(M, L, alpha)
     
     # calculating the product between the diagonals and the slices of m
-    m1 = m*d1
-    m2 = m[M+2:]*d2
-    m3 = m[:P-M-2]*d3
-    
-    # filling the m's vectors with zeros
-    m2 = np.hstack((m2, np.zeros(M+2)))
-    m3 = np.hstack((np.zeros(M+2), m3))
-    
-    # the result    
-    m = alpha*(m1 + m2 + m3)
+    m += m*d0
+    m[M+2:] += m[M+2:]*d1
+    m[:P-M-2] += m[:P-M-2]*d1
     
     return m
 
 def gradient_phi_6(M, L, m, alpha):
     '''
-    This function calculates the gradient of the smoothness constraint
-    for the the radial distances in the prisms.
+    Returns the gradient vector constrained that radial distances
+    within each prism must be close to null values.
     
     input
     
     M: integer - number of vertices
     L: integer - number of prisms
-    m: 1D array - parameter vector
-    alpha: integer - increment
+    m: 1D array - gradient of parameter vector
+    alpha: float - increment
     
     output
     
-    m: 1D array - parameter vector plus phi_6 constraint
+    m: 1D array - gradient vector plus phi_6 constraint
     '''
     
     P = L*(M + 2)
     
     assert m.size == P, 'The size of parameter vector must be equal to P'
     
-    H = np.zeros((P,P))
-    
-    H = Hessian_phi_6(M,L,H,alpha)
-
-    # extrecting the non-zero diagonals
-    d1 = np.diag(H)
+    # extracting the non-zero diagonals
+    d0 = diags_phi_6(M, L, alpha)
     
     # calculating the product between the diagonals and the slices of m
-    m1 = m*d1
-    
-    # the result    
-    m = alpha*m1
+    m += m*d0
     
     return m
 
@@ -780,7 +720,7 @@ def diags_phi_2(M, L, alpha):
         d0[-M-2:-M+1] = alpha        
     
     d1 = np.zeros(M+2)
-    d1[:M+2] = - alpha
+    d1[:M] = - alpha
     d1 = np.resize(d1, P-M-2)
     
     return d0, d1
@@ -863,8 +803,8 @@ def diags_phi_5(M, L, alpha):
 def diags_phi_6(M, L, alpha):
     '''
     Returns the non-zero diagonals of hessian matrix for 
-    an order zero Tikhonov on adjacent radial distances
-    in the prisms.
+    an minimum Euclidian norm on adjacent radial distances
+    within each prisms.
     
     input
     
@@ -881,7 +821,7 @@ def diags_phi_6(M, L, alpha):
     
     # building the diagonal
     d0 = np.zeros(M+2)
-    d0[:M] = - alpha
-    d0 = np.resize(d1, P)
+    d0[:M] = alpha
+    d0 = np.resize(d0, P)
     
-    return d0, d1
+    return d0
