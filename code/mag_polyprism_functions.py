@@ -100,7 +100,7 @@ def fd_tf_x0_polyprism(xp, yp, zp, m, Nv, delta, inc, dec):
               z1 and z2 are the top and bottom of each prism and
               magnetization is the physical property
     Nv: int - number of vertices per prism
-    delta: float - variation for finite difference in meters
+    delta: float - increment in x coordinate in meters
     inc: float - inclination
     dec: declination
     
@@ -147,7 +147,7 @@ def fd_tf_y0_polyprism(xp, yp, zp, m, Nv, delta, inc, dec):
               z1 and z2 are the top and bottom of each prism and
               magnetization is the physical property
     Nv: int - number of vertices per prism
-    delta: float - variation for finite difference in meters
+    delta: float - increment in y coordinate in meters
     inc: float - inclination
     dec: declination
     
@@ -194,7 +194,7 @@ def fd_tf_radial_polyprism(xp, yp, zp, m, Nv, nv, delta, inc, dec):
               magnetization is the physical property
     Nv: int - number of vertices per prism
     nv: int - number of the vertice for the derivative
-    delta: float - variation for finite difference in meters
+    delta: float - increment in radial distance in meters
     inc: float - inclination
     dec: declination
     
@@ -252,9 +252,9 @@ def fd_tf_sm_polyprism(xp, yp, zp, m, Np, Nv, deltax, deltay, deltar, inc, dec):
               magnetization is the physical property
     Np: int - number of prisms
     Nv: int - number of vertices per prism
-    deltax: float - variation for finite difference in meters for x coordinate
-    deltay: float - variation for finite difference in meters for y coordinate
-    deltar: float - variation for finite difference in meters for radial coordinate
+    deltax: float - increment in x coordinate in meters
+    deltay: float - increment in y coordinate in meters
+    deltar: float - increment in z coordinate in meters
     inc: float - inclination of the local-geomagnetic field
     dec: declination of the local-geomagnetic field
     
@@ -291,7 +291,7 @@ def Hessian_phi_1(M, L, H, alpha):
     M: integer - number of vertices
     L: integer - number of prisms
     H: 2D array - hessian matrix
-    alpha: float - increment
+    alpha: float - weight
        
     output
     
@@ -328,7 +328,7 @@ def Hessian_phi_2(M, L, H, alpha):
     M: integer - number of vertices
     L: integer - number of prisms
     H: 2D array - hessian matrix
-    alpha: float - increment
+    alpha: float - weight
        
     output
     
@@ -362,7 +362,7 @@ def Hessian_phi_3(M, L, H, alpha):
     M: integer - number of vertices
     L: integer - number of prisms
     H: 2D array - hessian matrix
-    alpha: float - increment
+    alpha: float - weight
        
     output
     
@@ -389,7 +389,7 @@ def Hessian_phi_4(M, L, H, alpha):
     M: integer - number of vertices
     L: integer - number of prisms
     H: 2D array - hessian matrix
-    alpha: float - increment
+    alpha: float - weight
        
     output
     
@@ -417,7 +417,7 @@ def Hessian_phi_5(M, L, H, alpha):
     M: integer - number of vertices
     L: integer - number of prisms
     H: 2D array - hessian matrix
-    alpha: float - increment
+    alpha: float - weight
        
     output
     
@@ -452,7 +452,7 @@ def Hessian_phi_6(M, L, H, alpha):
     M: integer - number of vertices
     L: integer - number of prisms
     H: 2D array - hessian matrix
-    alpha: float - increment
+    alpha: float - weight
        
     output
     
@@ -482,7 +482,7 @@ def gradient_phi_1(M, L, m, alpha):
     M: integer - number of vertices
     L: integer - number of prisms
     m: 1D array - gradient of parameter vector
-    alpha: float - increment
+    alpha: float - weight
     
     output
     
@@ -515,7 +515,7 @@ def gradient_phi_2(M, L, m, alpha):
     M: integer - number of vertices
     L: integer - number of prisms
     m: 1D array - gradient of parameter vector
-    alpha: float - increment
+    alpha: float - weight
     
     output
     
@@ -547,7 +547,7 @@ def gradient_phi_3(M, L, m, m0, alpha):
     L: integer - number of prisms
     m: 1D array - gradient of parameter vector
     m0: 1D array - parameters of the outcropping body
-    alpha: float - increment
+    alpha: float - weight
     
     output
     
@@ -576,7 +576,7 @@ def gradient_phi_4(M, L, m, m0, alpha):
     L: integer - number of prisms
     m: 1D array - gradient of parameter vector
     m0: 1D array - origin (x0,y0) of the outcropping body
-    alpha: float - increment
+    alpha: float - weight
     
     output
     
@@ -603,7 +603,7 @@ def gradient_phi_5(M, L, m, alpha):
     M: integer - number of vertices
     L: integer - number of prisms
     m: 1D array - gradient of parameter vector
-    alpha: float - increment
+    alpha: float - weight
     
     output
     
@@ -634,7 +634,7 @@ def gradient_phi_6(M, L, m, alpha):
     M: integer - number of vertices
     L: integer - number of prisms
     m: 1D array - gradient of parameter vector
-    alpha: float - increment
+    alpha: float - weight
     
     output
     
@@ -663,7 +663,7 @@ def diags_phi_1(M, L, alpha):
     
     M: integer - number of vertices
     L: integer - number of prisms
-    alpha: float - increment
+    alpha: float - weight
     
     output
     
@@ -697,7 +697,7 @@ def diags_phi_2(M, L, alpha):
     
     M: integer - number of vertices
     L: integer - number of prisms
-    alpha: float - increment
+    alpha: float - weight
     
     output
     
@@ -735,7 +735,7 @@ def diags_phi_3(M, L, alpha):
     
     M: integer - number of vertices
     L: integer - number of prisms
-    alpha: float - increment
+    alpha: float - weight
     
     output
     
@@ -772,7 +772,7 @@ def diags_phi_5(M, L, alpha):
     
     M: integer - number of vertices
     L: integer - number of prisms
-    alpha: float - increment
+    alpha: float - weight
     
     output
     
@@ -810,7 +810,7 @@ def diags_phi_6(M, L, alpha):
     
     M: integer - number of vertices
     L: integer - number of prisms
-    alpha: float - increment
+    alpha: float - weight
     
     output
     
