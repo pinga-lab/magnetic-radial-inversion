@@ -493,17 +493,19 @@ def gradient_phi_1(M, L, m, alpha):
     
     assert m.size == P, 'The size of parameter vector must be equal to P'
     
+    m1 = m # the new vector m1 = gradient input + gradient of phi1
+    
     # extracting the non-zero diagonals
     d0, d1, dM = diags_phi_1(M, L, alpha)
     
     # calculating the product between the diagonals and the slices of m
-    m += m*d0
-    m[1:] += m[1:]*d1
-    m[:P-1] += m[:P-1]*d1
-    m[M-1:] += m[M-1:]*dM
-    m[:P-M+1] += m[:P-M+1]*dM
+    m1 += m*d0
+    m1[1:] += m[1:]*d1
+    m1[:P-1] += m[:P-1]*d1
+    m1[M-1:] += m[M-1:]*dM
+    m1[:P-M+1] += m[:P-M+1]*dM
        
-    return m
+    return m1
 
 def gradient_phi_2(M, L, m, alpha):
     '''
@@ -519,8 +521,10 @@ def gradient_phi_2(M, L, m, alpha):
     
     output
     
-    m: 1D array - gradient vector plus phi_2 constraint
+    m2: 1D array - gradient vector plus phi_2 constraint
     '''
+    
+    m2 = m # the new vector m1 = gradient input + gradient of phi2
     
     P = L*(M + 2)
     
@@ -530,11 +534,11 @@ def gradient_phi_2(M, L, m, alpha):
     d0, d1 = diags_phi_2(M, L, alpha)
     
     # calculating the product between the diagonals and the slices of m
-    m += m*d0
-    m[M+2:] += m[M+2:]*d1
-    m[:P-M-2] += m[:P-M-2]*d1
+    m2 += m*d0
+    m2[M+2:] += m[M+2:]*d1
+    m2[:P-M-2] += m[:P-M-2]*d1
     
-    return m
+    return m2
 
 def gradient_phi_3(M, L, m, m0, alpha):
     '''
@@ -607,8 +611,10 @@ def gradient_phi_5(M, L, m, alpha):
     
     output
     
-    m: 1D array - gradient vector plus phi_5 constraint
+    m5: 1D array - gradient vector plus phi_5 constraint
     '''
+    
+    m5 = m # the new vector m1 = gradient input + gradient of phi5
     
     P = L*(M + 2)
     
@@ -618,11 +624,11 @@ def gradient_phi_5(M, L, m, alpha):
     d0, d1 = diags_phi_5(M, L, alpha)
     
     # calculating the product between the diagonals and the slices of m
-    m += m*d0
-    m[M+2:] += m[M+2:]*d1
-    m[:P-M-2] += m[:P-M-2]*d1
+    m5 += m*d0
+    m5[M+2:] += m[M+2:]*d1
+    m5[:P-M-2] += m[:P-M-2]*d1
     
-    return m
+    return m5
 
 def gradient_phi_6(M, L, m, alpha):
     '''
