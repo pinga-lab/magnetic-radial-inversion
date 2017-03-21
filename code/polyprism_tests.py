@@ -306,7 +306,7 @@ def test_tfa_fd_radial_data():
     df_m = mfun.fd_tf_radial_polyprism(xp, yp, zp, m[0], r.size, nv, delta, inc, dec)  # derivative from the function
     df_mp_mm = (mp_fat - mm_fat)/(2.*delta)  # derivative from difference of data
     
-    assert np.allclose(df_m, df_mp_mm, atol=1e-06), 'The derivative is not correct'
+    assert np.allclose(df_m, df_mp_mm, atol=1e-15), 'The derivative is not correct'
     
 def test_Hessian_phi_1():
     '''
