@@ -8,7 +8,7 @@ from fatiando.constants import CM, T2NT
 
 ### Functions for the foward problem using fatiando
 
-def pol2cart(m, Np, Nv):
+def pol2cart(m, M, L):
     '''
     This function transforms polar coordinates of the prisms
     into Cartesian coordinates and returns a list of polygonal
@@ -21,8 +21,8 @@ def pol2cart(m, Np, Nv):
               x0 and y0 are the origin cartesian coordinates of each prism,
               z1 and z2 are the top and bottom of each prism and
               magnetization is physical property
-    Np: int - number of prisms
-    Nv: int - number of vertices per prism
+    M: int - number of vertices per prism
+    L: int - number of prisms
     
     output
     
@@ -31,26 +31,26 @@ def pol2cart(m, Np, Nv):
     '''
     
     mk = []
-    r = np.zeros(Nv)  # it contains radial distances of the vertices in polar coordinates
+    r = np.zeros(M)  # it contains radial distances of the vertices in polar coordinates
     verts = [] # it contains radial distances of the vertices in Cartesian coordinates
  
-    assert len(m) == Np, 'The size of m and the number of prisms must be equal'
+    assert len(m) == L, 'The size of m and the number of prisms must be equal'
     
     for mv in m:
-        assert len(mv[0]) == Nv, 'All prisms must have Nv vertices'
+        assert len(mv[0]) == M, 'All prisms must have M vertices'
       
-    ang = 2*np.pi/Nv # angle between two vertices
+    ang = 2*np.pi/M # angle between two vertices
 
     for mv in m:
         r = mv[0]
         verts=[]
-        for i in range(Nv):
+        for i in range(M):
             verts.append([r[i]*np.cos(i*ang) + mv[1], r[i]*np.sin(i*ang) + mv[2]])
         mk.append(PolygonalPrism(verts, mv[3], mv[4], mv[5]))
         
     return mk
 
-def param_vec(m, Np, Nv):
+def param_vec(m, M, L):
     '''
     This function receives the model of prisms and returns the vector of parameters
     
@@ -61,8 +61,8 @@ def param_vec(m, Np, Nv):
               x0 and y0 are the origin cartesian coordinates of each prism,
               z1 and z2 are the top and bottom of each prism and
               magnetization is physical property
-    Np: int - number of prisms
-    Nv: int - number of vertices per prism
+    M: int - number of vertices per prism
+    L: int - number of prisms
     
     output
     
@@ -72,19 +72,19 @@ def param_vec(m, Np, Nv):
     pv = np.zeros(0) # parameters vector
     mv = [] # list for the loop of asserts
  
-    assert len(m) == Np, 'The size of m and the number of prisms must be equal'
+    assert len(m) == L, 'The size of m and the number of prisms must be equal'
     
     for mv in m:
-        assert len(mv[0]) == Nv, 'All prisms must have Nv vertices'
+        assert len(mv[0]) == M, 'All prisms must have M vertices'
     
-    for i in range(Np):
+    for i in range(L):
         pv = np.hstack((pv, m[i][0], m[i][1:3]))
     
     return pv
 
 ### Functions for the derivatives with finite differences
 
-def fd_tf_x0_polyprism(xp, yp, zp, m, Nv, delta, inc, dec):
+def fd_tf_x0_polyprism(xp, yp, zp, m, M, delta, inc, dec):
     '''
     This function calculates the derivative for total field anomaly
     from a model of polygonal prisms using finite difference.
@@ -99,7 +99,7 @@ def fd_tf_x0_polyprism(xp, yp, zp, m, Nv, delta, inc, dec):
               x0 and y0 are the origin cartesian coordinates of each prism,
               z1 and z2 are the top and bottom of each prism and
               magnetization is the physical property
-    Nv: int - number of vertices per prism
+    M: int - number of vertices per prism
     delta: float - increment in x coordinate in meters
     inc: float - inclination
     dec: declination
@@ -109,7 +109,7 @@ def fd_tf_x0_polyprism(xp, yp, zp, m, Nv, delta, inc, dec):
     df: 1D array - derivative
     '''
     assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
-    assert m[0].size + len(m[1:]) == Nv + 5, 'The number of parameter must be Nv + 5'
+    assert m[0].size + len(m[1:]) == M + 5, 'The number of parameter must be M + 5'
     
     mp = []  # m + delta
     mm = []  # m - delta
@@ -120,8 +120,8 @@ def fd_tf_x0_polyprism(xp, yp, zp, m, Nv, delta, inc, dec):
     mp = [[m[0], m[1] + delta, m[2], m[3], m[4], m[5]]]
     mm = [[m[0], m[1] - delta, m[2], m[3], m[4], m[5]]]
     
-    mp_fat = pol2cart(mp, 1, Nv)
-    mm_fat = pol2cart(mm, 1, Nv)
+    mp_fat = pol2cart(mp, 1, M)
+    mm_fat = pol2cart(mm, 1, M)
     
     df = (polyprism.tf(xp, yp, zp, mp_fat, inc, dec)\
           - polyprism.tf(xp, yp, zp, mm_fat, inc, dec))
@@ -131,7 +131,7 @@ def fd_tf_x0_polyprism(xp, yp, zp, m, Nv, delta, inc, dec):
     return df
 
 
-def fd_tf_y0_polyprism(xp, yp, zp, m, Nv, delta, inc, dec):
+def fd_tf_y0_polyprism(xp, yp, zp, m, M, delta, inc, dec):
     '''
     This function calculates the derivative for total field anomaly
     from a model of polygonal prisms using finite difference.
@@ -146,7 +146,7 @@ def fd_tf_y0_polyprism(xp, yp, zp, m, Nv, delta, inc, dec):
               x0 and y0 are the origin cartesian coordinates of each prism,
               z1 and z2 are the top and bottom of each prism and
               magnetization is the physical property
-    Nv: int - number of vertices per prism
+    M: int - number of vertices per prism
     delta: float - increment in y coordinate in meters
     inc: float - inclination
     dec: declination
@@ -156,7 +156,7 @@ def fd_tf_y0_polyprism(xp, yp, zp, m, Nv, delta, inc, dec):
     df: 1D array - derivative
     '''
     assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
-    assert len(m[0]) + len(m[1:]) == Nv + 5, 'The number of parameter must be Nv + 5'
+    assert len(m[0]) + len(m[1:]) == M + 5, 'The number of parameter must be M + 5'
     
     mp = []  # m + delta
     mm = []  # m - delta
@@ -167,8 +167,8 @@ def fd_tf_y0_polyprism(xp, yp, zp, m, Nv, delta, inc, dec):
     mp = [[m[0], m[1], m[2] + delta, m[3], m[4], m[5]]]
     mm = [[m[0], m[1], m[2] - delta, m[3], m[4], m[5]]]
     
-    mp_fat = pol2cart(mp, 1, Nv)
-    mm_fat = pol2cart(mm, 1, Nv)
+    mp_fat = pol2cart(mp, 1, M)
+    mm_fat = pol2cart(mm, 1, M)
     
     df = (polyprism.tf(xp, yp, zp, mp_fat, inc, dec)\
           - polyprism.tf(xp, yp, zp, mm_fat, inc, dec))
@@ -177,7 +177,7 @@ def fd_tf_y0_polyprism(xp, yp, zp, m, Nv, delta, inc, dec):
     
     return df
 
-def fd_tf_radial_polyprism(xp, yp, zp, m, Nv, nv, delta, inc, dec):
+def fd_tf_radial_polyprism(xp, yp, zp, m, M, nv, delta, inc, dec):
     '''
     This function calculates the derivative for total field anomaly
     from a model of polygonal prisms using finite difference.
@@ -192,7 +192,7 @@ def fd_tf_radial_polyprism(xp, yp, zp, m, Nv, nv, delta, inc, dec):
               x0 and y0 are the origin cartesian coordinates of each prism,
               z1 and z2 are the top and bottom of each prism and
               magnetization is the physical property
-    Nv: int - number of vertices per prism
+    M: int - number of vertices per prism
     nv: int - number of the vertice for the derivative
     delta: float - increment in radial distance in meters
     inc: float - inclination
@@ -203,15 +203,15 @@ def fd_tf_radial_polyprism(xp, yp, zp, m, Nv, nv, delta, inc, dec):
     df: 1D array - derivative
     '''
     assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
-    assert len(m[0]) + len(m[1:]) == Nv + 5, 'The number of parameter must be Nv + 5'
-    assert nv < Nv, 'The vertice number must be smaller than the number of vertices (0 - Nv)'
+    assert len(m[0]) + len(m[1:]) == M + 5, 'The number of parameter must be M + 5'
+    assert nv < M, 'The vertice number must be smaller than the number of vertices (0 - M)'
     
     m_fat = [] # list of objects of the class fatiando.mesher.PolygonalPrism
     df = np.zeros(xp.size) # derivative
     verts = [] # vertices of new prism
-    ang = 2.*np.pi/Nv # angle between two vertices
+    ang = 2.*np.pi/M # angle between two vertices
     
-    if nv == Nv - 1:
+    if nv == M - 1:
         nvp = 0
     else:
         nvp = nv + 1
@@ -235,7 +235,7 @@ def fd_tf_radial_polyprism(xp, yp, zp, m, Nv, nv, delta, inc, dec):
     
     return df
 
-def fd_tf_sm_polyprism(xp, yp, zp, m, Np, Nv, deltax, deltay, deltar, inc, dec):
+def fd_tf_sm_polyprism(xp, yp, zp, m, M, L, deltax, deltay, deltar, inc, dec):
     '''
     This function calculates the derivative for total field anomaly
     from a model of polygonal prisms using finite difference.
@@ -250,8 +250,8 @@ def fd_tf_sm_polyprism(xp, yp, zp, m, Np, Nv, deltax, deltay, deltar, inc, dec):
               x0 and y0 are the origin cartesian coordinates of each prism,
               z1 and z2 are the top and bottom of each prism and
               magnetization is the physical property
-    Np: int - number of prisms
-    Nv: int - number of vertices per prism
+    M: int - number of vertices per prism
+    L: int - number of prisms
     deltax: float - increment in x coordinate in meters
     deltay: float - increment in y coordinate in meters
     deltar: float - increment in z coordinate in meters
@@ -263,19 +263,19 @@ def fd_tf_sm_polyprism(xp, yp, zp, m, Np, Nv, deltax, deltay, deltar, inc, dec):
     G: 2D array - sensibility matrix
     '''
     for mv in m:
-        assert len(mv[0]) == Nv, 'All prisms must have Nv vertices'
+        assert len(mv[0]) == M, 'All prisms must have M vertices'
     assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
     
-    pp = 2 + Nv # number of parameters per prism
+    pp = 2 + M # number of parameters per prism
     
     G = np.zeros((xp.size, pp*Np))
     
     for i, mv in enumerate(m):
         aux = i*pp
-        G[:, aux + Nv] = fd_tf_x0_polyprism(xp, yp, zp, mv, Nv, deltax, inc, dec)
-        G[:, aux + Nv + 1] = fd_tf_y0_polyprism(xp, yp, zp, mv, Nv, deltay, inc, dec)
-        for j in range(Nv):
-            G[:, aux + j] = fd_tf_radial_polyprism(xp, yp, zp, mv, Nv, j, deltar, inc, dec)
+        G[:, aux + M] = fd_tf_x0_polyprism(xp, yp, zp, mv, M, deltax, inc, dec)
+        G[:, aux + M + 1] = fd_tf_y0_polyprism(xp, yp, zp, mv, M, deltay, inc, dec)
+        for j in range(M):
+            G[:, aux + j] = fd_tf_radial_polyprism(xp, yp, zp, mv, M, j, deltar, inc, dec)
             
     return G
 
@@ -831,3 +831,38 @@ def diags_phi_6(M, L, alpha):
     d0 = np.resize(d0, P)
     
     return d0
+
+# Functions for inverse problem
+
+def trans_parameter(m, M, L, rmin, rmax, x0min, x0max, y0min, y0max):
+    '''
+    Returns transformated parameters.
+    
+    input
+    
+    M: integer - number of vertices
+    L: integer - number of prisms
+    m: 1D array - parameter vector
+    rmin: float - minimum value of radial distances
+    rmax: float - maximum value of radial distances
+    x0min: float - minimum value of x coordinate of origins
+    x0max: float - maximum value of x coordinate of origins
+    y0min: float - minimum value of y coordinate of origins
+    y0max: float - maximum value of y coordinate of origins
+    
+    output
+    
+    mt: 1D array - transformated parameter vector
+    '''
+    
+    assert len(m) == L*(M + 2), 'The size of m must be equal to L*(M + 2)'
+    
+
+    mt = np.zeros_like(m)
+    
+    for i in range(0, L*(M+2), M+2):
+        mt[i:M+i] = - np.log(rmax - m[i:M+i])/(m[i:M+i] - rmin)
+        mt[i+M] = - np.log(x0max - m[i+M])/(m[i+M] - x0min)
+        mt[i+M+1] = - np.log(y0max - m[i+M+1])/(m[i+M+1] - y0min)
+        
+    return mt
