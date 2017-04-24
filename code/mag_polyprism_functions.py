@@ -82,6 +82,37 @@ def param_vec(m, M, L):
     
     return pv
 
+def param2model(m, M, L):
+    '''
+    Returns a model of list of objects of the class
+    fatiando.mesher.PolygonalPrism
+    
+    input
+    
+    m: 1D array - parameter vector
+    M: number of vertices
+    L: number of prisms
+    
+    output
+    
+    model: list - list of the class 
+                  fatiando.mesher.PolygonalPrism
+                  
+    '''
+    assert m.size == L*(M + 2), 'The size of m must be equal to L*(M + 2)'
+    
+    r = np.zeros(M) # vector for radial distances
+    mv = [] # list of prisms    
+    model = [] # list of classes
+    
+    for i in range(0, L*(M + 2), M + 2):
+        r = m[i:M+2+i]
+        mv.append([r, m[i+M:M+2]])
+        
+    model = pol2cart(model, M, L)
+    
+    return model    
+
 ### Functions for the derivatives with finite differences
 
 def fd_tf_x0_polyprism(xp, yp, zp, m, M, delta, inc, dec):
@@ -120,8 +151,8 @@ def fd_tf_x0_polyprism(xp, yp, zp, m, M, delta, inc, dec):
     mp = [[m[0], m[1] + delta, m[2], m[3], m[4], m[5]]]
     mm = [[m[0], m[1] - delta, m[2], m[3], m[4], m[5]]]
     
-    mp_fat = pol2cart(mp, 1, M)
-    mm_fat = pol2cart(mm, 1, M)
+    mp_fat = pol2cart(mp, M, 1)
+    mm_fat = pol2cart(mm, M, 1)
     
     df = (polyprism.tf(xp, yp, zp, mp_fat, inc, dec)\
           - polyprism.tf(xp, yp, zp, mm_fat, inc, dec))
@@ -167,8 +198,8 @@ def fd_tf_y0_polyprism(xp, yp, zp, m, M, delta, inc, dec):
     mp = [[m[0], m[1], m[2] + delta, m[3], m[4], m[5]]]
     mm = [[m[0], m[1], m[2] - delta, m[3], m[4], m[5]]]
     
-    mp_fat = pol2cart(mp, 1, M)
-    mm_fat = pol2cart(mm, 1, M)
+    mp_fat = pol2cart(mp, M, 1)
+    mm_fat = pol2cart(mm, M, 1)
     
     df = (polyprism.tf(xp, yp, zp, mp_fat, inc, dec)\
           - polyprism.tf(xp, yp, zp, mm_fat, inc, dec))
@@ -237,8 +268,8 @@ def fd_tf_radial_polyprism(xp, yp, zp, m, M, nv, delta, inc, dec):
 
 def fd_tf_sm_polyprism(xp, yp, zp, m, M, L, deltax, deltay, deltar, inc, dec):
     '''
-    This function calculates the derivative for total field anomaly
-    from a model of polygonal prisms using finite difference.
+    Returns the sensibility matrix for polygonal prisms using finite 
+    differences.
     
     input
     
@@ -268,7 +299,7 @@ def fd_tf_sm_polyprism(xp, yp, zp, m, M, L, deltax, deltay, deltar, inc, dec):
     
     pp = 2 + M # number of parameters per prism
     
-    G = np.zeros((xp.size, pp*Np))
+    G = np.zeros((xp.size, pp*L))
     
     for i, mv in enumerate(m):
         aux = i*pp
@@ -561,7 +592,7 @@ def gradient_phi_3(M, L, m, m0, alpha):
     P = L*(M + 2)
     
     assert m.size == P, 'The size of parameter vector must be equal to P'
-    assert m0.size == M+2, 'The size of parameter vector must be equal to M + 2'
+    assert m0.size == M + 2, 'The size of parameter vector must be equal to M + 2'
 
     
     # calculating the product between the diagonals and the slices of m
@@ -842,7 +873,8 @@ def trans_parameter(m, M, L, rmin, rmax, x0min, x0max, y0min, y0max):
     
     M: integer - number of vertices
     L: integer - number of prisms
-    m: 1D array - parameter vector
+    m: 1D array - parameter vector with radial distances of each vertice
+                  and the Cartesian coordinates of each prism
     rmin: float - minimum value of radial distances
     rmax: float - maximum value of radial distances
     x0min: float - minimum value of x coordinate of origins
@@ -860,9 +892,125 @@ def trans_parameter(m, M, L, rmin, rmax, x0min, x0max, y0min, y0max):
 
     mt = np.zeros_like(m)
     
-    for i in range(0, L*(M+2), M+2):
-        mt[i:M+i] = - np.log(rmax - m[i:M+i])/(m[i:M+i] - rmin)
-        mt[i+M] = - np.log(x0max - m[i+M])/(m[i+M] - x0min)
-        mt[i+M+1] = - np.log(y0max - m[i+M+1])/(m[i+M+1] - y0min)
+    P = L*(M+2)  # number of parameters
+    
+    for i in range(0, P, M+2):
+        mt[i:M+i] = - np.log((rmax - m[i:M+i])/(m[i:M+i] - rmin))
+        mt[i+M] = - np.log((x0max - m[i+M])/(m[i+M] - x0min))
+        mt[i+M+1] = - np.log((y0max - m[i+M+1])/(m[i+M+1] - y0min))
         
     return mt
+
+def trans_inv_parameter(mt, M, L, rmin, rmax, x0min, x0max, y0min, y0max):
+    '''
+    Returns the initial parameters from the transformated ones.
+    
+    input
+    
+    M: integer - number of vertices
+    L: integer - number of prisms
+    mt: 1D array - transformated parameters vector with 
+                  radial distances of each vertice
+                  and the Cartesian coordinates of each prism
+    rmin: float - minimum value of radial distances
+    rmax: float - maximum value of radial distances
+    x0min: float - minimum value of x coordinate of origins
+    x0max: float - maximum value of x coordinate of origins
+    y0min: float - minimum value of y coordinate of origins
+    y0max: float - maximum value of y coordinate of origins
+    
+    output
+    
+    mt: 1D array - parameters vector
+    '''
+    
+    assert len(mt) == L*(M + 2), 'The size of m must be equal to L*(M + 2)'
+    
+
+    m = np.zeros_like(mt)
+    
+    for i in range(0, L*(M+2), M+2):
+        m[i:M+i] = rmin + ((rmax - rmin)/(1 + np.exp(- mt[i:M+i])))
+        m[i+M] = x0min + ((x0max - x0min)/(1 + np.exp(- mt[i+M])))
+        m[i+M+1] = y0min + ((y0max - y0min)/(1 + np.exp(- mt[i+M+1])))
+        
+    return m
+
+def gradient_data(xp, yp, zp, m, M, L, d, deltax, deltay, deltar, inc, dec):
+    '''
+    This function returns the gradient vector of the data
+    from a model of polygonal prisms using finite difference.
+    
+    input
+    
+    xp: 1D array - x observation points
+    yp: 1D array - y observation points
+    zp: 1D array - z observation points
+    m: 1D array - parameter vector with radial distances of each vertice
+                  and the Cartesian coordinates of each prism
+    M: int - number of vertices per prism
+    L: int - number of prisms
+    d: 1D array - data vector
+    deltax: float - increment in x coordinate in meters
+    deltay: float - increment in y coordinate in meters
+    deltar: float - increment in z coordinate in meters
+    inc: float - inclination of the local-geomagnetic field
+    dec: declination of the local-geomagnetic field
+    
+    output
+    
+    g: 2D array - gradient vector of the data
+    '''
+    assert len(m) == L, 'The size of m must be equal to L*(M + 2)'
+    assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
+    
+    model = pol2cart(m, M, L) # model with transformated parameters
+    
+    # predict data of transformated matrix
+    dp = polyprism.tf(xp, yp, zp, model, inc, dec)
+    
+    # residual
+    df = d - dp
+    
+    #Jacobian matrix
+    G = fd_tf_sm_polyprism(xp, yp, zp, m, M, L, deltax, deltay, deltar, inc, dec)
+    
+    g = -2*np.dot(G.T, df)/xp.size
+    
+    return g
+
+def Hessian_data(xp, yp, zp, m, M, L, deltax, deltay, deltar, inc, dec):
+    '''
+    This function returns the Hessian matrix of the data
+    from a model of polygonal prisms using finite difference.
+    
+    input
+    
+    xp: array - x observation points
+    yp: array - y observation points
+    zp: array - z observation points
+    m: 1D array - parameter vector with radial distances of each vertice
+                  and the Cartesian coordinates of each prism
+    M: int - number of vertices per prism
+    L: int - number of prisms
+    deltax: float - increment in x coordinate in meters
+    deltay: float - increment in y coordinate in meters
+    deltar: float - increment in z coordinate in meters
+    inc: float - inclination of the local-geomagnetic field
+    dec: declination of the local-geomagnetic field
+    
+    output
+    
+    H: 2D array - Hessian matrix of the data
+    '''
+    assert len(m) == L, 'The size of m must be equal to L*(M + 2)'
+    assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
+    
+    model = pol2cart(m, M, L) # model with transformated parameters
+    
+    #Jacobian matrix
+    G = fd_tf_sm_polyprism(xp, yp, zp, m, M, L, deltax, deltay, deltar, inc, dec)
+    
+    H = np.dot(G.T, G)/xp.size
+    
+    return H
