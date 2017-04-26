@@ -82,7 +82,7 @@ def param_vec(m, M, L):
     
     return pv
 
-def param2model(m, M, L):
+def param2model(m, M, L, z0, dz, props):
     '''
     Returns a model of list of objects of the class
     fatiando.mesher.PolygonalPrism
@@ -90,8 +90,11 @@ def param2model(m, M, L):
     input
     
     m: 1D array - parameter vector
-    M: number of vertices
-    L: number of prisms
+    M: int - number of vertices
+    L: int - number of prisms
+    z0: float - the top of the model
+    dz: float - the thickness of each prism
+    props: dictionary - physical property
     
     output
     
@@ -105,11 +108,13 @@ def param2model(m, M, L):
     mv = [] # list of prisms    
     model = [] # list of classes
     
+    k = 0
     for i in range(0, L*(M + 2), M + 2):
-        r = m[i:M+2+i]
-        mv.append([r, m[i+M:M+2]])
+        r = m[i:M+i]
+        mv.append([r, m[i+M], m[i+M+1], z0 + dz*k, z0 + dz*(k + 1), props])
+        k = k + 1
         
-    model = pol2cart(model, M, L)
+    model = pol2cart(mv, M, L)
     
     return model    
 
@@ -961,7 +966,7 @@ def gradient_data(xp, yp, zp, m, M, L, d, deltax, deltay, deltar, inc, dec):
     
     g: 2D array - gradient vector of the data
     '''
-    assert len(m) == L, 'The size of m must be equal to L*(M + 2)'
+    assert len(m) == L, 'The size of m must be equal to L'
     assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
     
     model = pol2cart(m, M, L) # model with transformated parameters
