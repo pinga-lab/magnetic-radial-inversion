@@ -560,7 +560,7 @@ def gradient_phi_2(M, L, m, alpha):
     m2: 1D array - gradient vector plus phi_2 constraint
     '''
     
-    m2 = m # the new vector m1 = gradient input + gradient of phi2
+    m2 = m # the new vector m2 = gradient input + gradient of phi2
     
     P = L*(M + 2)
     
@@ -694,6 +694,76 @@ def gradient_phi_6(M, L, m, alpha):
     m += m*d0
     
     return m
+
+def phi_1(M, L, m, alpha):
+    '''
+    Returns the value for the phi1 constraint.
+    
+    input
+    
+    M: integer - number of vertices
+    L: integer - number of prisms
+    m: 1D array - gradient of parameter vector
+    alpha: float - weight
+    
+    output
+    
+    phi_1: float - value of phi_1 constraint
+    '''
+    
+    P = L*(M + 2)
+    
+    assert m.size == P, 'The size of parameter vector must be equal to P'
+    
+    m1 = m # the new vector m1 = gradient input + gradient of phi1
+    
+    # extracting the non-zero diagonals
+    d0, d1, dM = diags_phi_1(M, L, alpha)
+    
+    # calculating the product between the diagonals and the slices of m
+    m1 += m*d0
+    m1[1:] += m[1:]*d1
+    m1[:P-1] += m[:P-1]*d1
+    m1[M-1:] += m[M-1:]*dM
+    m1[:P-M+1] += m[:P-M+1]*dM
+    
+    phi_1 = np.dot(m1, m)
+    
+    return phi_1
+
+def phi_2(M, L, m, alpha):
+    '''
+    Returns the value for the phi2 constraint.
+    
+    input
+    
+    M: integer - number of vertices
+    L: integer - number of prisms
+    m: 1D array - gradient of parameter vector
+    alpha: float - weight
+    
+    output
+    
+    phi_2: float - value of phi_2 constraint
+    '''
+    
+    m2 = m # the new vector m2 = gradient input + gradient of phi2
+    
+    P = L*(M + 2)
+    
+    assert m.size == P, 'The size of parameter vector must be equal to P'
+    
+    # extracting the non-zero diagonals
+    d0, d1 = diags_phi_2(M, L, alpha)
+    
+    # calculating the product between the diagonals and the slices of m
+    m2 += m*d0
+    m2[M+2:] += m[M+2:]*d1
+    m2[:P-M-2] += m[:P-M-2]*d1
+    
+    phi_2 = np.dot(m1, m)
+    
+    return m2
 
 def diags_phi_1(M, L, alpha):
     '''
