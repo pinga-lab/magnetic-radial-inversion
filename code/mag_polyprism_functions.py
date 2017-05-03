@@ -703,7 +703,7 @@ def phi_1(M, L, m, alpha):
     
     M: integer - number of vertices
     L: integer - number of prisms
-    m: 1D array - gradient of parameter vector
+    m: 1D array - parameter vector
     alpha: float - weight
     
     output
@@ -715,17 +715,17 @@ def phi_1(M, L, m, alpha):
     
     assert m.size == P, 'The size of parameter vector must be equal to P'
     
-    m1 = m # the new vector m1 = gradient input + gradient of phi1
+    m1 = gradient_phi_1(M, L, m, alpha) # the new vector m1 = gradient input + gradient of phi1
     
     # extracting the non-zero diagonals
-    d0, d1, dM = diags_phi_1(M, L, alpha)
+    #d0, d1, dM = diags_phi_1(M, L, alpha)
     
     # calculating the product between the diagonals and the slices of m
-    m1 += m*d0
-    m1[1:] += m[1:]*d1
-    m1[:P-1] += m[:P-1]*d1
-    m1[M-1:] += m[M-1:]*dM
-    m1[:P-M+1] += m[:P-M+1]*dM
+    #m1 += m*d0
+    #m1[1:] += m[1:]*d1
+    #m1[:P-1] += m[:P-1]*d1
+    #m1[M-1:] += m[M-1:]*dM
+    #m1[:P-M+1] += m[:P-M+1]*dM
     
     phi_1 = np.dot(m1, m)
     
@@ -739,7 +739,7 @@ def phi_2(M, L, m, alpha):
     
     M: integer - number of vertices
     L: integer - number of prisms
-    m: 1D array - gradient of parameter vector
+    m: 1D array - parameter vector
     alpha: float - weight
     
     output
@@ -761,9 +761,135 @@ def phi_2(M, L, m, alpha):
     m2[M+2:] += m[M+2:]*d1
     m2[:P-M-2] += m[:P-M-2]*d1
     
-    phi_2 = np.dot(m1, m)
+    phi_2 = np.dot(m2, m)
     
-    return m2
+    return phi_2
+
+def phi_3(M, L, m, m0, alpha):
+    '''
+    Returns the value for the phi3 constraint.
+    
+    input
+    
+    M: integer - number of vertices
+    L: integer - number of prisms
+    m: 1D array - parameter vector
+    m0: 1D array - parameters of the outcropping body
+    alpha: float - weight
+    
+    output
+    
+    phi_3: float - value of phi_3 constraint
+    '''
+    
+    P = L*(M + 2)
+    
+    assert m.size == P, 'The size of parameter vector must be equal to P'
+    assert m0.size == M + 2, 'The size of parameter vector must be equal to M + 2'
+
+    
+    # calculating the product between the diagonals and the slices of m
+    m[:M+2] += m[:M+2] - m0
+    
+    phi_3 = np.dot(m, m)
+        
+    return phi_3
+
+def phi_4(M, L, m, m0, alpha):
+    '''
+    Returns the value for the phi4 constraint.
+    
+    input
+    
+    M: integer - number of vertices
+    L: integer - number of prisms
+    m: 1D array - parameter vector
+    m0: 1D array - parameters of the outcropping body
+    alpha: float - weight
+    
+    output
+    
+    phi_4: float - value of phi_4 constraint
+    '''
+    
+    P = L*(M + 2)
+    
+    assert m.size == P, 'The size of parameter vector must be equal to P'
+    assert m0.size == 2, 'The size of parameter vector must be equal to 2'
+
+    
+    # calculating the product between the diagonals and the slices of m
+    m[M:M+2] += m[M:M+2] - m0
+    
+    phi_4 = np.dot(m, m)
+        
+    return phi_4
+
+def phi_5(M, L, m, alpha):
+    '''
+    Returns the value for the phi5 constraint.
+    
+    input
+    
+    M: integer - number of vertices
+    L: integer - number of prisms
+    m: 1D array - parameter vector
+    alpha: float - weight
+    
+    output
+    
+    phi_5: float - value of phi_5 constraint
+    '''
+    
+    m5 = m # the new vector m1 = gradient input + gradient of phi5
+    
+    P = L*(M + 2)
+    
+    assert m.size == P, 'The size of parameter vector must be equal to P'
+    
+    # extracting the non-zero diagonals
+    d0, d1 = diags_phi_5(M, L, alpha)
+    
+    # calculating the product between the diagonals and the slices of m
+    m5 += m*d0
+    m5[M+2:] += m[M+2:]*d1
+    m5[:P-M-2] += m[:P-M-2]*d1
+    
+    phi_5 = np.dot(m5, m)
+    
+    return phi_5
+
+def phi_6(M, L, m, alpha):
+    '''
+    Returns the value for the phi6 constraint.
+    
+    input
+    
+    M: integer - number of vertices
+    L: integer - number of prisms
+    m: 1D array - parameter vector
+    alpha: float - weight
+    
+    output
+    
+    phi_6: float - value of phi_6 constraint
+    '''
+    
+    P = L*(M + 2)
+    
+    assert m.size == P, 'The size of parameter vector must be equal to P'
+    
+    # extracting the non-zero diagonals
+    d0 = diags_phi_6(M, L, alpha)
+    
+    m6 = m
+    
+    # calculating the product between the diagonals and the slices of m
+    m6 += m*d0
+    
+    phi_6 = np.dot(m6, m)
+    
+    return phi_6
 
 def diags_phi_1(M, L, alpha):
     '''
@@ -1086,6 +1212,6 @@ def Hessian_data(xp, yp, zp, m, M, L, deltax, deltay, deltar, inc, dec):
     #Jacobian matrix
     G = fd_tf_sm_polyprism(xp, yp, zp, m, M, L, deltax, deltay, deltar, inc, dec)
     
-    H = np.dot(G.T, G)/xp.size
+    H = 2*np.dot(G.T, G)/xp.size
     
     return H
