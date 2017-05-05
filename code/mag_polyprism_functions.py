@@ -753,13 +753,15 @@ def phi_2(M, L, m, alpha):
     
     assert m.size == P, 'The size of parameter vector must be equal to P'
     
+    m2 = gradient_phi_1(M, L, m, alpha) # the new vector m1 = gradient input + gradient of phi1
+    
     # extracting the non-zero diagonals
-    d0, d1 = diags_phi_2(M, L, alpha)
+    #d0, d1 = diags_phi_2(M, L, alpha)
     
     # calculating the product between the diagonals and the slices of m
-    m2 += m*d0
-    m2[M+2:] += m[M+2:]*d1
-    m2[:P-M-2] += m[:P-M-2]*d1
+    #m2 += m*d0
+    #m2[M+2:] += m[M+2:]*d1
+    #m2[:P-M-2] += m[:P-M-2]*d1
     
     phi_2 = np.dot(m2, m)
     
@@ -847,13 +849,15 @@ def phi_5(M, L, m, alpha):
     
     assert m.size == P, 'The size of parameter vector must be equal to P'
     
+    m5 = gradient_phi_1(M, L, m, alpha) # the new vector m1 = gradient input + gradient of phi1
+    
     # extracting the non-zero diagonals
-    d0, d1 = diags_phi_5(M, L, alpha)
+    #d0, d1 = diags_phi_5(M, L, alpha)
     
     # calculating the product between the diagonals and the slices of m
-    m5 += m*d0
-    m5[M+2:] += m[M+2:]*d1
-    m5[:P-M-2] += m[:P-M-2]*d1
+    #m5 += m*d0
+    #m5[M+2:] += m[M+2:]*d1
+    #m5[:P-M-2] += m[:P-M-2]*d1
     
     phi_5 = np.dot(m5, m)
     
@@ -879,13 +883,15 @@ def phi_6(M, L, m, alpha):
     
     assert m.size == P, 'The size of parameter vector must be equal to P'
     
-    # extracting the non-zero diagonals
-    d0 = diags_phi_6(M, L, alpha)
+    m6 = gradient_phi_1(M, L, m, alpha) # the new vector m1 = gradient input + gradient of phi1
     
-    m6 = m
+    # extracting the non-zero diagonals
+    #d0 = diags_phi_6(M, L, alpha)
+    
+    #m6 = m
     
     # calculating the product between the diagonals and the slices of m
-    m6 += m*d0
+    #m6 += m*d0
     
     phi_6 = np.dot(m6, m)
     
