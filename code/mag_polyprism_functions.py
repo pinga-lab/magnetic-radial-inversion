@@ -1137,9 +1137,9 @@ def trans_inv_parameter(mt, M, L, rmin, rmax, x0min, x0max, y0min, y0max):
     m = np.zeros_like(mt)
     
     for i in range(0, L*(M+2), M+2):
-        m[i:M+i] = rmin + ((rmax - rmin)/(1 + np.exp(- mt[i:M+i])))
-        m[i+M] = x0min + ((x0max - x0min)/(1 + np.exp(- mt[i+M])))
-        m[i+M+1] = y0min + ((y0max - y0min)/(1 + np.exp(- mt[i+M+1])))
+        m[i:M+i] = rmin + (rmax - rmin)/(1. + np.exp(-mt[i:M+i]))
+        m[i+M] = x0min + (x0max - x0min)/(1. + np.exp(-mt[i+M]))
+        m[i+M+1] = y0min + (y0max - y0min)/(1. + np.exp(-mt[i+M+1]))
         
     return m
 
@@ -1157,7 +1157,7 @@ def gradient_data(xp, yp, zp, m, M, L, d, deltax, deltay, deltar, inc, dec):
                   and the Cartesian coordinates of each prism
     M: int - number of vertices per prism
     L: int - number of prisms
-    d: 1D array - data vector
+    d: 1D array - observed data vector
     deltax: float - increment in x coordinate in meters
     deltay: float - increment in y coordinate in meters
     deltar: float - increment in z coordinate in meters
@@ -1210,10 +1210,10 @@ def Hessian_data(xp, yp, zp, m, M, L, deltax, deltay, deltar, inc, dec):
     
     H: 2D array - Hessian matrix of the data
     '''
-    assert len(m) == L, 'The size of m must be equal to L*(M + 2)'
+    assert len(m) == L, 'The size of m must be equal to L'
     assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
     
-    model = pol2cart(m, M, L) # model with transformated parameters
+    #model = pol2cart(m, M, L) # model with transformated parameters
     
     #Jacobian matrix
     G = fd_tf_sm_polyprism(xp, yp, zp, m, M, L, deltax, deltay, deltar, inc, dec)
