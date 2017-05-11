@@ -1108,6 +1108,14 @@ def trans_parameter(m, M, L, rmin, rmax, x0min, x0max, y0min, y0max):
         
     return mt
 
+
+def trans_parameter2(m, mmax, mmin):
+
+    mt = -np.log((mmax - m)/(m - mmin))
+
+    return mt
+
+
 def trans_inv_parameter(mt, M, L, rmin, rmax, x0min, x0max, y0min, y0max):
     '''
     Returns the initial parameters from the transformated ones.
@@ -1137,11 +1145,21 @@ def trans_inv_parameter(mt, M, L, rmin, rmax, x0min, x0max, y0min, y0max):
     m = np.zeros_like(mt)
     
     for i in range(0, L*(M+2), M+2):
-        m[i:M+i] = rmin + (rmax - rmin)/(1. + np.exp(-mt[i:M+i]))
-        m[i+M] = x0min + (x0max - x0min)/(1. + np.exp(-mt[i+M]))
-        m[i+M+1] = y0min + (y0max - y0min)/(1. + np.exp(-mt[i+M+1]))
+        m[i:M+i] = 0.001*rmin + 0.001*(rmax - rmin)/(1. + np.exp(-0.001*mt[i:M+i]))
+        m[i+M] = 0.001*x0min + 0.001*(x0max - x0min)/(1. + np.exp(-0.001*mt[i+M]))
+        m[i+M+1] = 0.001*y0min + 0.001*(y0max - y0min)/(1. + np.exp(-0.001*mt[i+M+1]))
+
+    m *= 1000.
         
     return m
+
+
+def trans_inv_parameter2(mt, mmax, mmin):
+
+    m = 1000.*(0.001*mmin + (0.001*(mmax - mmin))/(1. + np.exp(-0.001*mt)))
+
+    return m
+    
 
 def gradient_data(xp, yp, zp, m, M, L, d, deltax, deltay, deltar, inc, dec):
     '''
