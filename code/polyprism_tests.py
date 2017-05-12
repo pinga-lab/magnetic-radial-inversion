@@ -18,11 +18,11 @@ def test_volume():
     
     Assertion
     '''
-    Np = 10 # number of prisms
-    Nv = 8 # number of vertices
+    L = 10 # number of prisms
+    M = 8 # number of vertices
 
     #r = 1000. # radial distance for each vertice
-    r = np.zeros(Nv)
+    r = np.zeros(M)
     r[::2] = 1000.
     r[1::2] = np.sqrt(2.)*1000./2.
     
@@ -30,11 +30,11 @@ def test_volume():
 
     area = 0.
 
-    for i in range(Nv-1):
-        area += r[i]*r[i+1]*np.sin(2.*(i+1)*np.pi/Nv - 2.*i*np.pi/Nv)
-    area = area + r[-1]*r[0]*np.sin(2.*np.pi - 2.*(Nv-1)*np.pi/Nv)
+    for i in range(M-1):
+        area += r[i]*r[i+1]*np.sin(2.*(i+1)*np.pi/M - 2.*i*np.pi/M)
+    area = area + r[-1]*r[0]*np.sin(2.*np.pi - 2.*(M-1)*np.pi/M)
 
-    volume = area*Np*dz
+    volume = area*L*dz
     
     volume_ref = 2000.*2000.*1000.  # l*l*h
     
@@ -51,17 +51,17 @@ def test_tfa_data():
     
     Assertion
     '''
-    Np = 10 # number of prisms
-    Nv = 8 # number of vertices
+    L = 10 # number of prisms
+    M = 8 # number of vertices
 
     #r = 1000. # radial distance for each vertice
-    r = np.zeros(Nv)
+    r = np.zeros(M)
     r[::2] = 1000.
     r[1::2] = np.sqrt(2.)*1000.
     
     # Cartesian coordinates of the origin of each prism
-    x0 = np.zeros(Np) 
-    y0 = np.zeros(Np)
+    x0 = np.zeros(L) 
+    y0 = np.zeros(L)
     
     dz = 100.0    # thickness of each prism
     
@@ -75,10 +75,10 @@ def test_tfa_data():
     
     ### creating the lis of prisms
     
-    for i in range(Np):
+    for i in range(L):
         m.append([r, x0[i], y0[i], z0 + dz*i, z0 + dz*(i + 1), props])
     
-    model_polyprism = mfun.pol2cart(m, Np, Nv)
+    model_polyprism = mfun.pol2cart(m, M, L)
     
     #area over which the data are calculated
     #x minimum, x maximum, y minimum and y maximum
@@ -160,8 +160,8 @@ def test_tfa_fd_x0_data():
     mm = [[r, x0 - delta, y0, z1, z2, props]]   # prism minus increment
 
     ### creating data of the prisms
-    mpt = mfun.pol2cart(mp, len(mp), r.size)
-    mmt = mfun.pol2cart(mm, len(mm), r.size)
+    mpt = mfun.pol2cart(mp, r.size, len(mp))
+    mmt = mfun.pol2cart(mm, r.size, len(mm))
 
     mp_fat = polyprism.tf(xp, yp, zp, mpt, inc, dec)   # data of prism plus increment
     mm_fat = polyprism.tf(xp, yp, zp, mmt, inc, dec)   # data of prism minus increment
@@ -225,8 +225,8 @@ def test_tfa_fd_y0_data():
     mm = [[r, x0, y0 - delta, z1, z2, props]]   # prism minus increment
 
     ### creating data of the prisms
-    mpt = mfun.pol2cart(mp, len(mp), r.size)
-    mmt = mfun.pol2cart(mm, len(mm), r.size)
+    mpt = mfun.pol2cart(mp, r.size, len(mp))
+    mmt = mfun.pol2cart(mm, r.size, len(mm))
 
     mp_fat = polyprism.tf(xp, yp, zp, mpt, inc, dec)   # data of prism plus increment
     mm_fat = polyprism.tf(xp, yp, zp, mmt, inc, dec)   # data of prism minus increment
@@ -295,8 +295,8 @@ def test_tfa_fd_radial_data():
     mm = [[rm, x0, y0, z1, z2, props]]   # prism minus increment
     
     ### creating data of the prisms
-    mpt = mfun.pol2cart(mp, len(mp), rp.size)
-    mmt = mfun.pol2cart(mm, len(mm), rm.size)
+    mpt = mfun.pol2cart(mp, rp.size, len(mp))
+    mmt = mfun.pol2cart(mm, rm.size, len(mm))
 
     mp_fat = polyprism.tf(xp, yp, zp, mpt, inc, dec)   # data of prism plus increment
     mm_fat = polyprism.tf(xp, yp, zp, mmt, inc, dec)   # data of prism minus increment
@@ -306,7 +306,7 @@ def test_tfa_fd_radial_data():
     df_m = mfun.fd_tf_radial_polyprism(xp, yp, zp, m[0], r.size, nv, delta, inc, dec)  # derivative from the function
     df_mp_mm = (mp_fat - mm_fat)/(2.*delta)  # derivative from difference of data
     
-    assert np.allclose(df_m, df_mp_mm, atol=1e-15), 'The derivative is not correct'
+    assert np.allclose(df_m, df_mp_mm), 'The derivative is not correct'
     
 def test_Hessian_phi_1():
     '''

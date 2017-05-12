@@ -259,10 +259,10 @@ def fd_tf_radial_polyprism(xp, yp, zp, m, M, nv, delta, inc, dec):
     cos_nvp = np.cos(nvp*ang)
     sin_nvp = np.sin(nvp*ang)
     
-    verts.append([m[0][nv - 1]*cos_nvm, m[0][nv - 1]*sin_nv])
-    verts.append([(m[0][nv] + delta)*cos_nv, (m[0][nv] + delta)*sin_nv])
-    verts.append([m[0][nvp]*cos_nvp, m[0][nvp]*sin_nvp])
-    verts.append([(m[0][nv] - delta)*cos_nv, (m[0][nv] - delta)*sin_nv])
+    verts.append([m[0][nv - 1]*cos_nvm + m[1], m[0][nv - 1]*sin_nvm + m[2]])
+    verts.append([(m[0][nv] + delta)*cos_nv + m[1], (m[0][nv] + delta)*sin_nv + m[2]])
+    verts.append([m[0][nvp]*cos_nvp + m[1], m[0][nvp]*sin_nvp + m[2]])
+    verts.append([(m[0][nv] - delta)*cos_nv + m[1], (m[0][nv] - delta)*sin_nv + m[2]])
 
     m_fat = [PolygonalPrism(verts, m[3], m[4], m[5])]
     
@@ -1171,9 +1171,11 @@ def gradient_data(xp, yp, zp, m, M, L, d, deltax, deltay, deltar, inc, dec):
     xp: 1D array - x observation points
     yp: 1D array - y observation points
     zp: 1D array - z observation points
-    m: 1D array - parameter vector with radial distances of each vertice
-                  and the Cartesian coordinates of each prism
-    M: int - number of vertices per prism
+    m: list - each element is a list of [r, x0, y0, z1, z2, 'magnetization'],
+              whrere r is an array with the radial distances of the vertices,
+              x0 and y0 are the origin cartesian coordinates of each prism,
+              z1 and z2 are the top and bottom of each prism and
+              magnetization is physical property
     L: int - number of prisms
     d: 1D array - observed data vector
     deltax: float - increment in x coordinate in meters
@@ -1214,9 +1216,11 @@ def Hessian_data(xp, yp, zp, m, M, L, deltax, deltay, deltar, inc, dec):
     xp: array - x observation points
     yp: array - y observation points
     zp: array - z observation points
-    m: 1D array - parameter vector with radial distances of each vertice
-                  and the Cartesian coordinates of each prism
-    M: int - number of vertices per prism
+    m: list - each element is a list of [r, x0, y0, z1, z2, 'magnetization'],
+              whrere r is an array with the radial distances of the vertices,
+              x0 and y0 are the origin cartesian coordinates of each prism,
+              z1 and z2 are the top and bottom of each prism and
+              magnetization is physical property
     L: int - number of prisms
     deltax: float - increment in x coordinate in meters
     deltay: float - increment in y coordinate in meters
