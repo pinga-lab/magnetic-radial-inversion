@@ -1141,7 +1141,7 @@ def trans_parameter2(m, mmax, mmin):
 
 def trans_inv_parameter(mt, M, L, rmin, rmax, x0min, x0max, y0min, y0max):
     '''
-    Returns the initial parameters from the transformated ones.
+    Returns the parameters from the inverse transformation.
     
     input
     

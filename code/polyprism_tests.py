@@ -52,6 +52,51 @@ def test_volume():
     
     assert np.allclose(volume, volume_ref), 'The volume is not correct'
     
+def test_paramvec():
+    '''
+    Test for function that transform a list of prisms into
+    a parameter vector.
+    
+    output
+    
+    Assertion
+    '''
+    L = 2 # number of prisms
+    M = 4 # number of vertices
+    P = L*(M + 2) # number of parameters
+
+    #r = 1000. # radial distance for each vertice
+    r = np.zeros(M) + 1000.
+        
+    # Cartesian coordinates of the origin of each prism
+    x0 = 0. 
+    y0 = 0.
+    
+    dz = 100.0    # thickness of each prism
+    
+    inc, dec = -60., 50. # inclination and declination of regional field
+    
+    props={'magnetization': utils.ang2vec(3, inc, dec)} # physical property
+    
+    z0 = 100.0    # depth of the top the shallowest prism
+    
+    m = []   # list of prisms
+    
+    ### creating the lis of prisms
+    
+    for i in range(L):
+        m.append([r, x0, y0, z0 + dz*i, z0 + dz*(i + 1), props])
+    
+    model_polyprism = mfun.pol2cart(m, M, L)
+    
+    p = mfun.param_vec(m, M, L)
+    
+    p_ref = np.zeros(P)
+    p_ref[:M] = r 
+    p_ref[M+2:2*M+2] = r
+    
+    assert np.allclose(p, p_ref), 'The result does not match with the reference'
+    
     
 def test_tfa_data():
     '''
@@ -118,7 +163,7 @@ def test_tfa_data():
     
     tfat_recprism = prism.tf(xp, yp, zp, model_recprism, inc, dec)
     
-    assert np.allclose(tfat_polyprism, tfat_recprism, atol=1e-05), 'The data from small rectangular prisms must be equal to a big rectangular prism'
+    assert np.allclose(tfat_polyprism, tfat_recprism), 'The data from small rectangular prisms must be equal to a big rectangular prism'
     
 def test_tfa_fd_x0_data():
     '''
