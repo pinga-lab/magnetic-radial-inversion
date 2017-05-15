@@ -18,27 +18,39 @@ def test_volume():
     
     Assertion
     '''
-    L = 10 # number of prisms
-    M = 8 # number of vertices
+    L = 1 # number of prisms
+    M = 4 # number of vertices
 
     #r = 1000. # radial distance for each vertice
-    r = np.zeros(M)
-    r[::2] = 1000.
-    r[1::2] = np.sqrt(2.)*1000./2.
+    r = np.zeros(M) + np.sqrt(2000000.)
+        
+    # Cartesian coordinates of the origin of each prism
+    x0 = 0. 
+    y0 = 0.
     
-    dz = 100.0    # thickness of each prism
+    dz = 1000.0    # thickness of each prism
+    
+    inc, dec = -60., 50. # inclination and declination of regional field
+    
+    props={'magnetization': utils.ang2vec(3, inc, dec)} # physical property
+    
+    z0 = 100.0    # depth of the top the shallowest prism
+    
+    m = []   # list of prisms
+    
+    ### creating the lis of prisms
+    
+    m.append([r, x0, y0, z0, z0 + dz, props])
+    
+    model = mfun.pol2cart(m, M, L)
 
-    area = 0.
-
-    for i in range(M-1):
-        area += r[i]*r[i+1]*np.sin(2.*(i+1)*np.pi/M - 2.*i*np.pi/M)
-    area = area + r[-1]*r[0]*np.sin(2.*np.pi - 2.*(M-1)*np.pi/M)
+    area = mfun.area_polygon(model[0].x, model[0].y)
 
     volume = area*L*dz
     
     volume_ref = 2000.*2000.*1000.  # l*l*h
     
-    assert volume == volume_ref
+    assert np.allclose(volume, volume_ref), 'The volume is not correct'
     
     
 def test_tfa_data():

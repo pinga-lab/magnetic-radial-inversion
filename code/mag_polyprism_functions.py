@@ -8,6 +8,29 @@ from fatiando.constants import CM, T2NT
 
 ### Functions for the foward problem using fatiando
 
+def area_polygon(x, y):
+    '''
+    Returns the area of a polygon using the shoelace
+    formula.
+    
+    input
+    
+    x: 1D array - Cartesian coordinates
+    y: 1D array - Cartesian coordinates
+    
+    output
+    
+    area: float - area of the polygon
+    '''
+    
+    x = np.asanyarray(x)
+    y = np.asanyarray(y)
+    n = len(x)
+    shift_up = np.arange(-n+1, 1)
+    shift_down = np.arange(-1, n-1)
+    area = (x * (y.take(shift_up) - y.take(shift_down))).sum() / 2.0
+    return area
+
 def pol2cart(m, M, L):
     '''
     This function transforms polar coordinates of the prisms
