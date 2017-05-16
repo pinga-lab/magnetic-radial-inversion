@@ -127,7 +127,6 @@ def param2model(m, M, L, z0, dz, props):
     
     r = np.zeros(M) # vector for radial distances
     mv = [] # list of prisms    
-    #model = [] # list of classes
     
     k = 0
     for i in range(0, L*(M + 2), M + 2):
@@ -135,8 +134,6 @@ def param2model(m, M, L, z0, dz, props):
         mv.append([r, m[i+M], m[i+M+1], z0 + dz*k, z0 + dz*(k + 1), props])
         k = k + 1
         
-    #model = pol2cart(mv, M, L)
-    
     return mv    
 
 ### Functions for the derivatives with finite differences
