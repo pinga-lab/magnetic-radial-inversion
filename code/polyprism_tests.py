@@ -114,7 +114,7 @@ def test_tfa_data():
     #r = 1000. # radial distance for each vertice
     r = np.zeros(M)
     r[::2] = 1000.
-    r[1::2] = np.sqrt(2.)*1000.
+    r[1::2] = np.sqrt(2.)*1000./2.
     
     # Cartesian coordinates of the origin of each prism
     x0 = np.zeros(L) 

@@ -115,21 +115,19 @@ def param2model(m, M, L, z0, dz, props):
     m: 1D array - parameter vector
     M: int - number of vertices
     L: int - number of prisms
-    z0: float - the top of the model
-    dz: float - the thickness of each prism
+    z0: float - top of the model
+    dz: float - thickness of each prism
     props: dictionary - physical property
     
     output
     
-    model: list - list of the class 
-                  fatiando.mesher.PolygonalPrism
-                  
+    mv: list - list of prisms 
     '''
     assert m.size == L*(M + 2), 'The size of m must be equal to L*(M + 2)'
     
     r = np.zeros(M) # vector for radial distances
     mv = [] # list of prisms    
-    model = [] # list of classes
+    #model = [] # list of classes
     
     k = 0
     for i in range(0, L*(M + 2), M + 2):
@@ -137,9 +135,9 @@ def param2model(m, M, L, z0, dz, props):
         mv.append([r, m[i+M], m[i+M+1], z0 + dz*k, z0 + dz*(k + 1), props])
         k = k + 1
         
-    model = pol2cart(mv, M, L)
+    #model = pol2cart(mv, M, L)
     
-    return model    
+    return mv    
 
 ### Functions for the derivatives with finite differences
 
@@ -552,17 +550,17 @@ def gradient_phi_1(M, L, m, alpha):
     
     assert m.size == P, 'The size of parameter vector must be equal to P'
     
-    m1 = m # the new vector m1 = gradient input + gradient of phi1
+    m1 = m.copy() # the new vector m1 = gradient input + gradient of phi1
     
     # extracting the non-zero diagonals
     d0, d1, dM = diags_phi_1(M, L, alpha)
     
     # calculating the product between the diagonals and the slices of m
     m1 += m*d0
-    m1[1:] += m[1:]*d1
-    m1[:P-1] += m[:P-1]*d1
-    m1[M-1:] += m[M-1:]*dM
-    m1[:P-M+1] += m[:P-M+1]*dM
+    m1[:P-1] += m[1:]*d1
+    m1[1:] += m[:P-1]*d1
+    m1[:P-M+1] += m[M-1:]*dM
+    m1[M-1:] += m[:P-M+1]*dM
        
     return m1
 
@@ -583,7 +581,7 @@ def gradient_phi_2(M, L, m, alpha):
     m2: 1D array - gradient vector plus phi_2 constraint
     '''
     
-    m2 = m # the new vector m2 = gradient input + gradient of phi2
+    m2 = m.copy() # the new vector m2 = gradient input + gradient of phi2
     
     P = L*(M + 2)
     
@@ -594,8 +592,8 @@ def gradient_phi_2(M, L, m, alpha):
     
     # calculating the product between the diagonals and the slices of m
     m2 += m*d0
-    m2[M+2:] += m[M+2:]*d1
-    m2[:P-M-2] += m[:P-M-2]*d1
+    m2[:P-M-2] += m[M+2:]*d1
+    m2[M+2:] += m[:P-M-2]*d1
     
     return m2
 
@@ -652,7 +650,7 @@ def gradient_phi_4(M, L, m, m0, alpha):
     assert m0.size == 2, 'The size of parameter vector must be equal to 2'
     
     # calculating the product between the diagonals and the slices of m
-    m[M:M+2] += m[M:M+2] - m0
+    m[M:M+2] += (m[M:M+2] - m0)*alpha
     
     return m
 
@@ -684,8 +682,8 @@ def gradient_phi_5(M, L, m, alpha):
     
     # calculating the product between the diagonals and the slices of m
     m5 += m*d0
-    m5[M+2:] += m[M+2:]*d1
-    m5[:P-M-2] += m[:P-M-2]*d1
+    m5[:P-M-2] += m[M+2:]*d1
+    m5[M+2:] += m[:P-M-2]*d1
     
     return m5
 
@@ -739,17 +737,7 @@ def phi_1(M, L, m, alpha):
     assert m.size == P, 'The size of parameter vector must be equal to P'
     
     m1 = gradient_phi_1(M, L, m, alpha) # the new vector m1 = gradient input + gradient of phi1
-    
-    # extracting the non-zero diagonals
-    #d0, d1, dM = diags_phi_1(M, L, alpha)
-    
-    # calculating the product between the diagonals and the slices of m
-    #m1 += m*d0
-    #m1[1:] += m[1:]*d1
-    #m1[:P-1] += m[:P-1]*d1
-    #m1[M-1:] += m[M-1:]*dM
-    #m1[:P-M+1] += m[:P-M+1]*dM
-    
+  
     phi_1 = np.dot(m1, m)
     
     return phi_1
@@ -770,21 +758,11 @@ def phi_2(M, L, m, alpha):
     phi_2: float - value of phi_2 constraint
     '''
     
-    m2 = m # the new vector m2 = gradient input + gradient of phi2
-    
     P = L*(M + 2)
     
     assert m.size == P, 'The size of parameter vector must be equal to P'
     
     m2 = gradient_phi_1(M, L, m, alpha) # the new vector m1 = gradient input + gradient of phi1
-    
-    # extracting the non-zero diagonals
-    #d0, d1 = diags_phi_2(M, L, alpha)
-    
-    # calculating the product between the diagonals and the slices of m
-    #m2 += m*d0
-    #m2[M+2:] += m[M+2:]*d1
-    #m2[:P-M-2] += m[:P-M-2]*d1
     
     phi_2 = np.dot(m2, m)
     
@@ -812,7 +790,6 @@ def phi_3(M, L, m, m0, alpha):
     assert m.size == P, 'The size of parameter vector must be equal to P'
     assert m0.size == M + 2, 'The size of parameter vector must be equal to M + 2'
 
-    
     # calculating the product between the diagonals and the slices of m
     m[:M+2] += m[:M+2] - m0
     
@@ -842,7 +819,6 @@ def phi_4(M, L, m, m0, alpha):
     assert m.size == P, 'The size of parameter vector must be equal to P'
     assert m0.size == 2, 'The size of parameter vector must be equal to 2'
 
-    
     # calculating the product between the diagonals and the slices of m
     m[M:M+2] += m[M:M+2] - m0
     
@@ -866,22 +842,12 @@ def phi_5(M, L, m, alpha):
     phi_5: float - value of phi_5 constraint
     '''
     
-    m5 = m # the new vector m1 = gradient input + gradient of phi5
-    
     P = L*(M + 2)
     
     assert m.size == P, 'The size of parameter vector must be equal to P'
     
     m5 = gradient_phi_1(M, L, m, alpha) # the new vector m1 = gradient input + gradient of phi1
-    
-    # extracting the non-zero diagonals
-    #d0, d1 = diags_phi_5(M, L, alpha)
-    
-    # calculating the product between the diagonals and the slices of m
-    #m5 += m*d0
-    #m5[M+2:] += m[M+2:]*d1
-    #m5[:P-M-2] += m[:P-M-2]*d1
-    
+
     phi_5 = np.dot(m5, m)
     
     return phi_5
@@ -907,15 +873,7 @@ def phi_6(M, L, m, alpha):
     assert m.size == P, 'The size of parameter vector must be equal to P'
     
     m6 = gradient_phi_1(M, L, m, alpha) # the new vector m1 = gradient input + gradient of phi1
-    
-    # extracting the non-zero diagonals
-    #d0 = diags_phi_6(M, L, alpha)
-    
-    #m6 = m
-    
-    # calculating the product between the diagonals and the slices of m
-    #m6 += m*d0
-    
+
     phi_6 = np.dot(m6, m)
     
     return phi_6
@@ -1134,7 +1092,7 @@ def trans_parameter(m, M, L, rmin, rmax, x0min, x0max, y0min, y0max):
 
 def trans_parameter2(m, mmax, mmin):
 
-    mt = -np.log((mmax - m)/(m - mmin))
+    mt = -np.log(abs((mmax - m))/(m - mmin))
 
     return mt
 
