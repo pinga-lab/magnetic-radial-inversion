@@ -144,7 +144,7 @@ def test_param2model():
     for i in range(L):
         assert ma[i].x.all() == moda[i].x.all()
         assert ma[i].y.all() == moda[i].y.all()
-        assert ma[i].z1 == moda[i].z1
+        assert ma[i].z1 == moda[i].z1test
         assert ma[i].z2 == moda[i].z2
         assert ma[i].props == moda[i].props
 
