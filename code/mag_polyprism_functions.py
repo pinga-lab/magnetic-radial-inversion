@@ -669,7 +669,7 @@ def gradient_phi_5(M, L, m, alpha):
     m5: 1D array - gradient vector plus phi_5 constraint
     '''
     
-    m5 = m # the new vector m1 = gradient input + gradient of phi5
+    m5 = m.copy() # the new vector m1 = gradient input + gradient of phi5
     
     P = L*(M + 2)
     
@@ -926,7 +926,7 @@ def diags_phi_2(M, L, alpha):
     
     d0, d1: 1D array - diagonals from phi_2 hessian
     '''
-    assert L >= 2, 'The number of prisms must be major than 1'
+    assert L >= 2, 'The number of prisms must be greater than 1'
         
     P = L*(M + 2)
     
@@ -964,7 +964,7 @@ def diags_phi_5(M, L, alpha):
     
     d0, d1: 1D array - diagonals from phi_5 hessian
     '''
-    assert L >= 2, 'The number of prisms must be major than 1'
+    assert L >= 2, 'The number of prisms must be greater than 1'
     
     P = L*(M + 2)
     

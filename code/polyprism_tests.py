@@ -744,9 +744,9 @@ def test_gradient_phi_1_unitary():
     P = L*(M + 2) # number of parameters
     alpha = .1 # regularization
     m = np.ones(P)*5 # gradient
-    
+    grad_ref = m.copy()    
     grad = mfun.gradient_phi_1(M, L, m, alpha)
-    grad_ref = m.copy()
+    
     
     assert np.allclose(grad, grad_ref), 'The gradient is not correct'
     
@@ -785,9 +785,9 @@ def test_gradient_phi_2_unitary():
     P = L*(M + 2) # number of parameters
     alpha = .1 # regularization
     m = np.ones(P)*5 # gradient
-    
+    grad_ref = m.copy()    
     grad = mfun.gradient_phi_2(M, L, m, alpha)
-    grad_ref = m.copy()
+    
     
     assert np.allclose(grad, grad_ref), 'The gradient is not correct'
     
@@ -805,12 +805,12 @@ def test_gradient_phi_2_arranged():
     P = L*(M + 2) # number of parameters
     alpha = 1. # regularization
     m = np.arange(1., P+1., 1.) # gradient
-    
+    grad_ref = m.copy()
+    grad_ref[:M] -= 5.*alpha
+    grad_ref[M+2:-2] += 5.*alpha
     grad = mfun.gradient_phi_2(M, L, m, alpha)
-    m[:M] -= 5.*alpha
-    m[M+2:-2] += 5.*alpha
     
-    assert np.allclose(grad, m), 'The gradient is not correct'
+    assert np.allclose(grad, grad_ref), 'The gradient is not correct'
     
 def test_gradient_phi_3():
     '''
@@ -826,11 +826,11 @@ def test_gradient_phi_3():
     alpha = 1. # regularization
     m = np.arange(1., P+1., 1.) # gradient
     m0 = np.arange(1., M+3., 1.) # parameters of outcropping body
-    
+    grad_ref = m.copy()
+    grad_ref[:M+2] += (grad_ref[:M+2] - m0)*alpha
     grad = mfun.gradient_phi_3(M, L, m, m0, alpha)
-    m[:M+2] -= m0*alpha
     
-    assert np.allclose(grad, m), 'The gradient is not correct'
+    assert np.allclose(grad, grad_ref), 'The gradient is not correct'
     
 def test_gradient_phi_4():
     '''
@@ -846,8 +846,69 @@ def test_gradient_phi_4():
     alpha = 1. # regularization
     m = np.arange(1., P+1., 1.) # gradient
     m0 = np.arange(1., 3., 1.) # parameters of outcropping body
-    
+    grad_ref = m.copy()
+    grad_ref[M:M+2] += (grad_ref[M:M+2] - m0)*alpha
     grad = mfun.gradient_phi_4(M, L, m, m0, alpha)
-    m[M:M+2] -= m0*alpha
     
-    assert np.allclose(grad, m), 'The gradient is not correct'
+    assert np.allclose(grad, grad_ref), 'The gradient is not correct'
+    
+def test_gradient_phi_5_unitary():
+    '''
+    This function tests the result for the gradient_phi_5 function
+    for an unitary vector.
+    
+    output
+    
+    assertion
+    '''
+    M = 3   # number of vertices
+    L = 3   # number of prisms
+    P = L*(M + 2) # number of parameters
+    alpha = .1 # regularization
+    m = np.ones(P)*5 # gradient
+    grad_ref = m.copy()
+    grad = mfun.gradient_phi_5(M, L, m, alpha)
+        
+    assert np.allclose(grad, grad_ref), 'The gradient is not correct'
+    
+def test_gradient_phi_5_arranged():
+    '''
+    This function tests the result for the gradient_phi_5 function
+    for an arranged vector.
+    
+    output
+    
+    assertion
+    '''
+    M = 3   # number of vertices
+    L = 3   # number of prisms
+    P = L*(M + 2) # number of parameters
+    alpha = 1. # regularization
+    m = np.arange(1., P+1., 1.) # gradient
+    grad_ref = m.copy()
+    grad_ref[M:M+2] -= 5.*alpha
+    grad_ref[2*(M+2)+M:] += 5.*alpha
+    grad = mfun.gradient_phi_5(M, L, m, alpha)
+    
+    assert np.allclose(grad, grad_ref), 'The gradient is not correct'
+    
+def test_gradient_phi_6():
+    '''
+    This function tests the result for the gradient_phi_6 function
+    for an unitary vector.
+    
+    output
+    
+    assertion
+    '''
+    M = 3   # number of vertices
+    L = 2   # number of prisms
+    P = L*(M + 2) # number of parameters
+    alpha = 1. # regularization
+    m = np.ones(P)*5. # gradient
+    grad_ref = m.copy() + m*alpha
+    grad_ref[M:M+2] -= 5.
+    grad_ref[2*M+2:] -= 5.
+    grad = mfun.gradient_phi_6(M, L, m, alpha)
+    
+    assert np.allclose(grad, grad_ref), 'The gradient is not correct'
