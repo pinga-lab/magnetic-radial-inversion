@@ -97,7 +97,57 @@ def test_paramvec():
     
     assert np.allclose(p, p_ref), 'The result does not match with the reference'
     
+def test_param2model():
+    '''
+    Test for function that transform a parameters vector into
+    a list of prisms.
     
+    output
+    
+    Assertion
+    '''
+    L = 2 # number of prisms
+    M = 4 # number of vertices
+    P = L*(M + 2) # number of parameters
+
+    #r = 1000. # radial distance for each vertice
+    r = np.zeros(M) + 1000.
+        
+    # Cartesian coordinates of the origin of each prism
+    x0 = 0. 
+    y0 = 0.
+    
+    dz = 100.0    # thickness of each prism
+    
+    inc, dec = -60., 50. # inclination and declination of regional field
+    
+    props={'magnetization': utils.ang2vec(3, inc, dec)} # physical property
+    
+    z0 = 100.0    # depth of the top the shallowest prism
+    
+    m = []   # list of prisms
+    
+    ### creating the lis of prisms
+    
+    for i in range(L):
+        m.append([r, x0, y0, z0 + dz*i, z0 + dz*(i + 1), props])
+        
+    # transform the list of prisms into parameters vector
+    p = mfun.param_vec(m, M, L)
+    
+    # transform the parameters vector into list of prisms
+    model = mfun.param2model(p, M, L, z0, dz, props)
+    
+    ma = mfun.pol2cart(m,M,L)
+    moda = mfun.pol2cart(model,M,L)
+    
+    for i in range(L):
+        assert ma[i].x.all() == moda[i].x.all()
+        assert ma[i].y.all() == moda[i].y.all()
+        assert ma[i].z1 == moda[i].z1
+        assert ma[i].z2 == moda[i].z2
+        assert ma[i].props == moda[i].props
+
 def test_tfa_data():
     '''
     This function tests the total field anomaly data 

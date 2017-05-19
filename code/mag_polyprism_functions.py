@@ -123,18 +123,19 @@ def param2model(m, M, L, z0, dz, props):
     
     mv: list - list of prisms 
     '''
-    assert m.size == L*(M + 2), 'The size of m must be equal to L*(M + 2)'
+    P = L*(M + 2)
+    assert m.size == P, 'The size of m must be equal to L*(M + 2)'
     
     r = np.zeros(M) # vector for radial distances
     mv = [] # list of prisms    
     
-    k = 0
-    for i in range(0, L*(M + 2), M + 2):
+    k = 0.
+    for i in range(0, P, M + 2):
         r = m[i:M+i]
-        mv.append([r, m[i+M], m[i+M+1], z0 + dz*k, z0 + dz*(k + 1), props])
-        k = k + 1
+        mv.append([r, m[i+M], m[i+M+1], z0 + dz*k, z0 + dz*(k + 1.), props])
+        k = k + 1.
         
-    return mv    
+    return mv
 
 ### Functions for the derivatives with finite differences
 
