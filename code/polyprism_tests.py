@@ -660,6 +660,55 @@ def test_diags_phi_2_mp():
     assert np.allclose(d0, dzero), 'The diagonal is not correct'
     assert np.allclose(d1, done), 'The diagonal is not correct'
     
+def test_diags_phi_5_tp():
+    '''
+    This function tests the result for the diags_phi_5 function
+    for an simple example with two prisms.
+    
+    output
+    
+    assertion
+    '''
+    M = 4   # number of vertices
+    L = 2   # number of prisms
+    P = L*(M + 2) # number of parameters
+    alpha = 1. # regularization
+    
+    d0, d1 = mfun.diags_phi_5(M, L, alpha) # non-zero diagonals
+    
+    dzero = np.array([0., 0., 0., 0., alpha, alpha])
+    dzero = np.resize(dzero, P)
+    done = np.array([0., 0., 0., 0., -alpha, -alpha])
+    done = np.resize(done, P-M-2)
+    
+    assert np.allclose(d0, dzero), 'The diagonal is not correct'
+    assert np.allclose(d1, done), 'The diagonal is not correct'
+    
+def test_diags_phi_5_mp():
+    '''
+    This function tests the result for the diags_phi_5 function
+    for an simple example with more than two prisms.
+    
+    output
+    
+    assertion
+    '''
+    M = 4   # number of vertices
+    L = 3   # number of prisms
+    P = L*(M + 2) # number of parameters
+    alpha = 1. # regularization
+    
+    d0, d1 = mfun.diags_phi_5(M, L, alpha) # non-zero diagonals
+    
+    dzero = np.array([0., 0., 0., 0., alpha, alpha])
+    dzero = np.resize(dzero, P)
+    dzero[2*M+2:2*(M+2)] += alpha
+    done = np.array([0., 0., 0., 0., -alpha, -alpha])
+    done = np.resize(done, P-M-2)
+
+    assert np.allclose(d0, dzero), 'The diagonal is not correct'
+    assert np.allclose(d1, done), 'The diagonal is not correct'
+    
 def test_gradient_phi_1():
     '''
     This function tests the result for the gradient_phi_1 function
