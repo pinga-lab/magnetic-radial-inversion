@@ -587,7 +587,7 @@ def test_Hessian_phi_6():
 def test_diags_phi_1():
     '''
     This function tests the result for the diags_phi_1 function
-    for an empty vector.
+    for an simple example.
     
     output
     
@@ -610,6 +610,55 @@ def test_diags_phi_1():
     assert np.allclose(d0, dzero), 'The diagonal is not correct'
     assert np.allclose(d1, done), 'The diagonal is not correct'
     assert np.allclose(dM, dm), 'The diagonal is not correct'
+    
+def test_diags_phi_2_tp():
+    '''
+    This function tests the result for the diags_phi_2 function
+    for an simple example with two prisms.
+    
+    output
+    
+    assertion
+    '''
+    M = 4   # number of vertices
+    L = 2   # number of prisms
+    P = L*(M + 2) # number of parameters
+    alpha = 1. # regularization
+    
+    d0, d1 = mfun.diags_phi_2(M, L, alpha) # non-zero diagonals
+    
+    dzero = np.array([alpha, alpha, alpha, alpha, 0., 0.])
+    dzero = np.resize(dzero, P)
+    done = np.array([-alpha, -alpha, -alpha, -alpha, 0., 0.])
+    done = np.resize(done, P-M-2)
+    
+    assert np.allclose(d0, dzero), 'The diagonal is not correct'
+    assert np.allclose(d1, done), 'The diagonal is not correct'
+    
+def test_diags_phi_2_mp():
+    '''
+    This function tests the result for the diags_phi_2 function
+    for an simple example with more than two prisms.
+    
+    output
+    
+    assertion
+    '''
+    M = 4   # number of vertices
+    L = 3   # number of prisms
+    P = L*(M + 2) # number of parameters
+    alpha = 1. # regularization
+    
+    d0, d1 = mfun.diags_phi_2(M, L, alpha) # non-zero diagonals
+    
+    dzero = np.array([alpha, alpha, alpha, alpha, 0., 0.])
+    dzero = np.resize(dzero, P)
+    dzero[M+2:2*M+2] += alpha
+    done = np.array([-alpha, -alpha, -alpha, -alpha, 0., 0.])
+    done = np.resize(done, P-M-2)
+
+    assert np.allclose(d0, dzero), 'The diagonal is not correct'
+    assert np.allclose(d1, done), 'The diagonal is not correct'
     
 def test_gradient_phi_1():
     '''

@@ -931,16 +931,16 @@ def diags_phi_2(M, L, alpha):
     
     # building the diagonals
     
-    if M <= 2:
+    if L <= 2:
         d0 = np.zeros(M+2)
         d0[:M] = alpha
         d0 = np.resize(d0, P)
     else:
         d0 = np.zeros(M+2)
-        d0[:M] = 2*alpha
+        d0[:M] = 2.*alpha
         d0 = np.resize(d0, P)
         d0[:M] = alpha
-        d0[-M-2:-M+1] = alpha        
+        d0[-M-2:-M+2] = alpha        
     
     d1 = np.zeros(M+2)
     d1[:M] = - alpha
