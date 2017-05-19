@@ -417,7 +417,7 @@ def test_tfa_fd_radial_data():
     
 def test_Hessian_phi_1():
     '''
-    This function tests the result for the phi_1 function
+    This function tests the result for the Hessian_phi_1 function
     for an empty matrix.
     
     output
@@ -449,7 +449,7 @@ def test_Hessian_phi_1():
 
 def test_Hessian_phi_2():
     '''
-    This function tests the result for the phi_2 function
+    This function tests the result for the Hessian_phi_2 function
     for an empty matrix.
     
     output
@@ -481,7 +481,7 @@ def test_Hessian_phi_2():
         
 def test_Hessian_phi_3():
     '''
-    This function tests the result for the phi_3 function
+    This function tests the result for the Hessian_phi_3 function
     for an empty matrix.
     
     output
@@ -504,7 +504,7 @@ def test_Hessian_phi_3():
     
 def test_Hessian_phi_4():
     '''
-    This function tests the result for the phi_4 function
+    This function tests the result for the Hessian_phi_4 function
     for an empty matrix.
     
     output
@@ -531,7 +531,7 @@ def test_Hessian_phi_4():
     
 def test_Hessian_phi_5():
     '''
-    This function tests the result for the phi_5 function
+    This function tests the result for the Hessian_phi_5 function
     for an empty matrix.
     
     output
@@ -558,7 +558,7 @@ def test_Hessian_phi_5():
     
 def test_Hessian_phi_6():
     '''
-    This function tests the result for the phi_6 function
+    This function tests the result for the Hessian_phi_6 function
     for an empty matrix.
     
     output
@@ -583,3 +583,41 @@ def test_Hessian_phi_6():
         H_ref[i+M+2,i+M+2] = alpha
         
     assert np.allclose(H, H_ref), 'The matrices is not correct'
+    
+def test_diags_phi_1():
+    '''
+    This function tests the result for the diags_phi_1 function
+    for an empty vector.
+    
+    output
+    
+    assertion
+    '''
+    M = 4   # number of vertices
+    L = 2   # number of prisms
+    P = L*(M + 2) # number of parameters
+    alpha = 1. # regularization
+    
+    d0, d1, dM = mfun.diags_phi_1(M, L, alpha) # non-zero diagonals
+    
+    dzero = np.array([2.*alpha, 2.*alpha, 2.*alpha, 2.*alpha, 0., 0.])
+    dzero = np.resize(dzero, P)
+    done = np.array([-alpha, -alpha, -alpha, 0., 0.])
+    done = np.resize(done, P-2)
+    dm = np.array([-alpha, 0., 0.])
+    dm = np.resize(dm, 3*L)
+
+    assert np.allclose(d0, dzero), 'The diagonal is not correct'
+    assert np.allclose(d1, done), 'The diagonal is not correct'
+    assert np.allclose(dM, dm), 'The diagonal is not correct'
+    
+def test_gradient_phi_1():
+    '''
+    This function tests the result for the gradient_phi_1 function
+    for an empty vector.
+    
+    output
+    
+    assertion
+    '''
+    

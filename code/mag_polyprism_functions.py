@@ -900,13 +900,13 @@ def diags_phi_1(M, L, alpha):
     d0[:M] = 2.*alpha
     d0 = np.resize(d0, P)
     
-    d1 = np.zeros(M+2)
+    d1 = np.zeros(M+1)
     d1[:M-1] = - alpha
-    d1 = np.resize(d1, P-1)
+    d1 = np.resize(d1, P-2)
     
-    dM = np.zeros(M+2)
+    dM = np.zeros(3)
     dM[0] = - alpha
-    dM = np.resize(dM, P - M + 1)
+    dM = np.resize(dM, 3*L)
     
     return d0, d1, dM
 
