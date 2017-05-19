@@ -743,7 +743,7 @@ def test_gradient_phi_1_unitary():
     L = 1   # number of prisms
     P = L*(M + 2) # number of parameters
     alpha = .1 # regularization
-    m = np.ones(P)*5
+    m = np.ones(P)*5 # gradient
     
     grad = mfun.gradient_phi_1(M, L, m, alpha)
     grad_ref = m.copy()
@@ -763,7 +763,7 @@ def test_gradient_phi_1_arranged():
     L = 1   # number of prisms
     P = L*(M + 2) # number of parameters
     alpha = .01 # regularization
-    m = np.arange(1., 6., 1.)
+    m = np.arange(1., 6., 1.) # gradient
     
     grad = mfun.gradient_phi_1(M, L, m, alpha)
     m[0] -= 3.*alpha
@@ -784,7 +784,7 @@ def test_gradient_phi_2_unitary():
     L = 2   # number of prisms
     P = L*(M + 2) # number of parameters
     alpha = .1 # regularization
-    m = np.ones(P)*5
+    m = np.ones(P)*5 # gradient
     
     grad = mfun.gradient_phi_2(M, L, m, alpha)
     grad_ref = m.copy()
@@ -804,10 +804,50 @@ def test_gradient_phi_2_arranged():
     L = 2   # number of prisms
     P = L*(M + 2) # number of parameters
     alpha = 1. # regularization
-    m = np.arange(1., P+1., 1.)
+    m = np.arange(1., P+1., 1.) # gradient
     
     grad = mfun.gradient_phi_2(M, L, m, alpha)
     m[:M] -= 5.*alpha
     m[M+2:-2] += 5.*alpha
+    
+    assert np.allclose(grad, m), 'The gradient is not correct'
+    
+def test_gradient_phi_3():
+    '''
+    This function tests the result for the gradient_phi_3 function.
+    
+    output
+    
+    assertion
+    '''
+    M = 3   # number of vertices
+    L = 2   # number of prisms
+    P = L*(M + 2) # number of parameters
+    alpha = 1. # regularization
+    m = np.arange(1., P+1., 1.) # gradient
+    m0 = np.arange(1., M+3., 1.) # parameters of outcropping body
+    
+    grad = mfun.gradient_phi_3(M, L, m, m0, alpha)
+    m[:M+2] -= m0*alpha
+    
+    assert np.allclose(grad, m), 'The gradient is not correct'
+    
+def test_gradient_phi_4():
+    '''
+    This function tests the result for the gradient_phi_4 function.
+    
+    output
+    
+    assertion
+    '''
+    M = 3   # number of vertices
+    L = 2   # number of prisms
+    P = L*(M + 2) # number of parameters
+    alpha = 1. # regularization
+    m = np.arange(1., P+1., 1.) # gradient
+    m0 = np.arange(1., 3., 1.) # parameters of outcropping body
+    
+    grad = mfun.gradient_phi_4(M, L, m, m0, alpha)
+    m[M:M+2] -= m0*alpha
     
     assert np.allclose(grad, m), 'The gradient is not correct'

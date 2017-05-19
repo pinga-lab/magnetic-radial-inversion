@@ -620,7 +620,7 @@ def gradient_phi_3(M, L, m, m0, alpha):
 
     
     # calculating the product between the diagonals and the slices of m
-    m[:M+2] += m[:M+2] - m0
+    m[:M+2] += (m[:M+2] - m0)*alpha
         
     return m
 
