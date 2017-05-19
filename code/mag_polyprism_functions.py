@@ -900,13 +900,13 @@ def diags_phi_1(M, L, alpha):
     d0[:M] = 2.*alpha
     d0 = np.resize(d0, P)
     
-    d1 = np.zeros(M+1)
+    d1 = np.zeros(M+2)
     d1[:M-1] = - alpha
-    d1 = np.resize(d1, P-2)
+    d1 = np.resize(d1, P-1)
     
-    dM = np.zeros(3)
+    dM = np.zeros(M+2)
     dM[0] = - alpha
-    dM = np.resize(dM, 3*L)
+    dM = np.resize(dM, P-M+1)
     
     return d0, d1, dM
 
@@ -926,6 +926,7 @@ def diags_phi_2(M, L, alpha):
     
     d0, d1: 1D array - diagonals from phi_2 hessian
     '''
+    assert L >= 2, 'The number of prisms must be major than 1'
         
     P = L*(M + 2)
     

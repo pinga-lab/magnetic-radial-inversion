@@ -602,11 +602,11 @@ def test_diags_phi_1():
     
     dzero = np.array([2.*alpha, 2.*alpha, 2.*alpha, 2.*alpha, 0., 0.])
     dzero = np.resize(dzero, P)
-    done = np.array([-alpha, -alpha, -alpha, 0., 0.])
-    done = np.resize(done, P-2)
-    dm = np.array([-alpha, 0., 0.])
-    dm = np.resize(dm, 3*L)
-
+    done = np.array([-alpha, -alpha, -alpha, 0., 0., 0.])
+    done = np.resize(done, P-1)
+    dm = np.array([-alpha, 0., 0., 0., 0., 0.])
+    dm = np.resize(dm, P-M+1)
+    
     assert np.allclose(d0, dzero), 'The diagonal is not correct'
     assert np.allclose(d1, done), 'The diagonal is not correct'
     assert np.allclose(dM, dm), 'The diagonal is not correct'
@@ -719,7 +719,7 @@ def test_diags_phi_6():
     assertion
     '''
     M = 4   # number of vertices
-    L = 3   # number of prisms
+    L = 2   # number of prisms
     P = L*(M + 2) # number of parameters
     alpha = 1. # regularization
     
@@ -730,13 +730,84 @@ def test_diags_phi_6():
     
     assert np.allclose(d0, dzero), 'The diagonal is not correct'
     
-def test_gradient_phi_1():
+def test_gradient_phi_1_unitary():
     '''
     This function tests the result for the gradient_phi_1 function
-    for an empty vector.
+    for an unitary vector.
     
     output
     
     assertion
     '''
+    M = 3   # number of vertices
+    L = 1   # number of prisms
+    P = L*(M + 2) # number of parameters
+    alpha = .1 # regularization
+    m = np.ones(P)*5
     
+    grad = mfun.gradient_phi_1(M, L, m, alpha)
+    grad_ref = m.copy()
+    
+    assert np.allclose(grad, grad_ref), 'The gradient is not correct'
+    
+def test_gradient_phi_1_arranged():
+    '''
+    This function tests the result for the gradient_phi_1 function
+    for an arranged vector.
+    
+    output
+    
+    assertion
+    '''
+    M = 3   # number of vertices
+    L = 1   # number of prisms
+    P = L*(M + 2) # number of parameters
+    alpha = .01 # regularization
+    m = np.arange(1., 6., 1.)
+    
+    grad = mfun.gradient_phi_1(M, L, m, alpha)
+    m[0] -= 3.*alpha
+    m[2] += 3.*alpha
+    
+    assert np.allclose(grad, m), 'The gradient is not correct'
+    
+def test_gradient_phi_2_unitary():
+    '''
+    This function tests the result for the gradient_phi_2 function
+    for an unitary vector.
+    
+    output
+    
+    assertion
+    '''
+    M = 3   # number of vertices
+    L = 2   # number of prisms
+    P = L*(M + 2) # number of parameters
+    alpha = .1 # regularization
+    m = np.ones(P)*5
+    
+    grad = mfun.gradient_phi_2(M, L, m, alpha)
+    grad_ref = m.copy()
+    
+    assert np.allclose(grad, grad_ref), 'The gradient is not correct'
+    
+def test_gradient_phi_2_arranged():
+    '''
+    This function tests the result for the gradient_phi_2 function
+    for an arranged vector.
+    
+    output
+    
+    assertion
+    '''
+    M = 3   # number of vertices
+    L = 2   # number of prisms
+    P = L*(M + 2) # number of parameters
+    alpha = 1. # regularization
+    m = np.arange(1., P+1., 1.)
+    
+    grad = mfun.gradient_phi_2(M, L, m, alpha)
+    m[:M] -= 5.*alpha
+    m[M+2:-2] += 5.*alpha
+    
+    assert np.allclose(grad, m), 'The gradient is not correct'
