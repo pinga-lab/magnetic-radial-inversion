@@ -747,7 +747,6 @@ def test_gradient_phi_1_unitary():
     grad_ref = m.copy()    
     grad = mfun.gradient_phi_1(M, L, m, alpha)
     
-    
     assert np.allclose(grad, grad_ref), 'The gradient is not correct'
     
 def test_gradient_phi_1_arranged():
@@ -764,12 +763,12 @@ def test_gradient_phi_1_arranged():
     P = L*(M + 2) # number of parameters
     alpha = .01 # regularization
     m = np.arange(1., 6., 1.) # gradient
-    
+    grad_ref = m.copy()
+    grad_ref[0] -= 3.*alpha
+    grad_ref[2] += 3.*alpha
     grad = mfun.gradient_phi_1(M, L, m, alpha)
-    m[0] -= 3.*alpha
-    m[2] += 3.*alpha
     
-    assert np.allclose(grad, m), 'The gradient is not correct'
+    assert np.allclose(grad, grad_ref), 'The gradient is not correct'
     
 def test_gradient_phi_2_unitary():
     '''
@@ -912,3 +911,119 @@ def test_gradient_phi_6():
     grad = mfun.gradient_phi_6(M, L, m, alpha)
     
     assert np.allclose(grad, grad_ref), 'The gradient is not correct'
+
+def test_phi_1_arranged():
+    '''
+    This function tests the result for the phi_1 function
+    for an arranged vector.
+    
+    output
+    
+    assertion
+    '''
+    M = 3   # number of vertices
+    L = 1   # number of prisms
+    P = L*(M + 2) # number of parameters
+    alpha = .01 # regularization
+    m = np.arange(1., P+1., 1.) # gradient
+    phi_ref = 6.*alpha
+    phi = mfun.phi_1(M, L, m, alpha)
+    
+    assert np.allclose(phi, phi_ref), 'The value of constraint is not correct'
+    
+def test_phi_2_arranged():
+    '''
+    This function tests the result for the phi_2 function
+    for an arranged vector.
+    
+    output
+    
+    assertion
+    '''
+    M = 3   # number of vertices
+    L = 2   # number of prisms
+    P = L*(M + 2) # number of parameters
+    alpha = .01 # regularization
+    m = np.arange(1., P+1., 1.) # gradient
+    phi_ref = 75.*alpha
+    phi = mfun.phi_2(M, L, m, alpha)
+    
+    assert np.allclose(phi, phi_ref), 'The value of constraint is not correct'
+    
+def test_phi_3_arranged():
+    '''
+    This function tests the result for the phi_3 function.
+    
+    output
+    
+    assertion
+    '''
+    M = 3   # number of vertices
+    L = 2   # number of prisms
+    P = L*(M + 2) # number of parameters
+    alpha = 1. # regularization
+    m = np.arange(5., P+5., 1.) # gradient
+    m0 = np.arange(1., M+3., 1.) # parameters of outcropping body
+    m3 = (m[:M+2] - m0)*alpha
+    phi_ref = np.sum(m3*m[:M+2])
+    phi = mfun.phi_3(M, L, m, m0, alpha)
+    
+    assert np.allclose(phi, phi_ref), 'The value of constraint is not correct'
+    
+def test_phi_4_arranged():
+    '''
+    This function tests the result for the phi_4 function.
+    
+    output
+    
+    assertion
+    '''
+    M = 3   # number of vertices
+    L = 2   # number of prisms
+    P = L*(M + 2) # number of parameters
+    alpha = 1. # regularization
+    m = np.arange(5., P+5., 1.) # gradient
+    m0 = np.arange(1., 3., 1.) # parameters of outcropping body
+    m4 = (m[M:M+2] - m0)*alpha
+    phi_ref = np.sum(m4*m[M:M+2])
+    phi = mfun.phi_4(M, L, m, m0, alpha)
+    
+    assert np.allclose(phi, phi_ref), 'The value of constraint is not correct'
+
+def test_phi_5_arranged():
+    '''
+    This function tests the result for the phi_5 function
+    for an arranged vector.
+    
+    output
+    
+    assertion
+    '''
+    M = 3   # number of vertices
+    L = 3   # number of prisms
+    P = L*(M + 2) # number of parameters
+    alpha = .1 # regularization
+    m = np.arange(5., P+5., 1.) # gradient
+    phi_ref = 100.*alpha
+    phi = mfun.phi_5(M, L, m, alpha)
+        
+    assert np.allclose(phi, phi_ref), 'The value of constraint is not correct'
+    
+def test_phi_6_arranged():
+    '''
+    This function tests the result for the phi_6 function
+    for an arranged vector.
+    
+    output
+    
+    assertion
+    '''
+    M = 3   # number of vertices
+    L = 3   # number of prisms
+    P = L*(M + 2) # number of parameters
+    alpha = 1. # regularization
+    m = np.arange(1., P+1., 1.) # gradient
+    phi_ref = 597.*alpha
+    phi = mfun.phi_6(M, L, m, alpha)
+        
+    assert np.allclose(phi, phi_ref), 'The value of constraint is not correct'
