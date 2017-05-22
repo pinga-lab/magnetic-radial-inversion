@@ -178,8 +178,8 @@ def fd_tf_x0_polyprism(xp, yp, zp, m, M, delta, inc, dec):
     mp_fat = pol2cart(mp, M, 1)
     mm_fat = pol2cart(mm, M, 1)
     
-    df = (polyprism.tf(xp, yp, zp, mp_fat, inc, dec)\
-          - polyprism.tf(xp, yp, zp, mm_fat, inc, dec))
+    df = polyprism.tf(xp, yp, zp, mp_fat, inc, dec)
+    df -= polyprism.tf(xp, yp, zp, mm_fat, inc, dec)
     
     df /= (2.*delta)
     
@@ -225,8 +225,8 @@ def fd_tf_y0_polyprism(xp, yp, zp, m, M, delta, inc, dec):
     mp_fat = pol2cart(mp, M, 1)
     mm_fat = pol2cart(mm, M, 1)
     
-    df = (polyprism.tf(xp, yp, zp, mp_fat, inc, dec)\
-          - polyprism.tf(xp, yp, zp, mm_fat, inc, dec))
+    df = polyprism.tf(xp, yp, zp, mp_fat, inc, dec)
+    df -= polyprism.tf(xp, yp, zp, mm_fat, inc, dec)
     
     df /= (2.*delta)
     

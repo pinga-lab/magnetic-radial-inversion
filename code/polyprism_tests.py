@@ -1027,3 +1027,80 @@ def test_phi_6_arranged():
     phi = mfun.phi_6(M, L, m, alpha)
         
     assert np.allclose(phi, phi_ref), 'The value of constraint is not correct'
+    
+def test_sm():
+    '''
+    This function tests the sensibility matrix for polyprisms.
+    
+    output
+    
+    Assertion
+    '''
+    L = 10 # number of prisms
+    M = 8 # number of vertices
+
+    #r = 1000. # radial distance for each vertice
+    r = np.zeros(M)
+    r[::2] = 1000.
+    r[1::2] = np.sqrt(2.)*1000./2.
+    
+    # Cartesian coordinates of the origin of each prism
+    x0 = np.zeros(L) + 1000.
+    y0 = np.zeros(L) - 1000.
+    
+    dz = 100.0    # thickness of each prism
+    
+    inc, dec = -60., 50. # inclination and declination of regional field
+    
+    props={'magnetization': utils.ang2vec(3, inc, dec)} # physical property
+    
+    z0 = 100.0    # depth of the top the shallowest prism
+    
+    m = []   # list of prisms
+    
+    ### creating the lis of prisms
+    
+    for i in range(L):
+        m.append([r, x0[i], y0[i], z0 + dz*i, z0 + dz*(i + 1), props])
+    
+    model_polyprism = mfun.pol2cart(m, M, L)
+    
+    #area over which the data are calculated
+    #x minimum, x maximum, y minimum and y maximum
+    area = [-10000, 10000, -10000, 10000] 
+
+    #number of data along the y and x directions
+    shape = (80,80)
+
+    #total number of data
+    N = shape[0]*shape[1]
+
+    #coordinates x and y of the data
+    x = np.linspace(area[0],area[1],shape[0]) # points in x
+    y = np.linspace(area[2],area[3],shape[0]) # points in y
+    xp,yp = np.meshgrid(x,y)    # creating mesh points
+    xp = xp.ravel()
+    yp = yp.ravel()
+    
+    #vertical coordinates of the data
+    zp = -350. - 500.*utils.gaussian2d(xp, yp, 17000, 21000, 21000, 18500, angle=21) # relief
+    
+    # increment for derivatives
+    delta = .1
+
+    #predict data
+    d_fat = polyprism.tf(xp, yp, zp, model_polyprism, inc, dec)
+    
+    # sensibility matrx
+    A = mfun.fd_tf_sm_polyprism(xp, yp, zp, m, M, L, delta, delta, delta, inc, dec)
+    
+    # parameters vector
+    p = mfun.param_vec(m, M, L)
+    
+    # data to compare
+    d_calc = np.dot(A, p)
+    
+    print d_fat
+    print d_calc
+    
+    assert np.allclose(d_fat, d_calc), 'The sensibility matrix is not correct'
