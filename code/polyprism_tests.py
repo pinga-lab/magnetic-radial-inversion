@@ -342,7 +342,7 @@ def test_tfa_fd_y0_data():
 
     df_m = mfun.fd_tf_y0_polyprism(xp, yp, zp, m[0], r.size, delta, inc, dec)  # derivative from the function
     df_mp_mm = (mp_fat - mm_fat)/(2.*delta)  # derivative from difference of data
-    
+        
     assert np.allclose(df_m, df_mp_mm), 'The derivative is not correct'
     
 def test_tfa_fd_radial_data():
@@ -382,15 +382,15 @@ def test_tfa_fd_radial_data():
     
     z1 = 100.0    # depth of the top prism
     z2 = 1100.0    # bottom of prism
-    delta = 10.0   # increment
+    delta = 1.0   # increment
     nv = 5
 
     # creating vertices
     r = np.zeros(nv + 2) + 1000.
-    rp = np.zeros(nv + 2) + 1000.
-    rp[nv] = r[nv] + delta
-    rm = np.zeros(nv + 2) + 1000.
-    rm[nv] = r[nv] - delta
+    rp = r.copy()
+    rp[nv] += delta
+    rm = r.copy()
+    rm[nv] -= delta
 
     # origin
     x0 = 0.
@@ -413,7 +413,7 @@ def test_tfa_fd_radial_data():
     df_m = mfun.fd_tf_radial_polyprism(xp, yp, zp, m[0], r.size, nv, delta, inc, dec)  # derivative from the function
     df_mp_mm = (mp_fat - mm_fat)/(2.*delta)  # derivative from difference of data
     
-    assert np.allclose(df_m, df_mp_mm), 'The derivative is not correct'
+    assert np.allclose(df_m, df_mp_mm, atol=1e-5), 'The derivative is not correct'
     
 def test_Hessian_phi_1():
     '''
@@ -1036,8 +1036,8 @@ def test_sm():
     
     Assertion
     '''
-    L = 10 # number of prisms
-    M = 8 # number of vertices
+    L = 1 # number of prisms
+    M = 4 # number of vertices
 
     #r = 1000. # radial distance for each vertice
     r = np.zeros(M)
@@ -1086,13 +1086,14 @@ def test_sm():
     zp = -350. - 500.*utils.gaussian2d(xp, yp, 17000, 21000, 21000, 18500, angle=21) # relief
     
     # increment for derivatives
-    delta = .1
+    delta = 10.
 
     #predict data
     d_fat = polyprism.tf(xp, yp, zp, model_polyprism, inc, dec)
     
     # sensibility matrx
     A = mfun.fd_tf_sm_polyprism(xp, yp, zp, m, M, L, delta, delta, delta, inc, dec)
+    print A[:,0]
     
     # parameters vector
     p = mfun.param_vec(m, M, L)
