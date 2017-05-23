@@ -1028,9 +1028,9 @@ def test_phi_6_arranged():
         
     assert np.allclose(phi, phi_ref), 'The value of constraint is not correct'
     
-def test_sm():
+def test_Hessian_symetry():
     '''
-    This function tests the sensibility matrix for polyprisms.
+    This function tests the symetry of the Hessian matrix.
     
     output
     
@@ -1038,6 +1038,7 @@ def test_sm():
     '''
     L = 1 # number of prisms
     M = 4 # number of vertices
+    P = L*(M + 2) # number of parameters
 
     #r = 1000. # radial distance for each vertice
     r = np.zeros(M)
@@ -1093,15 +1094,9 @@ def test_sm():
     
     # sensibility matrx
     A = mfun.fd_tf_sm_polyprism(xp, yp, zp, m, M, L, delta, delta, delta, inc, dec)
-    print A[:,0]
     
-    # parameters vector
-    p = mfun.param_vec(m, M, L)
+    #Hessian matrix
+    H = np.dot(A.T, A)
     
-    # data to compare
-    d_calc = np.dot(A, p)
-    
-    print d_fat
-    print d_calc
-    
-    assert np.allclose(d_fat, d_calc), 'The sensibility matrix is not correct'
+    for i in range(P):
+        assert np.allclose(H[i,i+1:], H[i+1:,i]), 'The sensibility matrix is not correct'
