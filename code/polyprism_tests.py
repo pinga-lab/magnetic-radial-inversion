@@ -18,50 +18,59 @@ def test_volume():
     
     Assertion
     '''
-    Np = 10 # number of prisms
-    Nv = 8 # number of vertices
+    L = 1 # number of prisms
+    M = 4 # number of vertices
 
     #r = 1000. # radial distance for each vertice
-    r = np.zeros(Nv)
-    r[::2] = 1000.
-    r[1::2] = np.sqrt(2.)*1000./2.
+    r = np.zeros(M) + np.sqrt(2000000.)
+        
+    # Cartesian coordinates of the origin of each prism
+    x0 = 0. 
+    y0 = 0.
     
-    dz = 100.0    # thickness of each prism
+    dz = 1000.0    # thickness of each prism
+    
+    inc, dec = -60., 50. # inclination and declination of regional field
+    
+    props={'magnetization': utils.ang2vec(3, inc, dec)} # physical property
+    
+    z0 = 100.0    # depth of the top the shallowest prism
+    
+    m = []   # list of prisms
+    
+    ### creating the lis of prisms
+    
+    m.append([r, x0, y0, z0, z0 + dz, props])
+    
+    model = mfun.pol2cart(m, M, L)
 
-    area = 0.
+    area = mfun.area_polygon(model[0].x, model[0].y)
 
-    for i in range(Nv-1):
-        area += r[i]*r[i+1]*np.sin(2.*(i+1)*np.pi/Nv - 2.*i*np.pi/Nv)
-    area = area + r[-1]*r[0]*np.sin(2.*np.pi - 2.*(Nv-1)*np.pi/Nv)
-
-    volume = area*Np*dz
+    volume = area*L*dz
     
     volume_ref = 2000.*2000.*1000.  # l*l*h
     
-    assert volume == volume_ref
+    assert np.allclose(volume, volume_ref), 'The volume is not correct'
     
-    
-def test_tfa_data():
+def test_paramvec():
     '''
-    This function tests the total field anomaly data 
-    between a model from pol2cart function and the
-    fatiando function for a rectangular prism.
+    Test for function that transform a list of prisms into
+    a parameter vector.
     
     output
     
     Assertion
     '''
-    Np = 10 # number of prisms
-    Nv = 8 # number of vertices
+    L = 2 # number of prisms
+    M = 4 # number of vertices
+    P = L*(M + 2) # number of parameters
 
     #r = 1000. # radial distance for each vertice
-    r = np.zeros(Nv)
-    r[::2] = 1000.
-    r[1::2] = np.sqrt(2.)*1000.
-    
+    r = np.zeros(M) + 1000.
+        
     # Cartesian coordinates of the origin of each prism
-    x0 = np.zeros(Np) 
-    y0 = np.zeros(Np)
+    x0 = 0. 
+    y0 = 0.
     
     dz = 100.0    # thickness of each prism
     
@@ -75,10 +84,108 @@ def test_tfa_data():
     
     ### creating the lis of prisms
     
-    for i in range(Np):
+    for i in range(L):
+        m.append([r, x0, y0, z0 + dz*i, z0 + dz*(i + 1), props])
+    
+    model_polyprism = mfun.pol2cart(m, M, L)
+    
+    p = mfun.param_vec(m, M, L)
+    
+    p_ref = np.zeros(P)
+    p_ref[:M] = r 
+    p_ref[M+2:2*M+2] = r
+    
+    assert np.allclose(p, p_ref), 'The result does not match with the reference'
+    
+def test_param2model():
+    '''
+    Test for function that transform a parameters vector into
+    a list of prisms.
+    
+    output
+    
+    Assertion
+    '''
+    L = 2 # number of prisms
+    M = 4 # number of vertices
+    P = L*(M + 2) # number of parameters
+
+    #r = 1000. # radial distance for each vertice
+    r = np.zeros(M) + 1000.
+        
+    # Cartesian coordinates of the origin of each prism
+    x0 = 0. 
+    y0 = 0.
+    
+    dz = 100.0    # thickness of each prism
+    
+    inc, dec = -60., 50. # inclination and declination of regional field
+    
+    props={'magnetization': utils.ang2vec(3, inc, dec)} # physical property
+    
+    z0 = 100.0    # depth of the top the shallowest prism
+    
+    m = []   # list of prisms
+    
+    ### creating the lis of prisms
+    
+    for i in range(L):
+        m.append([r, x0, y0, z0 + dz*i, z0 + dz*(i + 1), props])
+        
+    # transform the list of prisms into parameters vector
+    p = mfun.param_vec(m, M, L)
+    
+    # transform the parameters vector into list of prisms
+    model = mfun.param2model(p, M, L, z0, dz, props)
+    
+    ma = mfun.pol2cart(m,M,L)
+    moda = mfun.pol2cart(model,M,L)
+    
+    for i in range(L):
+        assert ma[i].x.all() == moda[i].x.all()
+        assert ma[i].y.all() == moda[i].y.all()
+        assert ma[i].z1 == moda[i].z1test
+        assert ma[i].z2 == moda[i].z2
+        assert ma[i].props == moda[i].props
+
+def test_tfa_data():
+    '''
+    This function tests the total field anomaly data 
+    between a model from pol2cart function and the
+    fatiando function for a rectangular prism.
+    
+    output
+    
+    Assertion
+    '''
+    L = 10 # number of prisms
+    M = 8 # number of vertices
+
+    #r = 1000. # radial distance for each vertice
+    r = np.zeros(M)
+    r[::2] = 1000.
+    r[1::2] = np.sqrt(2.)*1000./2.
+    
+    # Cartesian coordinates of the origin of each prism
+    x0 = np.zeros(L) 
+    y0 = np.zeros(L)
+    
+    dz = 100.0    # thickness of each prism
+    
+    inc, dec = -60., 50. # inclination and declination of regional field
+    
+    props={'magnetization': utils.ang2vec(3, inc, dec)} # physical property
+    
+    z0 = 100.0    # depth of the top the shallowest prism
+    
+    m = []   # list of prisms
+    
+    ### creating the lis of prisms
+    
+    for i in range(L):
         m.append([r, x0[i], y0[i], z0 + dz*i, z0 + dz*(i + 1), props])
     
-    model_polyprism = mfun.pol2cart(m, Np, Nv)
+    model_polyprism = mfun.pol2cart(m, M, L)
     
     #area over which the data are calculated
     #x minimum, x maximum, y minimum and y maximum
@@ -106,7 +213,7 @@ def test_tfa_data():
     
     tfat_recprism = prism.tf(xp, yp, zp, model_recprism, inc, dec)
     
-    assert np.allclose(tfat_polyprism, tfat_recprism, atol=1e-05), 'The data from small rectangular prisms must be equal to a big rectangular prism'
+    assert np.allclose(tfat_polyprism, tfat_recprism), 'The data from small rectangular prisms must be equal to a big rectangular prism'
     
 def test_tfa_fd_x0_data():
     '''
@@ -160,8 +267,8 @@ def test_tfa_fd_x0_data():
     mm = [[r, x0 - delta, y0, z1, z2, props]]   # prism minus increment
 
     ### creating data of the prisms
-    mpt = mfun.pol2cart(mp, len(mp), r.size)
-    mmt = mfun.pol2cart(mm, len(mm), r.size)
+    mpt = mfun.pol2cart(mp, r.size, len(mp))
+    mmt = mfun.pol2cart(mm, r.size, len(mm))
 
     mp_fat = polyprism.tf(xp, yp, zp, mpt, inc, dec)   # data of prism plus increment
     mm_fat = polyprism.tf(xp, yp, zp, mmt, inc, dec)   # data of prism minus increment
@@ -225,8 +332,8 @@ def test_tfa_fd_y0_data():
     mm = [[r, x0, y0 - delta, z1, z2, props]]   # prism minus increment
 
     ### creating data of the prisms
-    mpt = mfun.pol2cart(mp, len(mp), r.size)
-    mmt = mfun.pol2cart(mm, len(mm), r.size)
+    mpt = mfun.pol2cart(mp, r.size, len(mp))
+    mmt = mfun.pol2cart(mm, r.size, len(mm))
 
     mp_fat = polyprism.tf(xp, yp, zp, mpt, inc, dec)   # data of prism plus increment
     mm_fat = polyprism.tf(xp, yp, zp, mmt, inc, dec)   # data of prism minus increment
@@ -235,7 +342,7 @@ def test_tfa_fd_y0_data():
 
     df_m = mfun.fd_tf_y0_polyprism(xp, yp, zp, m[0], r.size, delta, inc, dec)  # derivative from the function
     df_mp_mm = (mp_fat - mm_fat)/(2.*delta)  # derivative from difference of data
-    
+        
     assert np.allclose(df_m, df_mp_mm), 'The derivative is not correct'
     
 def test_tfa_fd_radial_data():
@@ -275,15 +382,15 @@ def test_tfa_fd_radial_data():
     
     z1 = 100.0    # depth of the top prism
     z2 = 1100.0    # bottom of prism
-    delta = 10.0   # increment
+    delta = 1.0   # increment
     nv = 5
 
     # creating vertices
     r = np.zeros(nv + 2) + 1000.
-    rp = np.zeros(nv + 2) + 1000.
-    rp[nv] = r[nv] + delta
-    rm = np.zeros(nv + 2) + 1000.
-    rm[nv] = r[nv] - delta
+    rp = r.copy()
+    rp[nv] += delta
+    rm = r.copy()
+    rm[nv] -= delta
 
     # origin
     x0 = 0.
@@ -295,8 +402,8 @@ def test_tfa_fd_radial_data():
     mm = [[rm, x0, y0, z1, z2, props]]   # prism minus increment
     
     ### creating data of the prisms
-    mpt = mfun.pol2cart(mp, len(mp), rp.size)
-    mmt = mfun.pol2cart(mm, len(mm), rm.size)
+    mpt = mfun.pol2cart(mp, rp.size, len(mp))
+    mmt = mfun.pol2cart(mm, rm.size, len(mm))
 
     mp_fat = polyprism.tf(xp, yp, zp, mpt, inc, dec)   # data of prism plus increment
     mm_fat = polyprism.tf(xp, yp, zp, mmt, inc, dec)   # data of prism minus increment
@@ -306,11 +413,11 @@ def test_tfa_fd_radial_data():
     df_m = mfun.fd_tf_radial_polyprism(xp, yp, zp, m[0], r.size, nv, delta, inc, dec)  # derivative from the function
     df_mp_mm = (mp_fat - mm_fat)/(2.*delta)  # derivative from difference of data
     
-    assert np.allclose(df_m, df_mp_mm, atol=1e-06), 'The derivative is not correct'
+    assert np.allclose(df_m, df_mp_mm, atol=1e-5), 'The derivative is not correct'
     
 def test_Hessian_phi_1():
     '''
-    This function tests the result for the phi_1 function
+    This function tests the result for the Hessian_phi_1 function
     for an empty matrix.
     
     output
@@ -342,7 +449,7 @@ def test_Hessian_phi_1():
 
 def test_Hessian_phi_2():
     '''
-    This function tests the result for the phi_2 function
+    This function tests the result for the Hessian_phi_2 function
     for an empty matrix.
     
     output
@@ -374,7 +481,7 @@ def test_Hessian_phi_2():
         
 def test_Hessian_phi_3():
     '''
-    This function tests the result for the phi_3 function
+    This function tests the result for the Hessian_phi_3 function
     for an empty matrix.
     
     output
@@ -397,7 +504,7 @@ def test_Hessian_phi_3():
     
 def test_Hessian_phi_4():
     '''
-    This function tests the result for the phi_4 function
+    This function tests the result for the Hessian_phi_4 function
     for an empty matrix.
     
     output
@@ -424,7 +531,7 @@ def test_Hessian_phi_4():
     
 def test_Hessian_phi_5():
     '''
-    This function tests the result for the phi_5 function
+    This function tests the result for the Hessian_phi_5 function
     for an empty matrix.
     
     output
@@ -451,7 +558,7 @@ def test_Hessian_phi_5():
     
 def test_Hessian_phi_6():
     '''
-    This function tests the result for the phi_6 function
+    This function tests the result for the Hessian_phi_6 function
     for an empty matrix.
     
     output
@@ -476,3 +583,525 @@ def test_Hessian_phi_6():
         H_ref[i+M+2,i+M+2] = alpha
         
     assert np.allclose(H, H_ref), 'The matrices is not correct'
+    
+def test_diags_phi_1():
+    '''
+    This function tests the result for the diags_phi_1 function
+    for an simple example.
+    
+    output
+    
+    assertion
+    '''
+    M = 4   # number of vertices
+    L = 2   # number of prisms
+    P = L*(M + 2) # number of parameters
+    alpha = 1. # regularization
+    
+    d0, d1, dM = mfun.diags_phi_1(M, L, alpha) # non-zero diagonals
+    
+    dzero = np.array([2.*alpha, 2.*alpha, 2.*alpha, 2.*alpha, 0., 0.])
+    dzero = np.resize(dzero, P)
+    done = np.array([-alpha, -alpha, -alpha, 0., 0., 0.])
+    done = np.resize(done, P-1)
+    dm = np.array([-alpha, 0., 0., 0., 0., 0.])
+    dm = np.resize(dm, P-M+1)
+    
+    assert np.allclose(d0, dzero), 'The diagonal is not correct'
+    assert np.allclose(d1, done), 'The diagonal is not correct'
+    assert np.allclose(dM, dm), 'The diagonal is not correct'
+    
+def test_diags_phi_2_tp():
+    '''
+    This function tests the result for the diags_phi_2 function
+    for an simple example with two prisms.
+    
+    output
+    
+    assertion
+    '''
+    M = 4   # number of vertices
+    L = 2   # number of prisms
+    P = L*(M + 2) # number of parameters
+    alpha = 1. # regularization
+    
+    d0, d1 = mfun.diags_phi_2(M, L, alpha) # non-zero diagonals
+    
+    dzero = np.array([alpha, alpha, alpha, alpha, 0., 0.])
+    dzero = np.resize(dzero, P)
+    done = np.array([-alpha, -alpha, -alpha, -alpha, 0., 0.])
+    done = np.resize(done, P-M-2)
+    
+    assert np.allclose(d0, dzero), 'The diagonal is not correct'
+    assert np.allclose(d1, done), 'The diagonal is not correct'
+    
+def test_diags_phi_2_mp():
+    '''
+    This function tests the result for the diags_phi_2 function
+    for an simple example with more than two prisms.
+    
+    output
+    
+    assertion
+    '''
+    M = 4   # number of vertices
+    L = 3   # number of prisms
+    P = L*(M + 2) # number of parameters
+    alpha = 1. # regularization
+    
+    d0, d1 = mfun.diags_phi_2(M, L, alpha) # non-zero diagonals
+    
+    dzero = np.array([alpha, alpha, alpha, alpha, 0., 0.])
+    dzero = np.resize(dzero, P)
+    dzero[M+2:2*M+2] += alpha
+    done = np.array([-alpha, -alpha, -alpha, -alpha, 0., 0.])
+    done = np.resize(done, P-M-2)
+
+    assert np.allclose(d0, dzero), 'The diagonal is not correct'
+    assert np.allclose(d1, done), 'The diagonal is not correct'
+    
+def test_diags_phi_5_tp():
+    '''
+    This function tests the result for the diags_phi_5 function
+    for an simple example with two prisms.
+    
+    output
+    
+    assertion
+    '''
+    M = 4   # number of vertices
+    L = 2   # number of prisms
+    P = L*(M + 2) # number of parameters
+    alpha = 1. # regularization
+    
+    d0, d1 = mfun.diags_phi_5(M, L, alpha) # non-zero diagonals
+    
+    dzero = np.array([0., 0., 0., 0., alpha, alpha])
+    dzero = np.resize(dzero, P)
+    done = np.array([0., 0., 0., 0., -alpha, -alpha])
+    done = np.resize(done, P-M-2)
+    
+    assert np.allclose(d0, dzero), 'The diagonal is not correct'
+    assert np.allclose(d1, done), 'The diagonal is not correct'
+    
+def test_diags_phi_5_mp():
+    '''
+    This function tests the result for the diags_phi_5 function
+    for an simple example with more than two prisms.
+    
+    output
+    
+    assertion
+    '''
+    M = 4   # number of vertices
+    L = 3   # number of prisms
+    P = L*(M + 2) # number of parameters
+    alpha = 1. # regularization
+    
+    d0, d1 = mfun.diags_phi_5(M, L, alpha) # non-zero diagonals
+    
+    dzero = np.array([0., 0., 0., 0., alpha, alpha])
+    dzero = np.resize(dzero, P)
+    dzero[2*M+2:2*(M+2)] += alpha
+    done = np.array([0., 0., 0., 0., -alpha, -alpha])
+    done = np.resize(done, P-M-2)
+
+    assert np.allclose(d0, dzero), 'The diagonal is not correct'
+    assert np.allclose(d1, done), 'The diagonal is not correct'
+    
+def test_diags_phi_6():
+    '''
+    This function tests the result for the diags_phi_6 function
+    for an simple example.
+    
+    output
+    
+    assertion
+    '''
+    M = 4   # number of vertices
+    L = 2   # number of prisms
+    P = L*(M + 2) # number of parameters
+    alpha = 1. # regularization
+    
+    d0 = mfun.diags_phi_6(M, L, alpha) # non-zero diagonals
+    
+    dzero = np.array([alpha, alpha, alpha, alpha, 0., 0.])
+    dzero = np.resize(dzero, P)
+    
+    assert np.allclose(d0, dzero), 'The diagonal is not correct'
+    
+def test_gradient_phi_1_unitary():
+    '''
+    This function tests the result for the gradient_phi_1 function
+    for an unitary vector.
+    
+    output
+    
+    assertion
+    '''
+    M = 3   # number of vertices
+    L = 1   # number of prisms
+    P = L*(M + 2) # number of parameters
+    alpha = .1 # regularization
+    m = np.ones(P)*5 # gradient
+    grad_ref = m.copy()    
+    grad = mfun.gradient_phi_1(M, L, m, alpha)
+    
+    assert np.allclose(grad, grad_ref), 'The gradient is not correct'
+    
+def test_gradient_phi_1_arranged():
+    '''
+    This function tests the result for the gradient_phi_1 function
+    for an arranged vector.
+    
+    output
+    
+    assertion
+    '''
+    M = 3   # number of vertices
+    L = 1   # number of prisms
+    P = L*(M + 2) # number of parameters
+    alpha = .01 # regularization
+    m = np.arange(1., 6., 1.) # gradient
+    grad_ref = m.copy()
+    grad_ref[0] -= 3.*alpha
+    grad_ref[2] += 3.*alpha
+    grad = mfun.gradient_phi_1(M, L, m, alpha)
+    
+    assert np.allclose(grad, grad_ref), 'The gradient is not correct'
+    
+def test_gradient_phi_2_unitary():
+    '''
+    This function tests the result for the gradient_phi_2 function
+    for an unitary vector.
+    
+    output
+    
+    assertion
+    '''
+    M = 3   # number of vertices
+    L = 2   # number of prisms
+    P = L*(M + 2) # number of parameters
+    alpha = .1 # regularization
+    m = np.ones(P)*5 # gradient
+    grad_ref = m.copy()    
+    grad = mfun.gradient_phi_2(M, L, m, alpha)
+    
+    
+    assert np.allclose(grad, grad_ref), 'The gradient is not correct'
+    
+def test_gradient_phi_2_arranged():
+    '''
+    This function tests the result for the gradient_phi_2 function
+    for an arranged vector.
+    
+    output
+    
+    assertion
+    '''
+    M = 3   # number of vertices
+    L = 2   # number of prisms
+    P = L*(M + 2) # number of parameters
+    alpha = 1. # regularization
+    m = np.arange(1., P+1., 1.) # gradient
+    grad_ref = m.copy()
+    grad_ref[:M] -= 5.*alpha
+    grad_ref[M+2:-2] += 5.*alpha
+    grad = mfun.gradient_phi_2(M, L, m, alpha)
+    
+    assert np.allclose(grad, grad_ref), 'The gradient is not correct'
+    
+def test_gradient_phi_3():
+    '''
+    This function tests the result for the gradient_phi_3 function.
+    
+    output
+    
+    assertion
+    '''
+    M = 3   # number of vertices
+    L = 2   # number of prisms
+    P = L*(M + 2) # number of parameters
+    alpha = 1. # regularization
+    m = np.arange(1., P+1., 1.) # gradient
+    m0 = np.arange(1., M+3., 1.) # parameters of outcropping body
+    grad_ref = m.copy()
+    grad_ref[:M+2] += (grad_ref[:M+2] - m0)*alpha
+    grad = mfun.gradient_phi_3(M, L, m, m0, alpha)
+    
+    assert np.allclose(grad, grad_ref), 'The gradient is not correct'
+    
+def test_gradient_phi_4():
+    '''
+    This function tests the result for the gradient_phi_4 function.
+    
+    output
+    
+    assertion
+    '''
+    M = 3   # number of vertices
+    L = 2   # number of prisms
+    P = L*(M + 2) # number of parameters
+    alpha = 1. # regularization
+    m = np.arange(1., P+1., 1.) # gradient
+    m0 = np.arange(1., 3., 1.) # parameters of outcropping body
+    grad_ref = m.copy()
+    grad_ref[M:M+2] += (grad_ref[M:M+2] - m0)*alpha
+    grad = mfun.gradient_phi_4(M, L, m, m0, alpha)
+    
+    assert np.allclose(grad, grad_ref), 'The gradient is not correct'
+    
+def test_gradient_phi_5_unitary():
+    '''
+    This function tests the result for the gradient_phi_5 function
+    for an unitary vector.
+    
+    output
+    
+    assertion
+    '''
+    M = 3   # number of vertices
+    L = 3   # number of prisms
+    P = L*(M + 2) # number of parameters
+    alpha = .1 # regularization
+    m = np.ones(P)*5 # gradient
+    grad_ref = m.copy()
+    grad = mfun.gradient_phi_5(M, L, m, alpha)
+        
+    assert np.allclose(grad, grad_ref), 'The gradient is not correct'
+    
+def test_gradient_phi_5_arranged():
+    '''
+    This function tests the result for the gradient_phi_5 function
+    for an arranged vector.
+    
+    output
+    
+    assertion
+    '''
+    M = 3   # number of vertices
+    L = 3   # number of prisms
+    P = L*(M + 2) # number of parameters
+    alpha = 1. # regularization
+    m = np.arange(1., P+1., 1.) # gradient
+    grad_ref = m.copy()
+    grad_ref[M:M+2] -= 5.*alpha
+    grad_ref[2*(M+2)+M:] += 5.*alpha
+    grad = mfun.gradient_phi_5(M, L, m, alpha)
+    
+    assert np.allclose(grad, grad_ref), 'The gradient is not correct'
+    
+def test_gradient_phi_6():
+    '''
+    This function tests the result for the gradient_phi_6 function
+    for an unitary vector.
+    
+    output
+    
+    assertion
+    '''
+    M = 3   # number of vertices
+    L = 2   # number of prisms
+    P = L*(M + 2) # number of parameters
+    alpha = 1. # regularization
+    m = np.ones(P)*5. # gradient
+    grad_ref = m.copy() + m*alpha
+    grad_ref[M:M+2] -= 5.
+    grad_ref[2*M+2:] -= 5.
+    grad = mfun.gradient_phi_6(M, L, m, alpha)
+    
+    assert np.allclose(grad, grad_ref), 'The gradient is not correct'
+
+def test_phi_1_arranged():
+    '''
+    This function tests the result for the phi_1 function
+    for an arranged vector.
+    
+    output
+    
+    assertion
+    '''
+    M = 3   # number of vertices
+    L = 1   # number of prisms
+    P = L*(M + 2) # number of parameters
+    alpha = .01 # regularization
+    m = np.arange(1., P+1., 1.) # gradient
+    phi_ref = 6.*alpha
+    phi = mfun.phi_1(M, L, m, alpha)
+    
+    assert np.allclose(phi, phi_ref), 'The value of constraint is not correct'
+    
+def test_phi_2_arranged():
+    '''
+    This function tests the result for the phi_2 function
+    for an arranged vector.
+    
+    output
+    
+    assertion
+    '''
+    M = 3   # number of vertices
+    L = 2   # number of prisms
+    P = L*(M + 2) # number of parameters
+    alpha = .01 # regularization
+    m = np.arange(1., P+1., 1.) # gradient
+    phi_ref = 75.*alpha
+    phi = mfun.phi_2(M, L, m, alpha)
+    
+    assert np.allclose(phi, phi_ref), 'The value of constraint is not correct'
+    
+def test_phi_3_arranged():
+    '''
+    This function tests the result for the phi_3 function.
+    
+    output
+    
+    assertion
+    '''
+    M = 3   # number of vertices
+    L = 2   # number of prisms
+    P = L*(M + 2) # number of parameters
+    alpha = 1. # regularization
+    m = np.arange(5., P+5., 1.) # gradient
+    m0 = np.arange(1., M+3., 1.) # parameters of outcropping body
+    m3 = (m[:M+2] - m0)*alpha
+    phi_ref = np.sum(m3*m[:M+2])
+    phi = mfun.phi_3(M, L, m, m0, alpha)
+    
+    assert np.allclose(phi, phi_ref), 'The value of constraint is not correct'
+    
+def test_phi_4_arranged():
+    '''
+    This function tests the result for the phi_4 function.
+    
+    output
+    
+    assertion
+    '''
+    M = 3   # number of vertices
+    L = 2   # number of prisms
+    P = L*(M + 2) # number of parameters
+    alpha = 1. # regularization
+    m = np.arange(5., P+5., 1.) # gradient
+    m0 = np.arange(1., 3., 1.) # parameters of outcropping body
+    m4 = (m[M:M+2] - m0)*alpha
+    phi_ref = np.sum(m4*m[M:M+2])
+    phi = mfun.phi_4(M, L, m, m0, alpha)
+    
+    assert np.allclose(phi, phi_ref), 'The value of constraint is not correct'
+
+def test_phi_5_arranged():
+    '''
+    This function tests the result for the phi_5 function
+    for an arranged vector.
+    
+    output
+    
+    assertion
+    '''
+    M = 3   # number of vertices
+    L = 3   # number of prisms
+    P = L*(M + 2) # number of parameters
+    alpha = .1 # regularization
+    m = np.arange(5., P+5., 1.) # gradient
+    phi_ref = 100.*alpha
+    phi = mfun.phi_5(M, L, m, alpha)
+        
+    assert np.allclose(phi, phi_ref), 'The value of constraint is not correct'
+    
+def test_phi_6_arranged():
+    '''
+    This function tests the result for the phi_6 function
+    for an arranged vector.
+    
+    output
+    
+    assertion
+    '''
+    M = 3   # number of vertices
+    L = 3   # number of prisms
+    P = L*(M + 2) # number of parameters
+    alpha = 1. # regularization
+    m = np.arange(1., P+1., 1.) # gradient
+    phi_ref = 597.*alpha
+    phi = mfun.phi_6(M, L, m, alpha)
+        
+    assert np.allclose(phi, phi_ref), 'The value of constraint is not correct'
+    
+def test_sm():
+    '''
+    This function tests the sensibility matrix for polyprisms.
+    
+    output
+    
+    Assertion
+    '''
+    L = 1 # number of prisms
+    M = 4 # number of vertices
+
+    #r = 1000. # radial distance for each vertice
+    r = np.zeros(M)
+    r[::2] = 1000.
+    r[1::2] = np.sqrt(2.)*1000./2.
+    
+    # Cartesian coordinates of the origin of each prism
+    x0 = np.zeros(L) + 1000.
+    y0 = np.zeros(L) - 1000.
+    
+    dz = 100.0    # thickness of each prism
+    
+    inc, dec = -60., 50. # inclination and declination of regional field
+    
+    props={'magnetization': utils.ang2vec(3, inc, dec)} # physical property
+    
+    z0 = 100.0    # depth of the top the shallowest prism
+    
+    m = []   # list of prisms
+    
+    ### creating the lis of prisms
+    
+    for i in range(L):
+        m.append([r, x0[i], y0[i], z0 + dz*i, z0 + dz*(i + 1), props])
+    
+    model_polyprism = mfun.pol2cart(m, M, L)
+    
+    #area over which the data are calculated
+    #x minimum, x maximum, y minimum and y maximum
+    area = [-10000, 10000, -10000, 10000] 
+
+    #number of data along the y and x directions
+    shape = (80,80)
+
+    #total number of data
+    N = shape[0]*shape[1]
+
+    #coordinates x and y of the data
+    x = np.linspace(area[0],area[1],shape[0]) # points in x
+    y = np.linspace(area[2],area[3],shape[0]) # points in y
+    xp,yp = np.meshgrid(x,y)    # creating mesh points
+    xp = xp.ravel()
+    yp = yp.ravel()
+    
+    #vertical coordinates of the data
+    zp = -350. - 500.*utils.gaussian2d(xp, yp, 17000, 21000, 21000, 18500, angle=21) # relief
+    
+    # increment for derivatives
+    delta = 10.
+
+    #predict data
+    d_fat = polyprism.tf(xp, yp, zp, model_polyprism, inc, dec)
+    
+    # sensibility matrx
+    A = mfun.fd_tf_sm_polyprism(xp, yp, zp, m, M, L, delta, delta, delta, inc, dec)
+    print A[:,0]
+    
+    # parameters vector
+    p = mfun.param_vec(m, M, L)
+    
+    # data to compare
+    d_calc = np.dot(A, p)
+    
+    print d_fat
+    print d_calc
+    
+    assert np.allclose(d_fat, d_calc), 'The sensibility matrix is not correct'
