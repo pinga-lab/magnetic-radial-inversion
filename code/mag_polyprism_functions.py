@@ -1081,6 +1081,28 @@ def trans_parameter(m, M, L, rmin, rmax, x0min, x0max, y0min, y0max):
 
 
 def trans_parameter2(m, mmax, mmin):
+    '''
+    Returns the transformated parameters.
+    
+    input
+    
+    M: integer - number of vertices
+    L: integer - number of prisms
+    mt: 1D array - transformated parameters vector with 
+                  radial distances of each vertice
+                  and the Cartesian coordinates of each prism
+    mmax: 1D array - maximum value of each parameter
+                    (r1max,...,rMmax, x0max, y0max)
+    mmin: 1D array - minimum value of each parameter
+                    (r1min,...,rMmin, x0min, y0min)
+    
+    output
+    
+    mt: 1D array - parameters vector
+    '''
+    assert len(mmax) == M + 2, 'The size of mmax must be equal to M + 2'
+    assert len(mmin) == M + 2, 'The size of mmin must be equal to M + 2'
+    assert len(mt) == L*(M + 2), 'The size of m must be equal to L*(M + 2)'
 
     mt = -np.log(abs((mmax - m))/(m - mmin))
 
@@ -1126,6 +1148,28 @@ def trans_inv_parameter(mt, M, L, rmin, rmax, x0min, x0max, y0min, y0max):
 
 
 def trans_inv_parameter2(mt, mmax, mmin):
+    '''
+    Returns the parameters from the inverse transformation.
+    
+    input
+    
+    M: integer - number of vertices
+    L: integer - number of prisms
+    mt: 1D array - transformated parameters vector with 
+                  radial distances of each vertice
+                  and the Cartesian coordinates of each prism
+    mmax: 1D array - maximum value of each parameter
+                    (r1max,...,rMmax, x0max, y0max)
+    mmin: 1D array - minimum value of each parameter
+                    (r1min,...,rMmin, x0min, y0min)
+    
+    output
+    
+    mt: 1D array - parameters vector
+    '''
+    assert len(mmax) == M + 2, 'The size of mmax must be equal to M + 2'
+    assert len(mmin) == M + 2, 'The size of mmin must be equal to M + 2'
+    assert len(mt) == L*(M + 2), 'The size of m must be equal to L*(M + 2)'
 
     m = 1000.*(0.001*mmin + (0.001*(mmax - mmin))/(1. + np.exp(-0.001*mt)))
 

@@ -382,7 +382,7 @@ def test_tfa_fd_radial_data():
     
     z1 = 100.0    # depth of the top prism
     z2 = 1100.0    # bottom of prism
-    delta = 1.0   # increment
+    delta = 10.0   # increment
     nv = 5
 
     # creating vertices
