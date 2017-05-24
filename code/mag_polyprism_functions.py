@@ -1080,7 +1080,29 @@ def trans_parameter(m, M, L, rmin, rmax, x0min, x0max, y0min, y0max):
     return mt
 
 
-def trans_parameter2(m, mmax, mmin):
+def trans_parameter2(m, M, L, mmax, mmin):
+    '''
+    Returns the transformated parameters.
+    
+    input
+    
+    M: integer - number of vertices
+    L: integer - number of prisms
+    mt: 1D array - transformated parameters vector with 
+                  radial distances of each vertice
+                  and the Cartesian coordinates of each prism
+    mmax: 1D array - maximum value of each parameter
+                    (r1max,...,rMmax, x0max, y0max)
+    mmin: 1D array - minimum value of each parameter
+                    (r1min,...,rMmin, x0min, y0min)
+    
+    output
+    
+    mt: 1D array - parameters vector
+    '''
+    assert mmax.size == L*(M + 2), 'The size of mmax must be equal to L*(M + 2)'
+    assert mmin.size == L*(M + 2), 'The size of mmin must be equal to L*(M + 2)'
+    assert m.size == L*(M + 2), 'The size of m must be equal to L*(M + 2)'
 
     mt = -np.log(abs((mmax - m))/(m - mmin))
 
@@ -1125,9 +1147,32 @@ def trans_inv_parameter(mt, M, L, rmin, rmax, x0min, x0max, y0min, y0max):
     return m
 
 
-def trans_inv_parameter2(mt, mmax, mmin):
+def trans_inv_parameter2(mt, M, L, mmax, mmin):
+    '''
+    Returns the parameters from the inverse transformation.
+    
+    input
+    
+    M: integer - number of vertices
+    L: integer - number of prisms
+    mt: 1D array - transformated parameters vector with 
+                  radial distances of each vertice
+                  and the Cartesian coordinates of each prism
+    mmax: 1D array - maximum value of each parameter
+                    (r1max,...,rMmax, x0max, y0max)
+    mmin: 1D array - minimum value of each parameter
+                    (r1min,...,rMmin, x0min, y0min)
+    
+    output
+    
+    mt: 1D array - parameters vector
+    '''
+    assert len(mmax) == L*(M + 2), 'The size of mmax must be equal to L*(M + 2)'
+    assert len(mmin) == L*(M + 2), 'The size of mmin must be equal to L*(M + 2)'
+    assert len(mt) == L*(M + 2), 'The size of m must be equal to L*(M + 2)'
 
-    m = 1000.*(0.001*mmin + (0.001*(mmax - mmin))/(1. + np.exp(-0.001*mt)))
+    #m = 0.001*mmin + (0.001*(mmax - mmin))/(1. + np.exp(-0.001*mt))
+    m = (mmin + (mmax - mmin)/(1. + np.exp(-mt)))
 
     return m
     

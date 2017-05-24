@@ -382,7 +382,7 @@ def test_tfa_fd_radial_data():
     
     z1 = 100.0    # depth of the top prism
     z2 = 1100.0    # bottom of prism
-    delta = 1.0   # increment
+    delta = 10.0   # increment
     nv = 5
 
     # creating vertices
@@ -1028,9 +1028,9 @@ def test_phi_6_arranged():
         
     assert np.allclose(phi, phi_ref), 'The value of constraint is not correct'
     
-def test_sm():
+def test_Hessian_symetry():
     '''
-    This function tests the sensibility matrix for polyprisms.
+    This function tests the symetry of the Hessian matrix.
     
     output
     
@@ -1038,6 +1038,7 @@ def test_sm():
     '''
     L = 1 # number of prisms
     M = 4 # number of vertices
+    P = L*(M + 2) # number of parameters
 
     #r = 1000. # radial distance for each vertice
     r = np.zeros(M)
@@ -1093,15 +1094,96 @@ def test_sm():
     
     # sensibility matrx
     A = mfun.fd_tf_sm_polyprism(xp, yp, zp, m, M, L, delta, delta, delta, inc, dec)
-    print A[:,0]
     
-    # parameters vector
-    p = mfun.param_vec(m, M, L)
+    #Hessian matrix
+    H = np.dot(A.T, A)
     
-    # data to compare
-    d_calc = np.dot(A, p)
+    for i in range(P):
+        assert np.allclose(H[i,i+1:], H[i+1:,i]), 'The sensibility matrix is not correct'
+
+def test_trans_parameter2_zeros():
+    '''
+    Test for parameter transformation during the Levenberg-Marquadt
+    algoithm with a vector of zeros and oposite limits values for 
+    the parameters
     
-    print d_fat
-    print d_calc
+    output
+    Assertion
+    '''
+    M = 8
+    L = 5
+    P = L*(M+2)
+    m = np.zeros(P)
+    # limits for parameters in meters
+    rmin = -4000.
+    rmax = 4000.
+    x0min = -4000.
+    x0max = 4000.
+    y0min = -4000.
+    y0max = 4000.
     
-    assert np.allclose(d_fat, d_calc), 'The sensibility matrix is not correct'
+    mmax = np.zeros(M+2)
+    mmin = np.zeros(M+2)
+
+    mmax[:M] = rmax
+    mmax[M] = x0max
+    mmax[M+1] = y0max
+    mmin[:M] = rmin
+    mmin[M] = x0min
+    mmin[M+1] = y0min
+
+    mmax = np.resize(mmax, P)
+    mmin = np.resize(mmin, P)
+    
+    mt = mfun.trans_parameter2(m, M, L, mmax, mmin)
+    
+    assert np.allclose(m, mt), 'The resultant vector is different of zero'
+    
+def test_trans_inv_parameter2_zeros():
+    '''
+    Test for parameter inverse transformation during
+    the Levenberg-Marquadt's algoithm with a known
+    vector and oposite limits values for 
+    the parameters
+    
+    output
+    Assertion
+    '''
+    M = 8
+    L = 5
+    P = L*(M+2)
+    m0 = np.zeros(M+2)
+    m0[:M] = 3000.
+    m0[M] = 100.
+    m0[M+1] = 100.
+    m0 = np.resize(m0, P)
+    # limits for parameters in meters
+    rmin = -4000.
+    rmax = 4000.
+    x0min = -4000.
+    x0max = 4000.
+    y0min = -4000.
+    y0max = 4000.
+    
+    mmax = np.zeros(M+2)
+    mmin = np.zeros(M+2)
+
+    mmax[:M] = rmax
+    mmax[M] = x0max
+    mmax[M+1] = y0max
+    mmin[:M] = rmin
+    mmin[M] = x0min
+    mmin[M+1] = y0min
+
+    mmax = np.resize(mmax, P)
+    mmin = np.resize(mmin, P)
+    
+    mt = mfun.trans_parameter2(m0, M, L, mmax, mmin)
+    
+    m = mfun.trans_inv_parameter2(mt, M, L, mmax, mmin)
+    
+    print m0
+    print mt
+    print m
+    
+    assert np.allclose(m0, m), 'The resultant vector is different from zero'
