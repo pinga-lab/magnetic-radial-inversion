@@ -1142,7 +1142,7 @@ def test_trans_parameter2_zeros():
 def test_trans_inv_parameter2_zeros():
     '''
     Test for parameter inverse transformation during
-    the Levenberg-Marquadt's algoithm with a known
+    the Levenberg-Marquadt algoithm with a known
     vector and oposite limits values for 
     the parameters
     
