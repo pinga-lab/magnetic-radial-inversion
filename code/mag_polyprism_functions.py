@@ -1171,7 +1171,8 @@ def trans_inv_parameter2(mt, M, L, mmax, mmin):
     assert len(mmin) == L*(M + 2), 'The size of mmin must be equal to L*(M + 2)'
     assert len(mt) == L*(M + 2), 'The size of m must be equal to L*(M + 2)'
 
-    m = 1000.*(0.001*mmin + (0.001*(mmax - mmin))/(1. + np.exp(-0.001*mt)))
+    #m = 0.001*mmin + (0.001*(mmax - mmin))/(1. + np.exp(-0.001*mt))
+    m = (mmin + (mmax - mmin)/(1. + np.exp(-mt)))
 
     return m
     

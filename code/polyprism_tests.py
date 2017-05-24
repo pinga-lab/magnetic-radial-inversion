@@ -1100,3 +1100,90 @@ def test_Hessian_symetry():
     
     for i in range(P):
         assert np.allclose(H[i,i+1:], H[i+1:,i]), 'The sensibility matrix is not correct'
+
+def test_trans_parameter2_zeros():
+    '''
+    Test for parameter transformation during the Levenberg-Marquadt
+    algoithm with a vector of zeros and oposite limits values for 
+    the parameters
+    
+    output
+    Assertion
+    '''
+    M = 8
+    L = 5
+    P = L*(M+2)
+    m = np.zeros(P)
+    # limits for parameters in meters
+    rmin = -4000.
+    rmax = 4000.
+    x0min = -4000.
+    x0max = 4000.
+    y0min = -4000.
+    y0max = 4000.
+    
+    mmax = np.zeros(M+2)
+    mmin = np.zeros(M+2)
+
+    mmax[:M] = rmax
+    mmax[M] = x0max
+    mmax[M+1] = y0max
+    mmin[:M] = rmin
+    mmin[M] = x0min
+    mmin[M+1] = y0min
+
+    mmax = np.resize(mmax, P)
+    mmin = np.resize(mmin, P)
+    
+    mt = mfun.trans_parameter2(m, M, L, mmax, mmin)
+    
+    assert np.allclose(m, mt), 'The resultant vector is different of zero'
+    
+def test_trans_inv_parameter2_zeros():
+    '''
+    Test for parameter inverse transformation during
+    the Levenberg-Marquadt's algoithm with a known
+    vector and oposite limits values for 
+    the parameters
+    
+    output
+    Assertion
+    '''
+    M = 8
+    L = 5
+    P = L*(M+2)
+    m0 = np.zeros(M+2)
+    m0[:M] = 3000.
+    m0[M] = 100.
+    m0[M+1] = 100.
+    m0 = np.resize(m0, P)
+    # limits for parameters in meters
+    rmin = -4000.
+    rmax = 4000.
+    x0min = -4000.
+    x0max = 4000.
+    y0min = -4000.
+    y0max = 4000.
+    
+    mmax = np.zeros(M+2)
+    mmin = np.zeros(M+2)
+
+    mmax[:M] = rmax
+    mmax[M] = x0max
+    mmax[M+1] = y0max
+    mmin[:M] = rmin
+    mmin[M] = x0min
+    mmin[M+1] = y0min
+
+    mmax = np.resize(mmax, P)
+    mmin = np.resize(mmin, P)
+    
+    mt = mfun.trans_parameter2(m0, M, L, mmax, mmin)
+    
+    m = mfun.trans_inv_parameter2(mt, M, L, mmax, mmin)
+    
+    print m0
+    print mt
+    print m
+    
+    assert np.allclose(m0, m), 'The resultant vector is different from zero'
