@@ -5,6 +5,7 @@ from fatiando import mesher, gridder, utils
 from fatiando.gravmag import polyprism
 from fatiando.mesher import PolygonalPrism
 from fatiando.constants import CM, T2NT
+from copy import deepcopy
 
 ### Functions for the foward problem using fatiando
 
@@ -1192,6 +1193,7 @@ def gradient_data(xp, yp, zp, m, M, L, d, deltax, deltay, deltar, inc, dec):
               x0 and y0 are the origin cartesian coordinates of each prism,
               z1 and z2 are the top and bottom of each prism and
               magnetization is physical property
+    M: integer - number of vertices
     L: int - number of prisms
     d: 1D array - observed data vector
     deltax: float - increment in x coordinate in meters
@@ -1237,6 +1239,7 @@ def Hessian_data(xp, yp, zp, m, M, L, deltax, deltay, deltar, inc, dec):
               x0 and y0 are the origin cartesian coordinates of each prism,
               z1 and z2 are the top and bottom of each prism and
               magnetization is physical property
+    M: integer - number of vertices
     L: int - number of prisms
     deltax: float - increment in x coordinate in meters
     deltay: float - increment in y coordinate in meters
@@ -1259,3 +1262,113 @@ def Hessian_data(xp, yp, zp, m, M, L, deltax, deltay, deltar, inc, dec):
     H = 2*np.dot(G.T, G)/xp.size
     
     return H
+
+def levmq(xp, yp, zp, lini, M, L, delta, lamb, mmin, mmax, mout, dobs, inc, dec):
+    '''
+    This function minimizes the objective function
+    using the Levenberg-Marqudt algorithm.
+    
+    input
+    
+    xp: array - x observation points
+    yp: array - y observation points
+    zp: array - z observation points
+    lini: list - each element is a list of [r, x0, y0, z1, z2, 'magnetization'],
+              whrere r is an array with the radial distances of the vertices,
+              x0 and y0 are the origin cartesian coordinates of each prism,
+              z1 and z2 are the top and bottom of each prism and
+              magnetization is physical property
+    M: integer - number of vertices
+    L: int - number of prisms
+    delta: float - increment in x, y and z coordinate in meters
+    lamb: float - Marquadt's parameter
+    mmin: array - minimum values for each parameters (rmin, x0min, y0min)
+    mmax: array - maximum values for each parameters (rmax, x0max, y0max)
+    mout: array - parameters from the outcropping body (M+2)
+    dobs: array - observated data
+    inc: float - inclination of the local-geomagnetic field
+    dec: declination of the local-geomagnetic field
+    
+    output
+    
+    d0: array - fitted data
+    m0: array - estimated parameters
+    l0: list - geometrical and physical parameters
+    phi_list: list - solutions of objective funtion
+    '''
+    itmax = 50
+    itmax_marq = 20
+    epsilon = 0.0001
+    lamb = 0.001
+    dlamb = 5.
+    z0 = lini[0][3]
+    dz = lini[0][4] - lini[0][3]
+    props = lini[0][5]
+    l0 = deepcopy(lini)
+    m0 = param_vec(l0, M, L) # inicial parameters vector
+    model0 = pol2cart(l0, M, L) # list of classes of prisms
+    d0 = polyprism.tf(xp, yp, zp, model0, inc, dec) # predict data
+    dif = dobs - d0
+    phi0 = np.sum(dif*dif)/xp.size
+    phi_list = [phi0]
+    alpha1 = 0.001
+    alpha2 = 0.001
+    alpha3 = 0.
+    alpha4 = 0.
+    alpha5 = alpha1
+    alpha6 = 0.0001
+    i,j = np.diag_indices(L*(M+2))
+
+    for it in range(itmax):
+        mt = trans_parameter2(m0, M, L, mmax, mmin)
+
+        grad = gradient_data(xp, yp, zp, l0, M, L, dobs, delta, delta, delta, inc, dec)
+        grad = gradient_phi_1(M, L, grad, alpha1)
+        grad = gradient_phi_2(M, L, grad, alpha2)
+        grad = gradient_phi_3(M, L, grad, mout, alpha3)
+        grad = gradient_phi_4(M, L, grad, mout[-2:], alpha4)
+        grad = gradient_phi_5(M, L, grad, alpha5)
+        grad = gradient_phi_6(M, L, grad, alpha6)
+
+        H = Hessian_data(xp, yp, zp, l0, M, L, delta, delta, delta, inc, dec)
+        H = Hessian_phi_1(M, L, H, alpha1)
+        H = Hessian_phi_2(M, L, H, alpha2)
+        H = Hessian_phi_3(M, L, H, alpha3)
+        H = Hessian_phi_4(M, L, H, alpha4)
+        H = Hessian_phi_5(M, L, H, alpha5)
+        H = Hessian_phi_6(M, L, H, alpha6)
+
+        # Diagonal da matriz de positividade
+        T = ((mmax - m0)*(m0 - mmin))/(mmax - mmin)
+
+        for it_marq in range(itmax_marq): 
+
+            S = H.copy()
+            S[i,:] *= T
+            S[i,j] += lamb
+
+            delta_mt = np.linalg.solve(S, -grad)
+            m_est = trans_inv_parameter2(mt + delta_mt, M, L, mmax, mmin)
+            l_est = param2model(m_est, M, L, z0, dz, props)
+            model_est = pol2cart(l_est, M, L)
+            d_est = polyprism.tf(xp, yp, zp, model_est, inc, dec)
+            res = dobs - d0
+            phi = np.sum(res*res)/xp.size
+            phi += (phi_1(M, L, m_est, alpha1) + phi_2(M, L, m_est, alpha2) + \
+                    phi_3(M, L, m_est, mout, alpha3) + phi_4(M, L, m_est, mout[-2:], alpha4) + \
+                    phi_5(M, L, m_est, alpha5) + phi_6(M, L, m_est, alpha6))
+            dphi = phi - phi0
+
+            if (dphi > 0.):
+                lamb *= dlamb
+            else:
+                lamb /= dlamb
+
+        if (abs((phi0 - phi)/phi0) > epsilon):
+            d0 = d_est
+            m0 = m_est
+            l0 = l_est
+            phi0 = phi
+            phi_list.append(phi0)
+            
+        return d0, m0, l0, phi_list
