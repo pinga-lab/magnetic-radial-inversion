@@ -939,6 +939,64 @@ def diags_phi_1(M, L, alpha):
     
     return d0, d1, dM
 
+def norm_regul_param(M, L, th, m0, a1, a2, a3, a4, a5, a6):
+    '''
+    Returns the normalized regularization parameters of each phi.
+    
+    input
+    
+    M: integer - number of vertices
+    L: integer - number of prisms
+    th: float - trace of the Hessian of initial model
+    a1: float - weight of phi1
+    a2: float - weight of phi2
+    a3: float - weight of phi3
+    a4: float - weight of phi4
+    a5: float - weight of phi5
+    a6: float - weight of phi6
+    
+    output
+    
+    alpha1: float - phi1 normalized regularization parameter
+    alpha2: float - phi2 normalized regularization parameter
+    alpha3: float - phi3 normalized regularization parameter
+    alpha4: float - phi4 normalized regularization parameter
+    alpha5: float - phi5 normalized regularization parameter
+    alpha6: float - phi6 normalized regularization parameter
+    '''
+    
+    P = L*(M + 2)
+
+    # phi1
+    alpha1 = a1*(th/(2.*P*M))
+    
+    # phi2
+    if L <= 2:
+        alpha2 = a2*(th/(P*M))
+    else:
+        alpha2 = a2*(th/(2.*(P-1)*M))
+
+    # phi3
+    m3 = np.ones(M+2)
+    m3 = (m3 - m0)
+    alpha3 = a3*(th/np.sum(m3))
+    
+    # phi4 
+    m4 = np.ones(2)
+    m4 = (m4 - m0[M:M+2])
+    alpha4 = a4*(th/np.sum(m4))
+    
+    # phi5
+    if L == 2:
+        alpha5 = a5*(th/(2.*P))
+    else:
+        alpha5 = a5*(th/(2.*(P-1)))
+        
+    # phi6
+    alpha6 = a6*(th/(P*M))
+    
+    return alpha1, alpha2, alpha3, alpha4, alpha5, alpha6
+
 def diags_phi_2(M, L, alpha):
     '''
     Returns the non-zero diagonals of hessian matrix for 
@@ -949,7 +1007,6 @@ def diags_phi_2(M, L, alpha):
     
     M: integer - number of vertices
     L: integer - number of prisms
-    alpha: float - weight
     
     output
     
@@ -998,7 +1055,6 @@ def diags_phi_5(M, L, alpha):
     P = L*(M + 2)
     
     # building the diagonals
-    
     if L == 2:
         d0 = np.zeros(M+2)
         d0[M:M+2] = alpha
