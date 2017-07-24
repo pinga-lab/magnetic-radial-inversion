@@ -965,16 +965,14 @@ def norm_regul_param(M, L, th, m0, a1, a2, a3, a4, a5, a6):
     alpha6: float - phi6 normalized regularization parameter
     '''
     
-    P = L*(M + 2)
-
     # phi1
-    alpha1 = a1*(th/(2.*P*M))
+    alpha1 = a1*(th/(2.*L*M))
     
     # phi2
     if L <= 2:
-        alpha2 = a2*(th/(P*M))
+        alpha2 = a2*(th/(L*M))
     else:
-        alpha2 = a2*(th/(2.*(P-1)*M))
+        alpha2 = a2*(th/(2.*(L-1)*M))
 
     # phi3
     m3 = np.ones(M+2)
@@ -988,12 +986,12 @@ def norm_regul_param(M, L, th, m0, a1, a2, a3, a4, a5, a6):
     
     # phi5
     if L == 2:
-        alpha5 = a5*(th/(2.*P))
+        alpha5 = a5*(th/(2.*L))
     else:
-        alpha5 = a5*(th/(2.*(P-1)))
+        alpha5 = a5*(th/(2.*(L-1)))
         
     # phi6
-    alpha6 = a6*(th/(P*M))
+    alpha6 = a6*(th/(L*M))
     
     return alpha1, alpha2, alpha3, alpha4, alpha5, alpha6
 
@@ -1229,7 +1227,7 @@ def trans_inv_parameter2(mt, M, L, mmax, mmin):
     assert len(mt) == L*(M + 2), 'The size of m must be equal to L*(M + 2)'
 
     #m = 0.001*mmin + (0.001*(mmax - mmin))/(1. + np.exp(-0.001*mt))
-    m = (mmin + (mmax - mmin)/(1. + np.exp(-mt)))
+    m = mmin + (mmax - mmin)/(1. + np.exp(-mt))
 
     return m
     
