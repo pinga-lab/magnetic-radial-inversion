@@ -1,0 +1,93 @@
+Timer unit: 1e-06 s
+
+Total time: 314.471 s
+File: <ipython-input-27-3a934c167c63>
+Function: mq at line 1
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+     1                                           def mq():
+     2         1            3      3.0      0.0      itmax = 30
+     3         1            2      2.0      0.0      itmax_marq = 10
+     4         1            2      2.0      0.0      epsilon = 1.0e-4
+     5         1            1      1.0      0.0      gamma = 1.0e-7
+     6                                           
+     7         1            2      2.0      0.0      lamb = 1.0e-4
+     8         1            1      1.0      0.0      dlamb = 10
+     9         1          634    634.0      0.0      l0 = deepcopy(lini)
+    10         1          302    302.0      0.0      m0 = mfun.param_vec(l0, M, L) # inicial parameters vector
+    11         1          897    897.0      0.0      model0 = mfun.pol2cart(l0, M, L) # list of classes of prisms
+    12         1      1105534 1105534.0      0.4      d0 = polyprism.tf(xp, yp, zp, model0, inc, dec) # predict data
+    13         1           79     79.0      0.0      res = dobs - d0
+    14                                           
+    15         1      8614871 8614871.0      2.7      G = mfun.fd_tf_sm_polyprism(xp, yp, zp, l0, M, L, delta, delta, delta, inc, dec)
+    16         1         9899   9899.0      0.0      H = 2*np.dot(G.T, G)/N
+    17         1           72     72.0      0.0      th = np.trace(H)
+    18                                           
+    19         1          113    113.0      0.0      alpha1, alpha2, alpha3, alpha4, alpha5, alpha6 = mfun.norm_regul_param(M, L, th, m_out, a1, a2, a3, a4, a5, a6)
+    20                                           
+    21         1           39     39.0      0.0      phi0 = np.sum(res*res)/N
+    22         1          455    455.0      0.0      phi0 += mfun.phi_1(M, L, m0, alpha1) + mfun.phi_2(M, L, m0, alpha2) +             mfun.phi_3(M, L, m0, m_out, alpha3) + mfun.phi_4(M, L, m0, m_out[-2:], alpha4) +             mfun.phi_5(M, L, m0, alpha5) + mfun.phi_6(M, L, m0, alpha6)
+    23         1            3      3.0      0.0      phi_list = [phi0]
+    24                                           
+    25         1           18     18.0      0.0      i,j = np.diag_indices(P)
+    26                                               
+    27        31           72      2.3      0.0      for it in range(itmax):
+    28        30          766     25.5      0.0          mt = mfun.trans_parameter2(m0, M, L, mmax, mmin)
+    29                                           
+    30                                                   # Jacobian matrix
+    31        30    245626358 8187545.3     78.1          G = mfun.fd_tf_sm_polyprism(xp, yp, zp, l0, M, L, delta, delta, delta, inc, dec)
+    32                                           
+    33                                                   # gradient vector
+    34        30        18493    616.4      0.0          grad = -2*np.dot(G.T, res)/N
+    35        30         5914    197.1      0.0          grad = mfun.gradient_phi_1(M, L, grad, alpha1)
+    36        30         3112    103.7      0.0          grad = mfun.gradient_phi_2(M, L, grad, alpha2)
+    37        30          389     13.0      0.0          grad = mfun.gradient_phi_3(M, L, grad, m_out, alpha3)
+    38        30          328     10.9      0.0          grad = mfun.gradient_phi_4(M, L, grad, m_out[-2:], alpha4)
+    39        30         3030    101.0      0.0          grad = mfun.gradient_phi_5(M, L, grad, alpha5)
+    40        30         1440     48.0      0.0          grad = mfun.gradient_phi_6(M, L, grad, alpha6)
+    41                                           
+    42                                                   # Hessian matrix
+    43        30       113114   3770.5      0.0          H = 2*np.dot(G.T, G)/N
+    44        30         9360    312.0      0.0          H = mfun.Hessian_phi_1(M, L, H, alpha1)
+    45        30         5606    186.9      0.0          H = mfun.Hessian_phi_2(M, L, H, alpha2)
+    46        30          666     22.2      0.0          H = mfun.Hessian_phi_3(M, L, H, alpha3)
+    47        30          362     12.1      0.0          H = mfun.Hessian_phi_4(M, L, H, alpha4)
+    48        30         5486    182.9      0.0          H = mfun.Hessian_phi_5(M, L, H, alpha5)
+    49        30         3043    101.4      0.0          H = mfun.Hessian_phi_6(M, L, H, alpha6)
+    50                                           
+    51                                                   # positivity matrix diagonal
+    52        30          373     12.4      0.0          T = ((mmax - m0)*(m0 - mmin))/(mmax - mmin)
+    53                                           
+    54                                                   #print phi0
+    55                                           
+    56        57          208      3.6      0.0          for it_marq in range(itmax_marq): 
+    57                                           
+    58        57         1336     23.4      0.0              S = H.copy()
+    59        57         3614     63.4      0.0              S[i,:] *= T
+    60        57         1016     17.8      0.0              S[i,j] += lamb
+    61                                           
+    62        57        23677    415.4      0.0              delta_mt = np.linalg.solve(S, -grad)
+    63        57         2035     35.7      0.0              m_est = mfun.trans_inv_parameter2(mt + delta_mt, M, L, mmax, mmin)
+    64        57         3082     54.1      0.0              l_est = mfun.param2model(m_est, M, L, z0, dz, props)
+    65        57        48929    858.4      0.0              model_est = mfun.pol2cart(l_est, M, L)
+    66        57     58822290 1031970.0     18.7              d_est = polyprism.tf(xp, yp, zp, model_est, inc, dec)
+    67        57         1972     34.6      0.0              res = dobs - d_est
+    68        57         4338     76.1      0.0              phi = np.sum(res*res)/N
+    69        57        26692    468.3      0.0              phi += mfun.phi_1(M, L, m_est, alpha1) + mfun.phi_2(M, L, m_est, alpha2) +                     mfun.phi_3(M, L, m_est, m_out, alpha3) + mfun.phi_4(M, L, m_est, m_out[-2:], alpha4) +                     mfun.phi_5(M, L, m_est, alpha5) + mfun.phi_6(M, L, m_est, alpha6)
+    70        57          141      2.5      0.0              dphi = phi - phi0
+    71                                           
+    72        57          111      1.9      0.0              if (dphi > 0.):
+    73        27           57      2.1      0.0                  lamb *= dlamb
+    74                                                       else:
+    75        30           76      2.5      0.0                  lamb /= dlamb
+    76        30           75      2.5      0.0                  break
+    77                                           
+    78        30           88      2.9      0.0          if (abs(dphi/phi0) > epsilon):
+    79        30          120      4.0      0.0              d0 = d_est
+    80        30           53      1.8      0.0              m0 = m_est
+    81        30          308     10.3      0.0              l0 = l_est
+    82        30           45      1.5      0.0              phi0 = phi
+    83        30           82      2.7      0.0              phi_list.append(phi0)
+    84                                                   else:
+    85                                                       break

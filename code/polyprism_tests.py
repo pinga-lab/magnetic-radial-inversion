@@ -1115,7 +1115,7 @@ def test_trans_parameter2_zeros():
     P = L*(M+2)
     m = np.zeros(P)
     # limits for parameters in meters
-    rmin = -4000.
+    rmin = 0.
     rmax = 4000.
     x0min = -4000.
     x0max = 4000.
@@ -1139,6 +1139,49 @@ def test_trans_parameter2_zeros():
     
     assert np.allclose(m, mt), 'The resultant vector is different of zero'
     
+def test_trans_parameter2():
+    '''
+    Test for parameter transformation during the Levenberg-Marquadt
+    algoithm with a vector of zeros and oposite limits values for 
+    the parameters
+    
+    output
+    Assertion
+    '''
+    M = 8
+    L = 5
+    P = L*(M+2)
+    m = np.zeros(P) + 2000.
+    # limits for parameters in meters
+    rmin = 0.
+    rmax = 4000.
+    x0min = -4000.
+    x0max = 4000.
+    y0min = -4000.
+    y0max = 4000.
+    
+    mmax = np.zeros(M+2)
+    mmin = np.zeros(M+2)
+
+    mmax[:M] = rmax
+    mmax[M] = x0max
+    mmax[M+1] = y0max
+    mmin[:M] = rmin
+    mmin[M] = x0min
+    mmin[M+1] = y0min
+
+    mmax = np.resize(mmax, P)
+    mmin = np.resize(mmin, P)
+    
+    mt = mfun.trans_parameter2(m, M, L, mmax, mmin)
+    
+    mref = np.zeros(M+2)
+    mref[:M] = 0.
+    mref[M:M+2] = -np.log(2000./6000.)
+    mref = np.resize(mref, P)
+    
+    assert np.allclose(mref, mt), 'The resultant vector is different from reference'
+    
 def test_trans_inv_parameter2_zeros():
     '''
     Test for parameter inverse transformation during
@@ -1158,7 +1201,7 @@ def test_trans_inv_parameter2_zeros():
     m0[M+1] = 100.
     m0 = np.resize(m0, P)
     # limits for parameters in meters
-    rmin = -4000.
+    rmin = 0.
     rmax = 4000.
     x0min = -4000.
     x0max = 4000.

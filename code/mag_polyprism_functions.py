@@ -1159,7 +1159,7 @@ def trans_parameter2(m, M, L, mmax, mmin):
     assert mmin.size == L*(M + 2), 'The size of mmin must be equal to L*(M + 2)'
     assert m.size == L*(M + 2), 'The size of m must be equal to L*(M + 2)'
 
-    mt = -np.log(abs((mmax - m))/(m - mmin))
+    mt = -np.log((mmax - m)/(m - mmin))
 
     return mt
 
