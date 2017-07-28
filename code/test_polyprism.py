@@ -7,6 +7,8 @@ from fatiando.mesher import PolygonalPrism
 from fatiando.gravmag import prism
 from fatiando.mesher import Prism
 from fatiando.constants import CM, T2NT
+import polyprism_tests as tests
+import numpy.testing as npt
 import mag_polyprism_functions as mfun
 
 def test_volume():
@@ -164,7 +166,7 @@ def test_tfa_data():
     #r = 1000. # radial distance for each vertice
     r = np.zeros(M)
     r[::2] = 1000.
-    r[1::2] = np.sqrt(2.)*1000./2.
+    r[1::2] = np.sqrt(2.)*1000.
     
     # Cartesian coordinates of the origin of each prism
     x0 = np.zeros(L) 
@@ -205,15 +207,15 @@ def test_tfa_data():
     yp = yp.ravel()
 
     #vertical coordinates of the data
-    zp = -350. - 500.*utils.gaussian2d(xp, yp, 17000, 21000, 21000, 18500, angle=21) # relief
+    zp = -350. - 500.*utils.gaussian2d(xp, yp, 17000., 21000., 21000., 18500., angle=21.) # relief
     
     tfat_polyprism = polyprism.tf(xp, yp, zp, model_polyprism, inc, dec)
     
-    model_recprism = [mesher.Prism(-1000, 1000, -1000, 1000, 100, 1100, props)]
+    model_recprism = [mesher.Prism(-1000., 1000., -1000., 1000., 100., 1100., props)]
     
     tfat_recprism = prism.tf(xp, yp, zp, model_recprism, inc, dec)
     
-    assert np.allclose(tfat_polyprism, tfat_recprism), 'The data from small rectangular prisms must be equal to a big rectangular prism'
+    npt.assert_almost_equal(tfat_polyprism, tfat_recprism, decimal=5), 'The data from small rectangular prisms must be equal to a big rectangular prism'
     
 def test_tfa_fd_x0_data():
     '''

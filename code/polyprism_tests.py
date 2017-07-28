@@ -1,6 +1,7 @@
 ### Test functions for magnetic problems with polygonal prisms
 
 import numpy as np
+import numpy.testing as npt
 from fatiando import mesher, gridder, utils
 from fatiando.gravmag import polyprism
 from fatiando.mesher import PolygonalPrism
@@ -144,7 +145,7 @@ def test_param2model():
     for i in range(L):
         assert ma[i].x.all() == moda[i].x.all()
         assert ma[i].y.all() == moda[i].y.all()
-        assert ma[i].z1 == moda[i].z1test
+        assert ma[i].z1 == moda[i].z1
         assert ma[i].z2 == moda[i].z2
         assert ma[i].props == moda[i].props
 
@@ -164,7 +165,7 @@ def test_tfa_data():
     #r = 1000. # radial distance for each vertice
     r = np.zeros(M)
     r[::2] = 1000.
-    r[1::2] = np.sqrt(2.)*1000./2.
+    r[1::2] = np.sqrt(2.)*1000.
     
     # Cartesian coordinates of the origin of each prism
     x0 = np.zeros(L) 
@@ -213,8 +214,8 @@ def test_tfa_data():
     
     tfat_recprism = prism.tf(xp, yp, zp, model_recprism, inc, dec)
     
-    assert np.allclose(tfat_polyprism, tfat_recprism), 'The data from small rectangular prisms must be equal to a big rectangular prism'
-    
+    npt.assert_almost_equal(tfat_polyprism, tfat_recprism, decimal=5), 'The data from small rectangular prisms must be equal to a big rectangular prism'
+
 def test_tfa_fd_x0_data():
     '''
     This function tests the derivative of total field anomaly data
@@ -1115,7 +1116,7 @@ def test_trans_parameter2_zeros():
     P = L*(M+2)
     m = np.zeros(P)
     # limits for parameters in meters
-    rmin = 0.
+    rmin = 100.
     rmax = 4000.
     x0min = -4000.
     x0max = 4000.

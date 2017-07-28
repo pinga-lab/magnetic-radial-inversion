@@ -1016,16 +1016,16 @@ def diags_phi_2(M, L, alpha):
     
     # building the diagonals
     
+    d0 = np.zeros(M+2)
+    
     if L <= 2:
-        d0 = np.zeros(M+2)
         d0[:M] = alpha
         d0 = np.resize(d0, P)
     else:
-        d0 = np.zeros(M+2)
         d0[:M] = 2.*alpha
         d0 = np.resize(d0, P)
         d0[:M] -= alpha
-        d0[-M-2:-M+2] -= alpha        
+        d0[-M-2:-2] -= alpha        
     
     d1 = np.zeros(M+2)
     d1[:M] = - alpha
@@ -1053,12 +1053,12 @@ def diags_phi_5(M, L, alpha):
     P = L*(M + 2)
     
     # building the diagonals
+    d0 = np.zeros(M+2)
+    
     if L == 2:
-        d0 = np.zeros(M+2)
         d0[M:M+2] = alpha
         d0 = np.resize(d0, P)
     else:
-        d0 = np.zeros(M+2)
         d0[M:M+2] = 2*alpha
         d0 = np.resize(d0, P)
         d0[M:M+2] -= alpha
@@ -1158,6 +1158,8 @@ def trans_parameter2(m, M, L, mmax, mmin):
     assert mmax.size == L*(M + 2), 'The size of mmax must be equal to L*(M + 2)'
     assert mmin.size == L*(M + 2), 'The size of mmin must be equal to L*(M + 2)'
     assert m.size == L*(M + 2), 'The size of m must be equal to L*(M + 2)'
+    assert mmax.all > m.all, 'mmax must be greater than m'
+    assert m.all > mmin.all, 'm must be greater than mmin'
 
     mt = -np.log((mmax - m)/(m - mmin))
 
