@@ -51,7 +51,7 @@ def test_volume():
     
     volume_ref = 2000.*2000.*1000.  # l*l*h
     
-    assert np.allclose(volume, volume_ref), 'The volume is not correct'
+    npt.assert_almost_equal(volume, volume_ref, decimal=5), 'The volume is not correct'
     
 def test_paramvec():
     '''
@@ -96,7 +96,7 @@ def test_paramvec():
     p_ref[:M] = r 
     p_ref[M+2:2*M+2] = r
     
-    assert np.allclose(p, p_ref), 'The result does not match with the reference'
+    npt.assert_almost_equal(p, p_ref), 'The result does not match with the reference'
     
 def test_param2model():
     '''
@@ -279,7 +279,7 @@ def test_tfa_fd_x0_data():
     df_m = mfun.fd_tf_x0_polyprism(xp, yp, zp, m[0], r.size, delta, inc, dec)  # derivative from the function
     df_mp_mm = (mp_fat - mm_fat)/(2.*delta)  # derivative from difference of data
     
-    assert np.allclose(df_m, df_mp_mm), 'The derivative is not correct'
+    npt.assert_almost_equal(df_m, df_mp_mm), 'The derivative is not correct'
     
 def test_tfa_fd_y0_data():
     '''
@@ -344,7 +344,7 @@ def test_tfa_fd_y0_data():
     df_m = mfun.fd_tf_y0_polyprism(xp, yp, zp, m[0], r.size, delta, inc, dec)  # derivative from the function
     df_mp_mm = (mp_fat - mm_fat)/(2.*delta)  # derivative from difference of data
         
-    assert np.allclose(df_m, df_mp_mm), 'The derivative is not correct'
+    npt.assert_almost_equal(df_m, df_mp_mm), 'The derivative is not correct'
     
 def test_tfa_fd_radial_data():
     '''
@@ -414,7 +414,7 @@ def test_tfa_fd_radial_data():
     df_m = mfun.fd_tf_radial_polyprism(xp, yp, zp, m[0], r.size, nv, delta, inc, dec)  # derivative from the function
     df_mp_mm = (mp_fat - mm_fat)/(2.*delta)  # derivative from difference of data
     
-    assert np.allclose(df_m, df_mp_mm, atol=1e-5), 'The derivative is not correct'
+    npt.assert_almost_equal(df_m, df_mp_mm, decimal=5), 'The derivative is not correct'
     
 def test_Hessian_phi_1():
     '''
@@ -439,14 +439,14 @@ def test_Hessian_phi_1():
     
     # building H_ref
     for i in range(M):
-        H_ref[i,i] = 2.*alpha
+        H_ref[i,i] += 2.*alpha
     for i in range(M - 1):
-        H_ref[i,i+1] = -1.*alpha
-        H_ref[i+1,i] = -1.*alpha
-    H_ref[0,M-1] = -1*alpha
-    H_ref[M-1,0] = -1*alpha
+        H_ref[i,i+1] -= alpha
+        H_ref[i+1,i] -= alpha
+    H_ref[0,M-1] -= alpha
+    H_ref[M-1,0] -= alpha
         
-    assert np.allclose(H, H_ref), 'The matrix H is not correct'
+    npt.assert_almost_equal(H, H_ref), 'The matrix H is not correct'
 
 def test_Hessian_phi_2():
     '''
@@ -470,15 +470,15 @@ def test_Hessian_phi_2():
     H = mfun.Hessian_phi_2(M, L, H, alpha) # building H
     
     for i in range(M):
-        H_ref[i,i] = alpha
-        H_ref[i,i+M+2] = -1.*alpha
-        H_ref[i+M+2,i] = -1.*alpha
-        H_ref[i+M+2,i+M+2] = 2.*alpha
-        H_ref[-i-3,-i-3] = alpha
-        H_ref[-i-3-M-2,-i-3] = -1.*alpha
-        H_ref[-i-3,-i-3-M-2] = -1.*alpha
+        H_ref[i,i] += alpha
+        H_ref[i,i+M+2] -= alpha
+        H_ref[i+M+2,i] -= alpha
+        H_ref[i+M+2,i+M+2] += 2.*alpha
+        H_ref[-i-3,-i-3] += alpha
+        H_ref[-i-3-M-2,-i-3] -= alpha
+        H_ref[-i-3,-i-3-M-2] -= alpha
         
-    assert np.allclose(H, H_ref), 'The matrices is not correct'
+    npt.assert_almost_equal(H, H_ref), 'The matrices is not correct'
         
 def test_Hessian_phi_3():
     '''
@@ -501,7 +501,7 @@ def test_Hessian_phi_3():
     
     H = mfun.Hessian_phi_3(M, L, H, alpha) # building H
         
-    assert np.allclose(H, H_ref), 'The matrices is not correct'
+    npt.assert_almost_equal(H, H_ref), 'The matrices is not correct'
     
 def test_Hessian_phi_4():
     '''
@@ -525,10 +525,10 @@ def test_Hessian_phi_4():
     H = mfun.Hessian_phi_4(M, L, H, alpha) # building H
     
     # building H_ref
-    H_ref[-1,-1] = alpha
-    H_ref[-2,-2] = alpha
+    H_ref[-1,-1] += alpha
+    H_ref[-2,-2] += alpha
         
-    assert np.allclose(H, H_ref), 'The matrices is not correct'
+    npt.assert_almost_equal(H, H_ref), 'The matrices is not correct'
     
 def test_Hessian_phi_5():
     '''
@@ -541,7 +541,7 @@ def test_Hessian_phi_5():
     '''
     
     M = 4   # number of vertices
-    L = 1   # number of prisms
+    L = 2   # number of prisms
     P = L*(M + 2) # number of parameters
     
     H = np.zeros((P, P))  # hessian for phi_1
@@ -552,10 +552,16 @@ def test_Hessian_phi_5():
     H = mfun.Hessian_phi_5(M, L, H, alpha) # building H
     
     # building H_ref
-    H_ref[-1,-1] = alpha
-    H_ref[-2,-2] = alpha
+    H_ref[M,M] += alpha
+    H_ref[M+1,M+1] += alpha
+    H_ref[2*M+2,M] -= alpha
+    H_ref[2*M+3,M+1] -= alpha
+    H_ref[M,2*M+2] -= alpha
+    H_ref[M+1,2*M+3] -= alpha
+    H_ref[-1,-1] += alpha
+    H_ref[-2,-2] += alpha
         
-    assert np.allclose(H, H_ref), 'The matrices is not correct'
+    npt.assert_almost_equal(H, H_ref), 'The matrices is not correct'
     
 def test_Hessian_phi_6():
     '''
@@ -580,10 +586,10 @@ def test_Hessian_phi_6():
     
     # building H_ref
     for i in range(M):
-        H_ref[i,i] = alpha
-        H_ref[i+M+2,i+M+2] = alpha
+        H_ref[i,i] += alpha
+        H_ref[i+M+2,i+M+2] += alpha
         
-    assert np.allclose(H, H_ref), 'The matrices is not correct'
+    npt.assert_almost_equal(H, H_ref), 'The matrices is not correct'
     
 def test_diags_phi_1():
     '''
@@ -608,9 +614,9 @@ def test_diags_phi_1():
     dm = np.array([-alpha, 0., 0., 0., 0., 0.])
     dm = np.resize(dm, P-M+1)
     
-    assert np.allclose(d0, dzero), 'The diagonal is not correct'
-    assert np.allclose(d1, done), 'The diagonal is not correct'
-    assert np.allclose(dM, dm), 'The diagonal is not correct'
+    npt.assert_almost_equal(d0, dzero), 'The diagonal is not correct'
+    npt.assert_almost_equal(d1, done), 'The diagonal is not correct'
+    npt.assert_almost_equal(dM, dm), 'The diagonal is not correct'
     
 def test_diags_phi_2_tp():
     '''
@@ -633,8 +639,8 @@ def test_diags_phi_2_tp():
     done = np.array([-alpha, -alpha, -alpha, -alpha, 0., 0.])
     done = np.resize(done, P-M-2)
     
-    assert np.allclose(d0, dzero), 'The diagonal is not correct'
-    assert np.allclose(d1, done), 'The diagonal is not correct'
+    npt.assert_almost_equal(d0, dzero), 'The diagonal is not correct'
+    npt.assert_almost_equal(d1, done), 'The diagonal is not correct'
     
 def test_diags_phi_2_mp():
     '''
@@ -658,8 +664,8 @@ def test_diags_phi_2_mp():
     done = np.array([-alpha, -alpha, -alpha, -alpha, 0., 0.])
     done = np.resize(done, P-M-2)
 
-    assert np.allclose(d0, dzero), 'The diagonal is not correct'
-    assert np.allclose(d1, done), 'The diagonal is not correct'
+    npt.assert_almost_equal(d0, dzero), 'The diagonal is not correct'
+    npt.assert_almost_equal(d1, done), 'The diagonal is not correct'
     
 def test_diags_phi_5_tp():
     '''
@@ -682,8 +688,8 @@ def test_diags_phi_5_tp():
     done = np.array([0., 0., 0., 0., -alpha, -alpha])
     done = np.resize(done, P-M-2)
     
-    assert np.allclose(d0, dzero), 'The diagonal is not correct'
-    assert np.allclose(d1, done), 'The diagonal is not correct'
+    npt.assert_almost_equal(d0, dzero), 'The diagonal is not correct'
+    npt.assert_almost_equal(d1, done), 'The diagonal is not correct'
     
 def test_diags_phi_5_mp():
     '''
@@ -707,8 +713,8 @@ def test_diags_phi_5_mp():
     done = np.array([0., 0., 0., 0., -alpha, -alpha])
     done = np.resize(done, P-M-2)
 
-    assert np.allclose(d0, dzero), 'The diagonal is not correct'
-    assert np.allclose(d1, done), 'The diagonal is not correct'
+    npt.assert_almost_equal(d0, dzero), 'The diagonal is not correct'
+    npt.assert_almost_equal(d1, done), 'The diagonal is not correct'
     
 def test_diags_phi_6():
     '''
@@ -729,7 +735,7 @@ def test_diags_phi_6():
     dzero = np.array([alpha, alpha, alpha, alpha, 0., 0.])
     dzero = np.resize(dzero, P)
     
-    assert np.allclose(d0, dzero), 'The diagonal is not correct'
+    npt.assert_almost_equal(d0, dzero), 'The diagonal is not correct'
     
 def test_gradient_phi_1_unitary():
     '''
@@ -748,7 +754,7 @@ def test_gradient_phi_1_unitary():
     grad_ref = m.copy()    
     grad = mfun.gradient_phi_1(M, L, m, alpha)
     
-    assert np.allclose(grad, grad_ref), 'The gradient is not correct'
+    npt.assert_almost_equal(grad, grad_ref), 'The gradient is not correct'
     
 def test_gradient_phi_1_arranged():
     '''
@@ -769,7 +775,7 @@ def test_gradient_phi_1_arranged():
     grad_ref[2] += 3.*alpha
     grad = mfun.gradient_phi_1(M, L, m, alpha)
     
-    assert np.allclose(grad, grad_ref), 'The gradient is not correct'
+    npt.assert_almost_equal(grad, grad_ref), 'The gradient is not correct'
     
 def test_gradient_phi_2_unitary():
     '''
@@ -789,7 +795,7 @@ def test_gradient_phi_2_unitary():
     grad = mfun.gradient_phi_2(M, L, m, alpha)
     
     
-    assert np.allclose(grad, grad_ref), 'The gradient is not correct'
+    npt.assert_almost_equal(grad, grad_ref), 'The gradient is not correct'
     
 def test_gradient_phi_2_arranged():
     '''
@@ -810,7 +816,7 @@ def test_gradient_phi_2_arranged():
     grad_ref[M+2:-2] += 5.*alpha
     grad = mfun.gradient_phi_2(M, L, m, alpha)
     
-    assert np.allclose(grad, grad_ref), 'The gradient is not correct'
+    npt.assert_almost_equal(grad, grad_ref), 'The gradient is not correct'
     
 def test_gradient_phi_3():
     '''
@@ -830,7 +836,7 @@ def test_gradient_phi_3():
     grad_ref[:M+2] += (grad_ref[:M+2] - m0)*alpha
     grad = mfun.gradient_phi_3(M, L, m, m0, alpha)
     
-    assert np.allclose(grad, grad_ref), 'The gradient is not correct'
+    npt.assert_almost_equal(grad, grad_ref), 'The gradient is not correct'
     
 def test_gradient_phi_4():
     '''
@@ -850,7 +856,7 @@ def test_gradient_phi_4():
     grad_ref[M:M+2] += (grad_ref[M:M+2] - m0)*alpha
     grad = mfun.gradient_phi_4(M, L, m, m0, alpha)
     
-    assert np.allclose(grad, grad_ref), 'The gradient is not correct'
+    npt.assert_almost_equal(grad, grad_ref), 'The gradient is not correct'
     
 def test_gradient_phi_5_unitary():
     '''
@@ -869,7 +875,7 @@ def test_gradient_phi_5_unitary():
     grad_ref = m.copy()
     grad = mfun.gradient_phi_5(M, L, m, alpha)
         
-    assert np.allclose(grad, grad_ref), 'The gradient is not correct'
+    npt.assert_almost_equal(grad, grad_ref), 'The gradient is not correct'
     
 def test_gradient_phi_5_arranged():
     '''
@@ -890,7 +896,7 @@ def test_gradient_phi_5_arranged():
     grad_ref[2*(M+2)+M:] += 5.*alpha
     grad = mfun.gradient_phi_5(M, L, m, alpha)
     
-    assert np.allclose(grad, grad_ref), 'The gradient is not correct'
+    npt.assert_almost_equal(grad, grad_ref), 'The gradient is not correct'
     
 def test_gradient_phi_6():
     '''
@@ -911,7 +917,7 @@ def test_gradient_phi_6():
     grad_ref[2*M+2:] -= 5.
     grad = mfun.gradient_phi_6(M, L, m, alpha)
     
-    assert np.allclose(grad, grad_ref), 'The gradient is not correct'
+    npt.assert_almost_equal(grad, grad_ref), 'The gradient is not correct'
 
 def test_phi_1_arranged():
     '''
@@ -930,7 +936,7 @@ def test_phi_1_arranged():
     phi_ref = 6.*alpha
     phi = mfun.phi_1(M, L, m, alpha)
     
-    assert np.allclose(phi, phi_ref), 'The value of constraint is not correct'
+    npt.assert_almost_equal(phi, phi_ref), 'The value of constraint is not correct'
     
 def test_phi_2_arranged():
     '''
@@ -949,7 +955,7 @@ def test_phi_2_arranged():
     phi_ref = 75.*alpha
     phi = mfun.phi_2(M, L, m, alpha)
     
-    assert np.allclose(phi, phi_ref), 'The value of constraint is not correct'
+    npt.assert_almost_equal(phi, phi_ref), 'The value of constraint is not correct'
     
 def test_phi_3_arranged():
     '''
@@ -969,7 +975,7 @@ def test_phi_3_arranged():
     phi_ref = np.sum(m3*m[:M+2])
     phi = mfun.phi_3(M, L, m, m0, alpha)
     
-    assert np.allclose(phi, phi_ref), 'The value of constraint is not correct'
+    npt.assert_almost_equal(phi, phi_ref), 'The value of constraint is not correct'
     
 def test_phi_4_arranged():
     '''
@@ -989,7 +995,7 @@ def test_phi_4_arranged():
     phi_ref = np.sum(m4*m[M:M+2])
     phi = mfun.phi_4(M, L, m, m0, alpha)
     
-    assert np.allclose(phi, phi_ref), 'The value of constraint is not correct'
+    npt.assert_almost_equal(phi, phi_ref), 'The value of constraint is not correct'
 
 def test_phi_5_arranged():
     '''
@@ -1008,7 +1014,7 @@ def test_phi_5_arranged():
     phi_ref = 100.*alpha
     phi = mfun.phi_5(M, L, m, alpha)
         
-    assert np.allclose(phi, phi_ref), 'The value of constraint is not correct'
+    npt.assert_almost_equal(phi, phi_ref), 'The value of constraint is not correct'
     
 def test_phi_6_arranged():
     '''
@@ -1027,7 +1033,7 @@ def test_phi_6_arranged():
     phi_ref = 597.*alpha
     phi = mfun.phi_6(M, L, m, alpha)
         
-    assert np.allclose(phi, phi_ref), 'The value of constraint is not correct'
+    npt.assert_almost_equal(phi, phi_ref), 'The value of constraint is not correct'
     
 def test_Hessian_symetry():
     '''
@@ -1100,46 +1106,8 @@ def test_Hessian_symetry():
     H = np.dot(A.T, A)
     
     for i in range(P):
-        assert np.allclose(H[i,i+1:], H[i+1:,i]), 'The sensibility matrix is not correct'
+        npt.assert_almost_equal(H[i,i+1:], H[i+1:,i]), 'The sensibility matrix is not correct'
 
-def test_trans_parameter2_zeros():
-    '''
-    Test for parameter transformation during the Levenberg-Marquadt
-    algoithm with a vector of zeros and oposite limits values for 
-    the parameters
-    
-    output
-    Assertion
-    '''
-    M = 8
-    L = 5
-    P = L*(M+2)
-    m = np.zeros(P)
-    # limits for parameters in meters
-    rmin = 100.
-    rmax = 4000.
-    x0min = -4000.
-    x0max = 4000.
-    y0min = -4000.
-    y0max = 4000.
-    
-    mmax = np.zeros(M+2)
-    mmin = np.zeros(M+2)
-
-    mmax[:M] = rmax
-    mmax[M] = x0max
-    mmax[M+1] = y0max
-    mmin[:M] = rmin
-    mmin[M] = x0min
-    mmin[M+1] = y0min
-
-    mmax = np.resize(mmax, P)
-    mmin = np.resize(mmin, P)
-    
-    mt = mfun.trans_parameter2(m, M, L, mmax, mmin)
-    
-    assert np.allclose(m, mt), 'The resultant vector is different of zero'
-    
 def test_trans_parameter2():
     '''
     Test for parameter transformation during the Levenberg-Marquadt
@@ -1181,53 +1149,4 @@ def test_trans_parameter2():
     mref[M:M+2] = -np.log(2000./6000.)
     mref = np.resize(mref, P)
     
-    assert np.allclose(mref, mt), 'The resultant vector is different from reference'
-    
-def test_trans_inv_parameter2_zeros():
-    '''
-    Test for parameter inverse transformation during
-    the Levenberg-Marquadt algoithm with a known
-    vector and oposite limits values for 
-    the parameters
-    
-    output
-    Assertion
-    '''
-    M = 8
-    L = 5
-    P = L*(M+2)
-    m0 = np.zeros(M+2)
-    m0[:M] = 3000.
-    m0[M] = 100.
-    m0[M+1] = 100.
-    m0 = np.resize(m0, P)
-    # limits for parameters in meters
-    rmin = 0.
-    rmax = 4000.
-    x0min = -4000.
-    x0max = 4000.
-    y0min = -4000.
-    y0max = 4000.
-    
-    mmax = np.zeros(M+2)
-    mmin = np.zeros(M+2)
-
-    mmax[:M] = rmax
-    mmax[M] = x0max
-    mmax[M+1] = y0max
-    mmin[:M] = rmin
-    mmin[M] = x0min
-    mmin[M+1] = y0min
-
-    mmax = np.resize(mmax, P)
-    mmin = np.resize(mmin, P)
-    
-    mt = mfun.trans_parameter2(m0, M, L, mmax, mmin)
-    
-    m = mfun.trans_inv_parameter2(mt, M, L, mmax, mmin)
-    
-    print m0
-    print mt
-    print m
-    
-    assert np.allclose(m0, m), 'The resultant vector is different from zero'
+    npt.assert_almost_equal(mref, mt), 'The resultant vector is different from reference'
