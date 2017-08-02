@@ -1,6 +1,7 @@
 ### Functions for magnetic problems with polygonal prisms
 
 import numpy as np
+import numpy.testing as npt
 from fatiando import mesher, gridder, utils
 from fatiando.gravmag import polyprism
 from fatiando.mesher import PolygonalPrism
@@ -1158,8 +1159,8 @@ def trans_parameter2(m, M, L, mmax, mmin):
     assert mmax.size == L*(M + 2), 'The size of mmax must be equal to L*(M + 2)'
     assert mmin.size == L*(M + 2), 'The size of mmin must be equal to L*(M + 2)'
     assert m.size == L*(M + 2), 'The size of m must be equal to L*(M + 2)'
-    assert mmax.all > m.all, 'mmax must be greater than m'
-    assert m.all > mmin.all, 'm must be greater than mmin'
+    npt.assert_array_less(m, mmax), 'mmax must be greater than m'
+    npt.assert_array_less(mmin, m), 'm must be greater than mmin'
 
     mt = -np.log((mmax - m)/(m - mmin))
 
