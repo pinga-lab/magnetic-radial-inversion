@@ -1231,6 +1231,7 @@ def trans_inv_parameter2(mt, M, L, mmax, mmin):
 
     #m = 0.001*mmin + (0.001*(mmax - mmin))/(1. + np.exp(-0.001*mt))
     m = mmin + (mmax - mmin)/(1. + np.exp(-mt))
+    #m *= 1000.
 
     return m
     
