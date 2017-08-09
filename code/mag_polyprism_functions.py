@@ -130,13 +130,47 @@ def param2model(m, M, L, z0, dz, props):
     
     r = np.zeros(M) # vector for radial distances
     mv = [] # list of prisms    
+        
+    k = 0.
+    for i in range(0, P, M + 2):
+        r = m[i:M+i]
+        mv.append([r, m[i+M], m[i+M+1], z0 + dz*k, z0 + dz*(k + 1.), props])
+        k = k + 1.
+       
+    return mv
+
+def param2polyprism(m, M, L, z0, dz, props):
+    '''
+    Returns a lis of objects of the class
+    fatiando.mesher.PolygonalPrism
+    
+    input
+    
+    m: 1D array - parameter vector
+    M: int - number of vertices
+    L: int - number of prisms
+    z0: float - top of the model
+    dz: float - thickness of each prism
+    props: dictionary - physical property
+    
+    output
+    
+    mv: list - list of fatiando.mesher.PolygonalPrism
+    '''
+    P = L*(M + 2)
+    assert m.size == P, 'The size of m must be equal to L*(M + 2)'
+    
+    r = np.zeros(M) # vector for radial distances
+    mv = [] # list of prisms    
     
     k = 0.
     for i in range(0, P, M + 2):
         r = m[i:M+i]
         mv.append([r, m[i+M], m[i+M+1], z0 + dz*k, z0 + dz*(k + 1.), props])
         k = k + 1.
-        
+       
+    mv = pol2cart(mv, M, L)
+    
     return mv
 
 ### Functions for the derivatives with finite differences
@@ -1162,7 +1196,7 @@ def trans_parameter2(m, M, L, mmax, mmin):
     npt.assert_array_less(m, mmax), 'mmax must be greater than m'
     npt.assert_array_less(mmin, m), 'm must be greater than mmin'
 
-    mt = -np.log((mmax - m)/(m - mmin))
+    mt = -np.log((mmax - m)/(m - mmin + 1e-15))
 
     return mt
 
