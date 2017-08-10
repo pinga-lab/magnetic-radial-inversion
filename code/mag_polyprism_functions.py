@@ -221,7 +221,6 @@ def fd_tf_x0_polyprism(xp, yp, zp, m, M, delta, inc, dec):
     
     return df
 
-
 def fd_tf_y0_polyprism(xp, yp, zp, m, M, delta, inc, dec):
     '''
     This function calculates the derivative for total field anomaly
@@ -367,6 +366,211 @@ def fd_tf_sm_polyprism(xp, yp, zp, m, M, L, deltax, deltay, deltar, inc, dec):
         G[:, aux + M + 1] = fd_tf_y0_polyprism(xp, yp, zp, mv, M, deltay, inc, dec)
         for j in range(M):
             G[:, aux + j] = fd_tf_radial_polyprism(xp, yp, zp, mv, M, j, deltar, inc, dec)
+            
+    return G
+
+def derivative_tf_x0(xp, yp, zp, m, M, delta, inc, dec):
+    '''
+    This function calculates the derivative for total field anomaly
+    from a model of polygonal prisms using finite difference.
+    
+    input
+    
+    xp: array - x observation points
+    yp: array - y observation points
+    zp: array - z observation points
+    m: list - list of one fatiando.mesher.PolygonalPrism
+    M: int - number of vertices per prism
+    delta: float - increment in x coordinate in meters
+    inc: float - inclination
+    dec: declination
+    
+    output
+    
+    df: 1D array - derivative
+    '''
+    assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
+    assert m.x.size == m.y.size == M, 'The number of vertices must be M'
+    
+    mp = deepcopy([m])  # m.x + delta
+    mm = deepcopy([m])  # m.x - delta
+    mp[0].x += delta
+    mm[0].x -= delta
+    
+    df = polyprism.tf(xp, yp, zp, mp, inc, dec)
+    df -= polyprism.tf(xp, yp, zp, mm, inc, dec)
+    
+    df /= (2.*delta)
+    
+    return df
+
+def derivative_tf_y0(xp, yp, zp, m, M, delta, inc, dec):
+    '''
+    This function calculates the derivative for total field anomaly
+    from a model of polygonal prisms using finite difference.
+    
+    input
+    
+    xp: array - x observation points
+    yp: array - y observation points
+    zp: array - z observation points
+    m: list - list of one fatiando.mesher.PolygonalPrism
+    M: int - number of vertices per prism
+    delta: float - increment in x coordinate in meters
+    inc: float - inclination
+    dec: declination
+    
+    output
+    
+    df: 1D array - derivative
+    '''
+    assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
+    assert m.x.size == m.y.size == M, 'The number of vertices must be M'
+    
+    mp = deepcopy([m])  # m.y + delta
+    mm = deepcopy([m])  # m.y - delta
+    mp[0].y += delta
+    mm[0].y -= delta
+    
+    df = polyprism.tf(xp, yp, zp, mp, inc, dec)
+    df -= polyprism.tf(xp, yp, zp, mm, inc, dec)
+    
+    df /= (2.*delta)
+    
+    return df
+
+def derivative_tf_radial(xp, yp, zp, m, M, nv, delta, inc, dec):
+    '''
+    This function calculates the derivative for total field anomaly
+    from a model of polygonal prisms using finite difference.
+    
+    input
+    
+    xp: array - x observation points
+    yp: array - y observation points
+    zp: array - z observation points
+    m: list - list of a fatiando.mesher.PolygonalPrism
+    M: int - number of vertices per prism
+    nv: int - number of the vertice for the derivative
+    delta: float - increment in radial distance in meters
+    inc: float - inclination
+    dec: declination
+    
+    output
+    
+    df: 1D array - derivative
+    '''
+    assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
+    assert m.x.size == m.y.size == M, 'The number of vertices must be M'
+    assert nv < M, 'The vertice number must be smaller than the number of vertices (0 - M)'
+    
+    m_fat = [] # list of objects of the class fatiando.mesher.PolygonalPrism
+    verts = [] # vertices of new prism
+    ang = 2.*np.pi/M # angle between two vertices
+    
+    if nv == M - 1:
+        nvp = 0
+    else:
+        nvp = nv + 1
+        
+    deltax = delta*np.cos(nv*ang)
+    deltay = delta*np.sin(nv*ang)
+    
+    verts.append([m.x[nv - 1], m.y[nv - 1]])
+    verts.append([m.x[nv] + deltax, m.y[nv] + deltay])
+    verts.append([m.x[nvp], m.y[nvp]])
+    verts.append([m.x[nv] - deltax, m.y[nv] - deltay])
+
+    m_fat = [PolygonalPrism(verts, m.z1, m.z2, m.props)]
+    
+    df = polyprism.tf(xp, yp, zp, m_fat, inc, dec)
+    df /= (2.*delta)
+    
+    return df
+
+def derivative_tf_radial2(xp, yp, zp, m, M, nv, delta, inc, dec):
+    '''
+    This function calculates the derivative for total field anomaly
+    from a model of polygonal prisms using finite difference.
+    
+    input
+    
+    xp: array - x observation points
+    yp: array - y observation points
+    zp: array - z observation points
+    m: list - list of a fatiando.mesher.PolygonalPrism
+    M: int - number of vertices per prism
+    nv: int - number of the vertice for the derivative
+    delta: float - increment in radial distance in meters
+    inc: float - inclination
+    dec: declination
+    
+    output
+    
+    df: 1D array - derivative
+    '''
+    assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
+    assert m.x.size == m.y.size == M, 'The number of vertices must be M'
+    assert nv < M, 'The vertice number must be smaller than the number of vertices (0 - M)'
+    
+    mp = deepcopy([m]) # list of objects of the class fatiando.mesher.PolygonalPrism
+    mm = deepcopy([m])  
+    
+    ang = 2.*np.pi/M # angle between two vertices
+        
+    deltax = delta*np.cos(nv*ang)
+    deltay = delta*np.sin(nv*ang)
+    
+    mp[0].x[nv] += deltax
+    mp[0].y[nv] += deltay
+    
+    mm[0].x[nv] -= deltax
+    mm[0].y[nv] -= deltay
+    
+    df = polyprism.tf(xp, yp, zp, mp, inc, dec)
+    df -= polyprism.tf(xp, yp, zp, mm, inc, dec)
+    df /= (2.*delta)
+    
+    return df
+
+def Jacobian_tf(xp, yp, zp, m, M, L, deltax, deltay, deltar, inc, dec):
+    '''
+    Returns the sensibility matrix for polygonal prisms using finite 
+    differences.
+    
+    input
+    
+    xp: array - x observation points
+    yp: array - y observation points
+    zp: array - z observation points
+    m: list - list of fatiando.mesher.PolygonalPrism
+    M: int - number of vertices per prism
+    L: int - number of prisms
+    deltax: float - increment in x coordinate in meters
+    deltay: float - increment in y coordinate in meters
+    deltar: float - increment in z coordinate in meters
+    inc: float - inclination of the local-geomagnetic field
+    dec: declination of the local-geomagnetic field
+    
+    output
+    
+    G: 2D array - sensibility matrix
+    '''
+    assert len(m) == L, 'The number of prisms must be L'
+    for mv in m:
+        assert len(mv.x) == M, 'All prisms must have M vertices'
+    assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
+    
+    pp = 2 + M # number of parameters per prism
+    
+    G = np.zeros((xp.size, pp*L))
+    
+    for i, mv in enumerate(m):
+        aux = i*pp
+        G[:, aux + M] = derivative_tf_x0(xp, yp, zp, mv, M, deltax, inc, dec)
+        G[:, aux + M + 1] = derivative_tf_y0(xp, yp, zp, mv, M, deltay, inc, dec)
+        for j in range(M):
+            G[:, aux + j] = derivative_tf_radial(xp, yp, zp, mv, M, j, deltar, inc, dec)
             
     return G
 
