@@ -7,6 +7,7 @@ from fatiando.gravmag import polyprism
 from fatiando.mesher import PolygonalPrism
 from fatiando.constants import CM, T2NT
 from copy import deepcopy
+from math import factorial
 
 ### Functions for the foward problem using fatiando
 
@@ -159,6 +160,8 @@ def param2polyprism(m, M, L, z0, dz, props):
     '''
     P = L*(M + 2)
     assert m.size == P, 'The size of m must be equal to L*(M + 2)'
+    for i in range(P):
+        assert m[i:i+M].all >= 0., 'The radial distances must be positives'
     
     r = np.zeros(M) # vector for radial distances
     mv = [] # list of prisms    
@@ -1399,8 +1402,8 @@ def trans_parameter2(m, M, L, mmax, mmin):
     assert mmax.size == L*(M + 2), 'The size of mmax must be equal to L*(M + 2)'
     assert mmin.size == L*(M + 2), 'The size of mmin must be equal to L*(M + 2)'
     assert m.size == L*(M + 2), 'The size of m must be equal to L*(M + 2)'
-    npt.assert_array_less(m, mmax), 'mmax must be greater than m'
-    npt.assert_array_less(mmin, m), 'm must be greater than mmin'
+    assert np.alltrue(m < (mmax + 1e-12)), 'mmax must be greater than m'
+    assert np.alltrue((mmin - 1e-12) < m), 'm must be greater than mmin'
 
     mt = -np.log((mmax - m)/(m - mmin + 1e-15))
 
@@ -1468,10 +1471,15 @@ def trans_inv_parameter2(mt, M, L, mmax, mmin):
     assert len(mmax) == L*(M + 2), 'The size of mmax must be equal to L*(M + 2)'
     assert len(mmin) == L*(M + 2), 'The size of mmin must be equal to L*(M + 2)'
     assert len(mt) == L*(M + 2), 'The size of m must be equal to L*(M + 2)'
+    
+    exp_sum =0.0
+    for n in range (M):
+        f         = factorial(n)
+        power     = (-mt)**n
+        nth_term  = power/f
+        exp_sum   = exp_sum + nth_term
 
-    #m = 0.001*mmin + (0.001*(mmax - mmin))/(1. + np.exp(-0.001*mt))
-    m = mmin + (mmax - mmin)/(1. + np.exp(-mt))
-    #m *= 1000.
+    m = mmin + (mmax - mmin)/(1. + exp_sum)
 
     return m
     
@@ -1529,9 +1537,9 @@ def Hessian_data(xp, yp, zp, m, M, L, deltax, deltay, deltar, inc, dec):
     
     input
     
-    xp: array - x observation points
-    yp: array - y observation points
-    zp: array - z observation points
+    xp: 1D array - x observation points
+    yp: 1D array - y observation points
+    zp: 1D array - z observation points
     m: list - each element is a list of [r, x0, y0, z1, z2, 'magnetization'],
               whrere r is an array with the radial distances of the vertices,
               x0 and y0 are the origin cartesian coordinates of each prism,
@@ -1560,6 +1568,44 @@ def Hessian_data(xp, yp, zp, m, M, L, deltax, deltay, deltar, inc, dec):
     H = 2*np.dot(G.T, G)/xp.size
     
     return H
+
+def build_range_param(M, L, rmin, rmax, x0min, x0max, y0min, y0max):
+    '''
+    Returns vectors of maximum and minimum values of
+    parameters
+    
+    input
+    
+    rmin: float - minimum value of radial distances
+    rmax: float - maximum value of radial distances
+    x0min: float - minimum value of x Cartesian coordinate of the origins
+    x0max: float - maximum value of x Cartesian coordinate of the origins
+    y0max: float - minimum value of y Cartesian coordinate of the origins
+    y0min: float - maximum value of y Cartesian coordinate of the origins
+    
+    output
+    
+    mmin: 1D array - vector of minimum values of parameters
+    mmax: 1D array - vector of maximum values of parameters
+    '''
+    assert rmin >= 0., 'The minimum value of radial distances must be positive'
+    assert rmax >= 0., 'The maximum value of radial distances must be positive'
+    
+    P = L*(M+2)
+    mmax = np.zeros(M+2)
+    mmin = np.zeros(M+2)
+
+    mmax[:M] = rmax
+    mmax[M] = x0max
+    mmax[M+1] = y0max
+    mmin[:M] = rmin
+    mmin[M] = x0min
+    mmin[M+1] = y0min
+
+    mmax = np.resize(mmax, P)
+    mmin = np.resize(mmin, P)
+    
+    return mmin, mmax
 
 def levmq(xp, yp, zp, lini, M, L, delta, lamb, mmin, mmax, mout, dobs, inc, dec):
     '''

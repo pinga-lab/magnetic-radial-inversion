@@ -1029,9 +1029,10 @@ def test_phi_6_arranged():
     L = 3   # number of prisms
     P = L*(M + 2) # number of parameters
     alpha = 1. # regularization
-    m = np.arange(1., P+1., 1.) # gradient
-    phi_ref = 597.*alpha
-    phi = mfun.phi_6(M, L, m, alpha)
+    m = np.arange(1., M+1., 1.) # gradient
+    m6 = np.resize(m, P)
+    phi_ref = np.sum(m*m)*L*alpha
+    phi = mfun.phi_6(M, L, m6, alpha)
         
     npt.assert_almost_equal(phi, phi_ref), 'The value of constraint is not correct'
     
