@@ -933,7 +933,7 @@ def test_phi_1_arranged():
     P = L*(M + 2) # number of parameters
     alpha = .01 # regularization
     m = np.arange(1., P+1., 1.) # gradient
-    phi_ref = 6.*alpha
+    phi_ref = (M-1)*M*L*alpha
     phi = mfun.phi_1(M, L, m, alpha)
     
     npt.assert_almost_equal(phi, phi_ref), 'The value of constraint is not correct'
@@ -952,7 +952,7 @@ def test_phi_2_arranged():
     P = L*(M + 2) # number of parameters
     alpha = .01 # regularization
     m = np.arange(1., P+1., 1.) # gradient
-    phi_ref = 75.*alpha
+    phi_ref = M*(M+2)*(M+2)*alpha
     phi = mfun.phi_2(M, L, m, alpha)
     
     npt.assert_almost_equal(phi, phi_ref), 'The value of constraint is not correct'
@@ -1011,7 +1011,7 @@ def test_phi_5_arranged():
     P = L*(M + 2) # number of parameters
     alpha = .1 # regularization
     m = np.arange(5., P+5., 1.) # gradient
-    phi_ref = 100.*alpha
+    phi_ref = (M+2)*(M+2)*(L+1)*alpha
     phi = mfun.phi_5(M, L, m, alpha)
         
     npt.assert_almost_equal(phi, phi_ref), 'The value of constraint is not correct'

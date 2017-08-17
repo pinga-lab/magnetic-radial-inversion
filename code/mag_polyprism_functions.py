@@ -946,13 +946,15 @@ def gradient_phi_6(M, L, m, alpha):
     
     assert m.size == P, 'The size of parameter vector must be equal to P'
     
+    m6 = m.copy() # the new vector m1 = gradient input + gradient of phi5
+    
     # extracting the non-zero diagonals
     d0 = diags_phi_6(M, L, alpha)
     
     # calculating the product between the diagonals and the slices of m
-    m += m*d0
+    m6 += m*d0
     
-    return m
+    return m6
 
 def phi_1(M, L, m, alpha):
     '''
@@ -1304,7 +1306,7 @@ def diags_phi_5(M, L, alpha):
         d0[-2:] -= alpha        
     
     d1 = np.zeros(M+2)
-    d1[M:M+2] = -alpha
+    d1[M:M+2] -= alpha
     d1 = np.resize(d1, P-M-2)
     
     return d0, d1
@@ -1330,7 +1332,7 @@ def diags_phi_6(M, L, alpha):
     
     # building the diagonal
     d0 = np.zeros(M+2)
-    d0[:M] = alpha
+    d0[:M] += alpha
     d0 = np.resize(d0, P)
     
     return d0
