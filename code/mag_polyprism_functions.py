@@ -1471,15 +1471,16 @@ def trans_inv_parameter2(mt, M, L, mmax, mmin):
     assert len(mmax) == L*(M + 2), 'The size of mmax must be equal to L*(M + 2)'
     assert len(mmin) == L*(M + 2), 'The size of mmin must be equal to L*(M + 2)'
     assert len(mt) == L*(M + 2), 'The size of m must be equal to L*(M + 2)'
-    
-    exp_sum =0.0
-    for n in range (M):
-        f         = factorial(n)
-        power     = (-mt)**n
-        nth_term  = power/f
-        exp_sum   = exp_sum + nth_term
+    P = L*(M+2)
+    #exp_sum =0.0
+    #for n in range (P):
+    #    f         = factorial(n)
+    #    power     = (-mt)**n
+    #    nth_term  = power/f
+    #    exp_sum   = exp_sum + nth_term
 
-    m = mmin + (mmax - mmin)/(1. + exp_sum)
+    #m = mmin + (mmax - mmin)/(1. + exp_sum)
+    m = mmin + (mmax - mmin)/(1. + np.exp(-mt))
 
     return m
     
