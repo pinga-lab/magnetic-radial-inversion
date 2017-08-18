@@ -573,7 +573,7 @@ def Jacobian_tf(xp, yp, zp, m, M, L, deltax, deltay, deltar, inc, dec):
         G[:, aux + M] = derivative_tf_x0(xp, yp, zp, mv, M, deltax, inc, dec)
         G[:, aux + M + 1] = derivative_tf_y0(xp, yp, zp, mv, M, deltay, inc, dec)
         for j in range(M):
-            G[:, aux + j] = derivative_tf_radial(xp, yp, zp, mv, M, j, deltar, inc, dec)
+            G[:, aux + j] = derivative_tf_radial2(xp, yp, zp, mv, M, j, deltar, inc, dec)
             
     return G
 
@@ -1480,7 +1480,7 @@ def trans_inv_parameter2(mt, M, L, mmax, mmin):
     #    exp_sum   = exp_sum + nth_term
 
     #m = mmin + (mmax - mmin)/(1. + exp_sum)
-    m = mmin + (mmax - mmin)/(1. + np.exp(-mt))
+    m = mmin + (mmax - mmin)/(1. + np.exp(-mt)) - 1e-10
 
     return m
     
