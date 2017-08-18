@@ -1118,10 +1118,10 @@ def test_trans_parameter2():
     output
     Assertion
     '''
-    M = 8
-    L = 5
+    M = 3
+    L = 1
     P = L*(M+2)
-    m = np.zeros(P) + 2000.
+    m = np.zeros(P) + 1000.
     # limits for parameters in meters
     rmin = 0.
     rmax = 4000.
@@ -1130,24 +1130,90 @@ def test_trans_parameter2():
     y0min = -4000.
     y0max = 4000.
     
-    mmax = np.zeros(M+2)
-    mmin = np.zeros(M+2)
-
-    mmax[:M] = rmax
-    mmax[M] = x0max
-    mmax[M+1] = y0max
-    mmin[:M] = rmin
-    mmin[M] = x0min
-    mmin[M+1] = y0min
-
-    mmax = np.resize(mmax, P)
-    mmin = np.resize(mmin, P)
+    mmin, mmax = mfun.build_range_param(M, L, rmin, rmax, x0min, x0max, y0min, y0max)
     
     mt = mfun.trans_parameter2(m, M, L, mmax, mmin)
     
     mref = np.zeros(M+2)
-    mref[:M] = 0.
-    mref[M:M+2] = -np.log(2000./6000.)
+    mref[:M] = -np.log(3.)
+    mref[M:M+2] = -np.log(3./5.)
     mref = np.resize(mref, P)
     
     npt.assert_almost_equal(mref, mt), 'The resultant vector is different from reference'
+    
+def test_build_range_param():
+    '''
+    Test for the build_range_param function
+    '''
+    M = 3 # number of vertices per prism
+    L = 3 # number of prisms
+    P = L*(M+2) # number of parameters
+    
+    # limits for parameters in meters
+    rmin = 0.
+    rmax = 6000.
+    x0min = -5000.
+    x0max = 5000.
+    y0min = -5000.
+    y0max = 5000.
+
+    mmin, mmax = mfun.build_range_param(M, L, rmin, rmax, x0min, x0max, y0min, y0max)
+    
+    mmin2 = np.array([rmin, rmin, rmin, x0min, y0min, rmin, rmin, rmin, x0min, y0min, \
+                     rmin, rmin, rmin, x0min, y0min])
+    mmax2 = np.array([rmax, rmax, rmax, x0max, y0max, rmax, rmax, rmax, x0max, y0max, \
+                     rmax, rmax, rmax, x0max, y0max])
+    
+    assert np.allclose(mmin, mmin2), 'the vectors of minimum values are different'
+    assert np.allclose(mmax, mmax2), 'the vectors of maximum values are different'
+    
+def test_trans_param():
+    '''
+    Test for the parameters transformation
+    '''
+    M = 3
+    L = 1
+    P = L*(M+2)
+    m = np.zeros(P) + 1000.
+    # limits for parameters in meters
+    rmin = 0.
+    rmax = 4000.
+    x0min = -4000.
+    x0max = 4000.
+    y0min = -4000.
+    y0max = 4000.
+    
+    mmin, mmax = mfun.build_range_param(M, L, rmin, rmax, x0min, x0max, y0min, y0max)
+    
+    mt = mfun.trans_parameter2(m, M, L, mmax, mmin)
+    
+    mtt = mfun.trans_inv_parameter2(mt, M, L, mmax, mmin)
+
+    assert np.allclose(m, mtt), 'the vectors are different'
+
+#def test_trans_param2_close2max():
+#    '''
+#    Test for parameter transformation in a case
+#    that the parameters are close to their limits
+#    '''
+    
+#    M = 3 # number of vertices per prism
+#    L = 3 # number of prisms
+#    P = L*(M+2) # number of parameters
+    
+    # limits for parameters in meters
+#    rmin = 0.
+#    rmax = 6000.
+#    x0min = -5000.
+#    x0max = 5000.
+#    y0min = -5000.
+#    y0max = 5000.
+    
+#    m = np.zeros(M+2)
+#    m[:M] = 5999.9999
+#    m[M:] = 4999.9999
+#    m = np.resize(m, P)
+
+#    mmin, mmax = mfun.build_range_param(M, L, rmin, rmax, x0min, x0max, y0min, y0max)
+    
+#    mt = mfun.trans_parameter2(m, M, L, mmax, mmin)
