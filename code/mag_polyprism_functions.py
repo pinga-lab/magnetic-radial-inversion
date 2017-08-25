@@ -34,7 +34,7 @@ def area_polygon(x, y):
     area = (x * (y.take(shift_up) - y.take(shift_down))).sum() / 2.0
     return area
 
-def pol2cart(m, M, L):
+def pol2cart(l, M, L):
     '''
     This function transforms polar coordinates of the prisms
     into Cartesian coordinates and returns a list of polygonal
@@ -42,7 +42,7 @@ def pol2cart(m, M, L):
     
     input
     
-    m: list - each element is a list of [r, x0, y0, z1, z2, 'magnetization'],
+    l: list - each element is a list of [r, x0, y0, z1, z2, 'magnetization'],
               whrere r is an array with the radial distances of the vertices,
               x0 and y0 are the origin cartesian coordinates of each prism,
               z1 and z2 are the top and bottom of each prism and
@@ -56,33 +56,33 @@ def pol2cart(m, M, L):
     fatiando.mesher.PolygonalPrism
     '''
     
-    mk = []
+    lk = []
     r = np.zeros(M)  # it contains radial distances of the vertices in polar coordinates
     verts = [] # it contains radial distances of the vertices in Cartesian coordinates
  
-    assert len(m) == L, 'The size of m and the number of prisms must be equal'
+    assert len(l) == L, 'The size of m and the number of prisms must be equal'
     
-    for mv in m:
-        assert len(mv[0]) == M, 'All prisms must have M vertices'
+    for lv in l:
+        assert len(lv[0]) == M, 'All prisms must have M vertices'
       
     ang = 2*np.pi/M # angle between two vertices
 
-    for mv in m:
-        r = mv[0]
+    for lv in l:
+        r = lv[0]
         verts=[]
         for i in range(M):
-            verts.append([r[i]*np.cos(i*ang) + mv[1], r[i]*np.sin(i*ang) + mv[2]])
-        mk.append(PolygonalPrism(verts, mv[3], mv[4], mv[5]))
+            verts.append([r[i]*np.cos(i*ang) + lv[1], r[i]*np.sin(i*ang) + lv[2]])
+        lk.append(PolygonalPrism(verts, lv[3], lv[4], lv[5]))
         
-    return mk
+    return lk
 
-def param_vec(m, M, L):
+def param_vec(l, M, L):
     '''
     This function receives the model of prisms and returns the vector of parameters
     
     input
     
-    m: list - each element is a list of [r, x0, y0, z1, z2, 'magnetization'],
+    l: list - each element is a list of [r, x0, y0, z1, z2, 'magnetization'],
               whrere r is an array with the radial distances of the vertices,
               x0 and y0 are the origin cartesian coordinates of each prism,
               z1 and z2 are the top and bottom of each prism and
@@ -96,15 +96,15 @@ def param_vec(m, M, L):
     '''
     
     pv = np.zeros(0) # parameters vector
-    mv = [] # list for the loop of asserts
+    lv = [] # list for the loop of asserts
  
-    assert len(m) == L, 'The size of m and the number of prisms must be equal'
+    assert len(l) == L, 'The size of m and the number of prisms must be equal'
     
-    for mv in m:
-        assert len(mv[0]) == M, 'All prisms must have M vertices'
+    for lv in l:
+        assert len(lv[0]) == M, 'All prisms must have M vertices'
     
     for i in range(L):
-        pv = np.hstack((pv, m[i][0], m[i][1:3]))
+        pv = np.hstack((pv, l[i][0], l[i][1:3]))
     
     return pv
 
