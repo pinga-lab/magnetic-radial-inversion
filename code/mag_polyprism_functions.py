@@ -979,6 +979,8 @@ def phi_1(M, L, m, alpha):
     
     assert m.size == P, 'The size of parameter vector must be equal to P'
     
+    m1 = m.copy()
+    
     # extracting the non-zero diagonals
     d0, d1, dM = diags_phi_1(M, L, alpha)
     
@@ -1015,6 +1017,8 @@ def phi_2(M, L, m, alpha):
     
     # extracting the non-zero diagonals
     d0, d1 = diags_phi_2(M, L, alpha)
+    
+    m2 = m.copy()
     
     # calculating the product between the diagonals and the slices of m
     m2 = m*d0
@@ -1107,6 +1111,8 @@ def phi_5(M, L, m, alpha):
     
     assert m.size == P, 'The size of parameter vector must be equal to P'
     
+    m5 = m.copy()
+    
     # extracting the non-zero diagonals
     d0, d1 = diags_phi_5(M, L, alpha)
     
@@ -1138,6 +1144,8 @@ def phi_6(M, L, m, alpha):
     P = L*(M + 2)
     
     assert m.size == P, 'The size of parameter vector must be equal to P'
+    
+    m6 = m.copy()
     
     # extracting the non-zero diagonals
     d0 = diags_phi_6(M, L, alpha)
@@ -1402,8 +1410,8 @@ def trans_parameter2(m, M, L, mmax, mmin):
     assert mmax.size == L*(M + 2), 'The size of mmax must be equal to L*(M + 2)'
     assert mmin.size == L*(M + 2), 'The size of mmin must be equal to L*(M + 2)'
     assert m.size == L*(M + 2), 'The size of m must be equal to L*(M + 2)'
-    assert np.alltrue(m < (mmax + 1e-12)), 'mmax must be greater than m'
-    assert np.alltrue((mmin - 1e-12) < m), 'm must be greater than mmin'
+    assert np.alltrue(m < mmax), 'mmax must be greater than m'
+    assert np.alltrue(mmin < m), 'm must be greater than mmin'
 
     mt = -np.log((mmax - m)/(m - mmin + 1e-15))
 
@@ -1480,7 +1488,7 @@ def trans_inv_parameter2(mt, M, L, mmax, mmin):
     #    exp_sum   = exp_sum + nth_term
 
     #m = mmin + (mmax - mmin)/(1. + exp_sum)
-    m = mmin + (mmax - mmin)/(1. + np.exp(-mt)) - 1e-10
+    m = mmin + (mmax - mmin)/(1. + np.exp(-mt)) - 1e-8
 
     return m
     
