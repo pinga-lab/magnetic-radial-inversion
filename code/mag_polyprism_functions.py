@@ -365,7 +365,7 @@ def fd_tf_radial_polyprism(xp, yp, zp, m, M, nv, delta, inc, dec):
 
 def fd_tf_sm_polyprism(xp, yp, zp, m, M, L, deltax, deltay, deltar, inc, dec):
     '''
-    Returns the sensibility matrix for polygonal prisms using finite
+    Returns the sensitivity matrix for polygonal prisms using finite
     differences.
 
     input
@@ -388,7 +388,7 @@ def fd_tf_sm_polyprism(xp, yp, zp, m, M, L, deltax, deltay, deltar, inc, dec):
 
     output
 
-    G: 2D array - sensibility matrix
+    G: 2D array - sensitivity matrix
     '''
     for mv in m:
         assert len(mv[0]) == M, 'All prisms must have M vertices'
@@ -573,7 +573,7 @@ def derivative_tf_radial2(xp, yp, zp, m, M, nv, delta, inc, dec):
 
 def Jacobian_tf(xp, yp, zp, m, M, L, deltax, deltay, deltar, inc, dec):
     '''
-    Returns the sensibility matrix for polygonal prisms using finite
+    Returns the sensitivity matrix for polygonal prisms using finite
     differences.
 
     input
@@ -592,16 +592,29 @@ def Jacobian_tf(xp, yp, zp, m, M, L, deltax, deltay, deltar, inc, dec):
 
     output
 
-    G: 2D array - sensibility matrix
+    G: 2D array - sensitivity matrix
     '''
     assert len(m) == L, 'The number of prisms must be L'
     for mv in m:
         assert len(mv.x) == M, 'All prisms must have M vertices'
     assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
 
-    pp = 2 + M # number of parameters per prism
-
-    G = np.zeros((xp.size, pp*L))
+    P = L*(M+2) # number of parameters per prism
+    pp = M+2
+    G = np.zeros((xp.size, P))
+    
+    l = np.arange(L)
+    lj = l*(M+2)
+    
+    p = np.arange(P)
+    
+    n = np.arange(M)
+    nj = n*(M+2)
+    
+    #G[:, lj + M] = derivative_tf_x0(xp, yp, zp, m[l], M, deltax, inc, dec)
+    #G[:, lj + M + 1] = derivative_tf_y0(xp, yp, zp, m[l], M, deltay, inc, dec)
+    #for j in range(M):
+    #    G[:, nj[l]+j] = derivative_tf_radial(xp, yp, zp, m[l], M, j, deltar, inc, dec)
 
     for i, mv in enumerate(m):
         aux = i*pp
@@ -1455,8 +1468,8 @@ def trans_parameter2(m, M, L, mmax, mmin):
     assert np.alltrue(m <= mmax), 'mmax must be greater than m'
     assert np.alltrue(mmin <= m), 'm must be greater than mmin'
 
-    #mt = -np.log((mmax - m)/(m - mmin + 1e-15))
-    mt = -np.log((mmax - m)/(m - mmin))
+    mt = -np.log((mmax - m)/(m - mmin + 1e-15)) -1e-10
+    #mt = -np.log((mmax - m)/(m - mmin))
 
     return mt
 
