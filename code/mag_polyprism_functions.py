@@ -1468,7 +1468,7 @@ def trans_parameter2(m, M, L, mmax, mmin):
     assert np.alltrue(m <= mmax), 'mmax must be greater than m'
     assert np.alltrue(mmin <= m), 'm must be greater than mmin'
 
-    mt = -np.log((mmax - m)/(m - mmin + 1e-15)) -1e-10
+    mt = -np.log((mmax - m)/(m - mmin + 1e-15)) -1e-9
     #mt = -np.log((mmax - m)/(m - mmin))
 
     return mt
@@ -1545,7 +1545,7 @@ def trans_inv_parameter2(mt, M, L, mmax, mmin):
 
     #m = mmin + (mmax - mmin)/(1. + exp_sum)
     #m = mmin + (mmax - mmin)/(1. + np.exp(-mt)) - 1e-8
-    m = mmin + (mmax - mmin)/(1. + np.exp(-mt))
+    m = mmin + (mmax - mmin)/(1. + np.exp(-mt))- 1e-8
 
     return m
 
