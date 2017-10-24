@@ -1293,12 +1293,12 @@ def norm_regul_param(M, L, th, m0, a1, a2, a3, a4, a5, a6):
     # phi6
     alpha6 = a6*(th/(L*M))
 
-    alpha1 = th*a1
-    alpha2 = th*a2
-    alpha3 = th*a3
-    alpha4 = th*a4
-    alpha5 = th*a5
-    alpha6 = th*a6
+    #alpha1 = th*a1
+    #alpha2 = th*a2
+    #alpha3 = th*a3
+    #alpha4 = th*a4
+    #alpha5 = th*a5
+    #alpha6 = th*a6
 
     return alpha1, alpha2, alpha3, alpha4, alpha5, alpha6
 
