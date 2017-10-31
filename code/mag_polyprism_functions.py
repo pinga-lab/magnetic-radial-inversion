@@ -1468,8 +1468,7 @@ def trans_parameter2(m, M, L, mmax, mmin):
     assert np.alltrue(m <= mmax), 'mmax must be greater than m'
     assert np.alltrue(mmin <= m), 'm must be greater than mmin'
 
-    mt = -np.log((mmax - m)/(m - mmin + 1e-15)) -1e-9
-    #mt = -np.log((mmax - m)/(m - mmin))
+    mt = -np.log((mmax - m)/(m - mmin + 1e-15))
 
     return mt
 
@@ -1530,22 +1529,21 @@ def trans_inv_parameter2(mt, M, L, mmax, mmin):
 
     output
 
-    mt: 1D array - parameters vector
+    p: 1D array - parameters vector
     '''
     assert len(mmax) == L*(M + 2), 'The size of mmax must be equal to L*(M + 2)'
     assert len(mmin) == L*(M + 2), 'The size of mmin must be equal to L*(M + 2)'
     assert len(mt) == L*(M + 2), 'The size of m must be equal to L*(M + 2)'
+    
     P = L*(M+2)
-    #exp_sum =0.0
-    #for n in range (P):
-    #    f         = factorial(n)
-    #    power     = (-mt)**n
-    #    nth_term  = power/f
-    #    exp_sum   = exp_sum + nth_term
-
-    #m = mmin + (mmax - mmin)/(1. + exp_sum)
-    #m = mmin + (mmax - mmin)/(1. + np.exp(-mt)) - 1e-8
-    m = mmin + (mmax - mmin)/(1. + np.exp(-mt))- 1e-8
+    
+    m = mmin + (mmax - mmin)/(1. + np.exp(-mt))
+    
+    for i in range(P):
+        if m[i] >= mmax[i]:
+            m[i] = mmax[i] - 1e-15
+        if m[i] <= mmin[i]:
+            m[i] = mmin[i] + 1e-15
 
     return m
 
