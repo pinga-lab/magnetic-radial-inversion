@@ -1,7 +1,7 @@
 (dp1
 S'dec'
 p2
-F50
+F-48
 sS'sphere'
 p3
 (lp4
@@ -60,7 +60,7 @@ tRp20
 (I3
 tg15
 I00
-S'`\xb2\xa9\x1e\x9a\t\x87?\xdcYD\x08}t\x8b?\x96t%V\xd1\t\x9f\xbf'
+S'T\xfa\xcb\xcd\xbb\xf1\xe4?\x85\xd3f\xf6\xceB\xe7\xbf\xf6XB\xac\xd9\x9c\xca\xbf'
 tbssS'y'
 F0
 sS'x'
@@ -69,7 +69,7 @@ sS'z'
 F100
 sbasS'intensity'
 p21
-F0.035000000000000003
+F1
 sS'r'
 F50
 sg17
@@ -84,5 +84,5 @@ sS'z'
 F100
 sS'inc'
 p23
-F-60
+F-12
 s.

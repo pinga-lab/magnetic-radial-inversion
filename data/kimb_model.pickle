@@ -61,7 +61,7 @@ tRp19
 (I3
 tg7
 I00
-S'\x1c\x86\xe5\xe46\xb8\xa0?\xebQ\xb8\x1e\x85\xeb\x81\xbf\xc0m\x9a\xa5Y\x8d\x82\xbf'
+S'T\xfa\xcb\xcd\xbb\xf1\xe4?\x85\xd3f\xf6\xceB\xe7\xbf\xf6XB\xac\xd9\x9c\xca\xbf'
 tbssS'y'
 g3
 (g4
@@ -242,7 +242,7 @@ sbasS'P'
 I110
 sS'intensity'
 p44
-F0.035000000000000003
+F1
 sS'dz'
 p45
 F60
@@ -252,11 +252,11 @@ g18
 g19
 ssS'dec'
 p47
-F-15
+F-48
 sS'z0'
 p48
 F0
 sS'inc'
 p49
-F-15
+F-12
 s.
