@@ -1541,9 +1541,9 @@ def trans_inv_parameter2(mt, M, L, mmax, mmin):
     
     for i in range(P):
         if m[i] >= mmax[i]:
-            m[i] = mmax[i] - 1e-15
+            m[i] = mmax[i] - 1e-10
         if m[i] <= mmin[i]:
-            m[i] = mmin[i] + 1e-15
+            m[i] = mmin[i] + 1e-10
 
     return m
 
