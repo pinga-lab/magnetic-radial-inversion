@@ -1539,11 +1539,10 @@ def trans_inv_parameter2(mt, M, L, mmax, mmin):
     
     m = mmin + (mmax - mmin)/(1. + np.exp(-mt))
     
-    for i in range(P):
-        if m[i] >= mmax[i]:
-            m[i] = mmax[i] - 1e-10
-        if m[i] <= mmin[i]:
-            m[i] = mmin[i] + 1e-10
+    i_max = np.argwhere(m > mmax)
+    i_min = np.argwhere(m < mmin)
+    m[i_max] = mmax[i] - 1e-8
+    m[i_min] = mmin[i] + 1e-8
 
     return m
 
