@@ -104,12 +104,63 @@ def pol2cart(l, M, L):
 
     for lv in l:
         r = lv[0]
-        verts=[]
+        verts = []
         for i in range(M):
             verts.append([r[i]*np.cos(i*ang) + lv[1], r[i]*np.sin(i*ang) + lv[2]])
         lk.append(PolygonalPrism(verts, lv[3], lv[4], lv[5]))
 
     return lk
+
+def prism_d_res_phi(xp, yp, zp, m, z0, dz, M, L, props, dobs, inc, dec):
+    '''
+    This function calculates the data for polygonal
+    prisms of the Fatiando a Terra with the two given parameters.
+
+    input
+
+    xp: array - x observation points
+    yp: array - y observation points
+    zp: array - z observation points
+    m: 1D array - parameter vector
+    z0: float - top of the model
+    dz: float - thickness of each prism
+    M: int - number of vertices
+    L: int - number of prisms
+    props: dictionary - physical property
+    dobs: 1D array - observed data
+    inc: float - inclination
+    dec: declination
+
+    output
+
+    prism: list - list of objects of the class fatiando.mesher.PolygonalPrism
+    d: 1D array - data vector
+    res: 1D array - residual data
+    phi: float - misfit function value
+    '''
+
+    prism = []
+    verts = [] # it contains radial distances of the vertices in Cartesian coordinates
+
+    l = []   # list of parameters of the prisms
+
+    for i in range(L):
+        l.append([m[i*(M+2):i*(M+2)+M], m[i*(M+2)+M], m[i*(M+2)+M+1], z0 + dz*i, z0 + dz*(i+1), props])
+
+    ang = 2*np.pi/M # angle between two vertices
+    
+    prism = []
+    for lv in l:
+        verts = []
+        for i in range(M):
+            verts.append([lv[0][i]*np.cos(i*ang) + lv[1], lv[0][i]*np.sin(i*ang) + lv[2]])
+        prism.append(PolygonalPrism(verts, lv[3], lv[4], lv[5]))
+
+    d = polyprism.tf(xp, yp, zp, prism, inc, dec)
+    res = dobs - d
+    phi = np.sum(res*res)
+    
+    return prism, d, res, phi
 
 def param_vec(l, M, L):
     '''
