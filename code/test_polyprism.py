@@ -11,6 +11,26 @@ import polyprism_tests as tests
 import numpy.testing as npt
 import mag_polyprism_functions as mfun
 
+def test_area_square():
+    '''
+    This function tests the area calculated
+    by sholace formula.
+    
+    output
+    
+    Assetion
+    '''
+    
+    l = 2.    
+    x = np.array([1., 1., -1., -1.])
+    y = np.array([1., -1., -1., 1.])
+    
+    area = mfun.area_polygon(x, y)
+    
+    area_ref = l*l
+    
+    assert np.allclose(area, area_true), 'The area is not correct'
+
 def test_volume():
     '''
     This function tests the volume between pol2cart

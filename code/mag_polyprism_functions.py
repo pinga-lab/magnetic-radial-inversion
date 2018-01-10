@@ -93,7 +93,7 @@ def pol2cart(l, M, L):
 
     lk = []
     r = np.zeros(M)  # it contains radial distances of the vertices in polar coordinates
-    verts = [] # it contains radial distances of the vertices in Cartesian coordinates
+    verts = [] # it contains radial distrantances of the vertices in Cartesian coordinates
 
     assert len(l) == L, 'The size of m and the number of prisms must be equal'
 
@@ -210,21 +210,21 @@ def param2model(m, M, L, z0, dz, props):
 
     output
 
-    mv: list - list of prisms
+    model: list - list of prisms
     '''
     P = L*(M + 2)
     assert m.size == P, 'The size of m must be equal to L*(M + 2)'
 
     r = np.zeros(M) # vector for radial distances
-    mv = [] # list of prisms
+    model = [] # list of prisms
 
     k = 0.
     for i in range(0, P, M + 2):
         r = m[i:M+i]
-        mv.append([r, m[i+M], m[i+M+1], z0 + dz*k, z0 + dz*(k + 1.), props])
+        model.append([r, m[i+M], m[i+M+1], z0 + dz*k, z0 + dz*(k + 1.), props])
         k = k + 1.
 
-    return mv
+    return model
 
 def param2polyprism(m, M, L, z0, dz, props):
     '''
@@ -242,7 +242,7 @@ def param2polyprism(m, M, L, z0, dz, props):
 
     output
 
-    mv: list - list of fatiando.mesher.PolygonalPrism
+    model: list - list of fatiando.mesher.PolygonalPrism
     '''
     P = L*(M + 2)
     assert m.size == P, 'The size of m must be equal to L*(M + 2)'
@@ -250,17 +250,17 @@ def param2polyprism(m, M, L, z0, dz, props):
         assert m[i:i+M].all >= 0., 'The radial distances must be positives'
 
     r = np.zeros(M) # vector for radial distances
-    mv = [] # list of prisms
+    model = [] # list of prisms
 
     k = 0.
     for i in range(0, P, M + 2):
         r = m[i:M+i]
-        mv.append([r, m[i+M], m[i+M+1], z0 + dz*k, z0 + dz*(k + 1.), props])
+        model.append([r, m[i+M], m[i+M+1], z0 + dz*k, z0 + dz*(k + 1.), props])
         k = k + 1.
 
-    mv = pol2cart(mv, M, L)
+    model = pol2cart(mv, M, L)
 
-    return mv
+    return model
 
 ### Functions for the derivatives with finite differences
 
@@ -1592,8 +1592,8 @@ def trans_inv_parameter2(mt, M, L, mmax, mmin):
     
     i_max = np.argwhere(m > mmax)
     i_min = np.argwhere(m < mmin)
-    m[i_max] = mmax[i] - 1e-8
-    m[i_min] = mmin[i] + 1e-8
+    m[i_max] = mmax[i_max] - 1e-4
+    m[i_min] = mmin[i_min] + 1e-4
 
     return m
 
