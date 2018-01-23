@@ -79,7 +79,7 @@ def pol2cart(l, M, L):
 
     l: list - each element is a list of [r, x0, y0, z1, z2, 'magnetization'],
               whrere r is an array with the radial distances of the vertices,
-              x0 and y0 are the origin cartesian coordinates of each prism,
+              x0 and y0 are the origin Cartesian coordinates of each prism,
               z1 and z2 are the top and bottom of each prism and
               magnetization is physical property
     M: int - number of vertices per prism
@@ -960,11 +960,12 @@ def gradient_phi_3(M, L, m, m0, alpha):
     assert m.size == P, 'The size of parameter vector must be equal to P'
     assert m0.size == M + 2, 'The size of parameter vector must be equal to M + 2'
 
-
+    m3 = np.copy(m) # the new vector m3 = gradient input + gradient of phi3
+    
     # calculating the product between the diagonals and the slices of m
-    m[:M+2] += (m[:M+2] - m0)*alpha
+    m3[:M+2] += (m[:M+2] - m0)*alpha
 
-    return m
+    return m3
 
 def gradient_phi_4(M, L, m, m0, alpha):
     '''
@@ -988,11 +989,13 @@ def gradient_phi_4(M, L, m, m0, alpha):
 
     assert m.size == P, 'The size of parameter vector must be equal to P'
     assert m0.size == 2, 'The size of parameter vector must be equal to 2'
+    
+    m4 = np.copy(m) # the new vector m4 = gradient input + gradient of phi4
 
     # calculating the product between the diagonals and the slices of m
-    m[M:M+2] += (m[M:M+2] - m0)*alpha
+    m4[M:M+2] += (m[M:M+2] - m0)*alpha
 
-    return m
+    return m4
 
 def gradient_phi_5(M, L, m, alpha):
     '''
@@ -1150,12 +1153,12 @@ def phi_3(M, L, m, m0, alpha):
     assert m.size == P, 'The size of parameter vector must be equal to P'
     assert m0.size == M + 2, 'The size of parameter vector must be equal to M + 2'
 
-    m3 = np.zeros(P)
+    m3 = np.zeros(M+2)
 
     # calculating the product between the diagonals and the slices of m
-    m3[:M+2] = (m[:M+2] - m0)*alpha
+    m3 = (m[:M+2] - m0)*alpha
 
-    phi_3 = np.dot(m3, m)
+    phi_3 = np.dot(m3, m3)
 
     return phi_3
 
@@ -1181,12 +1184,12 @@ def phi_4(M, L, m, m0, alpha):
     assert m.size == P, 'The size of parameter vector must be equal to P'
     assert m0.size == 2, 'The size of parameter vector must be equal to 2'
 
-    m4 = np.zeros(P)
+    m4 = np.zeros(2)
 
     # calculating the product between the diagonals and the slices of m
-    m4[M:M+2] = (m[M:M+2] - m0)*alpha
+    m4 = (m[M:M+2] - m0)*alpha
 
-    phi_4 = np.dot(m4, m)
+    phi_4 = np.dot(m4, m4)
 
     return phi_4
 
@@ -1344,12 +1347,12 @@ def norm_regul_param(M, L, th, m0, a1, a2, a3, a4, a5, a6):
     # phi6
     alpha6 = a6*(th/(L*M))
 
-    #alpha1 = th*a1
-    #alpha2 = th*a2
-    #alpha3 = th*a3
-    #alpha4 = th*a4
-    #alpha5 = th*a5
-    #alpha6 = th*a6
+    alpha1 = th*a1
+    alpha2 = th*a2
+    alpha3 = th*a3
+    alpha4 = th*a4
+    alpha5 = th*a5
+    alpha6 = th*a6
 
     return alpha1, alpha2, alpha3, alpha4, alpha5, alpha6
 
@@ -1519,7 +1522,7 @@ def trans_parameter2(m, M, L, mmax, mmin):
     assert np.alltrue(m <= mmax), 'mmax must be greater than m'
     assert np.alltrue(mmin <= m), 'm must be greater than mmin'
 
-    mt = -np.log((mmax - m)/(m - mmin + 1e-15))
+    mt = -np.log((mmax - m)/(m - mmin + 1e-10))
 
     return mt
 
