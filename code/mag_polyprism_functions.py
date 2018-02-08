@@ -34,41 +34,6 @@ def area_polygon(x, y):
     area = (x * (y.take(shift_up) - y.take(shift_down))).sum() / 2.0
     return area
 
-def polyprism2param(model):
-    '''
-    Returns the parameters vector of a list of polygonal prisms.
-
-    input
-
-    model: list - of objects of the class
-              fatiando.mesher.PolygonalPrism
-              
-    output
-
-    m: 1D array - parameters vector
-    '''
-    M = model[0].x.size
-    L = len(model)
-    P = L*(M+2)
-    m = np.zeros(P)
-    
-    for i, mod in enumerate(model):
-        x = np.asanyarray(mod.x)
-        y = np.asanyarray(mod.y)
-        n = len(x)
-        shift_up = np.arange(-n+1, 1)
-        shift_down = np.arange(-1, n-1)
-        area = (x * (y.take(shift_up) - y.take(shift_down))).sum() / 2.0
-        cx = ((x + x.take(shift_up))*x*(y.take(shift_up) - y.take(shift_down))).sum()
-        cx /= 6.*area
-        cy = (y + y.take(shift_up)*x*(y.take(shift_up) - y.take(shift_down))).sum()
-        cy /= 6.*area
-        m[i*M+M] = cx
-        m[i*M+M+1] = cy
-        m[i*(M+2):i*(M+2)+M] = np.sqrt((x - cx)*(x - cx) + (y - cy)*(y - cy))
-
-    return m
-
 def pol2cart(l, M, L):
     '''
     This function transforms polar coordinates of the prisms
@@ -110,6 +75,41 @@ def pol2cart(l, M, L):
         lk.append(PolygonalPrism(verts, lv[3], lv[4], lv[5]))
 
     return lk
+
+def polyprism2param(model):
+    '''
+    Returns the parameters vector of a list of polygonal prisms.
+
+    input
+
+    model: list - of objects of the class
+              fatiando.mesher.PolygonalPrism
+              
+    output
+
+    m: 1D array - parameters vector
+    '''
+    M = model[0].x.size
+    L = len(model)
+    P = L*(M+2)
+    m = np.zeros(P)
+    
+    for i, mod in enumerate(model):
+        x = np.asanyarray(mod.x)
+        y = np.asanyarray(mod.y)
+        n = len(x)
+        shift_up = np.arange(-n+1, 1)
+        shift_down = np.arange(-1, n-1)
+        area = (x * (y.take(shift_up) - y.take(shift_down))).sum() / 2.0
+        cx = ((x + x.take(shift_up))*x*(y.take(shift_up) - y.take(shift_down))).sum()
+        cx /= 6.*area
+        cy = (y + y.take(shift_up)*x*(y.take(shift_up) - y.take(shift_down))).sum()
+        cy /= 6.*area
+        m[i*M+M] = cx
+        m[i*M+M+1] = cy
+        m[i*(M+2):i*(M+2)+M] = np.sqrt((x - cx)*(x - cx) + (y - cy)*(y - cy))
+
+    return m
 
 def prism_d_res_phi(xp, yp, zp, m, z0, dz, M, L, props, dobs, inc, dec):
     '''
