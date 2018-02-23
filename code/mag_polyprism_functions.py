@@ -258,7 +258,7 @@ def param2polyprism(m, M, L, z0, dz, props):
         model.append([r, m[i+M], m[i+M+1], z0 + dz*k, z0 + dz*(k + 1.), props])
         k = k + 1.
 
-    model = pol2cart(mv, M, L)
+    model = pol2cart(model, M, L)
 
     return model
 
@@ -1522,8 +1522,11 @@ def trans_parameter2(m, M, L, mmax, mmin):
     assert np.alltrue(m <= mmax), 'mmax must be greater than m'
     assert np.alltrue(mmin <= m), 'm must be greater than mmin'
 
-    mt = -np.log((mmax - m)/(m - mmin + 1e-10))
-
+    #i0 = np.argwhere(m - mmin == 0.)
+    #m[i0] = 2.*mmin[i0]
+    #print m - mmin
+    mt = -np.log((mmax - m)/(m - mmin + 1e-2))
+    
     return mt
 
 
@@ -1591,13 +1594,20 @@ def trans_inv_parameter2(mt, M, L, mmax, mmin):
     
     P = L*(M+2)
     
+    #print mt
+    
+    i_overflow = np.argwhere(mt <= -710.)
+    mt[i_overflow] = 709.
+    
     m = mmin + (mmax - mmin)/(1. + np.exp(-mt))
     
-    i_max = np.argwhere(m > mmax)
-    i_min = np.argwhere(m < mmin)
-    m[i_max] = mmax[i_max] - 1e-4
-    m[i_min] = mmin[i_min] + 1e-4
-
+    i_max = np.argwhere(m >= mmax)
+    i_min = np.argwhere(m <= mmin)
+    m[i_max] *= 0.99
+    m[i_min] *= 1.01
+    
+    
+    
     return m
 
 
