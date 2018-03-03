@@ -672,7 +672,7 @@ def Jacobian_tf(xp, yp, zp, m, M, L, deltax, deltay, deltar, inc, dec):
 
     return G
 
-def derivative_amf_x0(xp, yp, zp, m, M, delta, inc, dec):
+def derivative_amf_x0(xp, yp, zp, m, M, delta):
     '''
     This function calculates the derivative for amplitude of
     anomalous field from a model of polygonal prisms using 
@@ -686,8 +686,6 @@ def derivative_amf_x0(xp, yp, zp, m, M, delta, inc, dec):
     m: list - list of one fatiando.mesher.PolygonalPrism
     M: int - number of vertices per prism
     delta: float - increment in x coordinate in meters
-    inc: float - inclination
-    dec: declination
 
     output
 
@@ -716,7 +714,7 @@ def derivative_amf_x0(xp, yp, zp, m, M, delta, inc, dec):
 
     return df
 
-def derivative_amf_y0(xp, yp, zp, m, M, delta, inc, dec):
+def derivative_amf_y0(xp, yp, zp, m, M, delta):
     '''
     This function calculates the derivative for amplitude of
     anomalous field from a model of polygonal prisms using 
@@ -730,8 +728,6 @@ def derivative_amf_y0(xp, yp, zp, m, M, delta, inc, dec):
     m: list - list of one fatiando.mesher.PolygonalPrism
     M: int - number of vertices per prism
     delta: float - increment in x coordinate in meters
-    inc: float - inclination
-    dec: declination
 
     output
 
@@ -760,7 +756,7 @@ def derivative_amf_y0(xp, yp, zp, m, M, delta, inc, dec):
 
     return df
 
-def derivative_amf_radial(xp, yp, zp, m, M, nv, delta, inc, dec):
+def derivative_amf_radial(xp, yp, zp, m, M, nv, delta):
     '''
     This function calculates the derivative for amplitude of
     anomalous field from a model of polygonal prisms using 
@@ -775,8 +771,6 @@ def derivative_amf_radial(xp, yp, zp, m, M, nv, delta, inc, dec):
     M: int - number of vertices per prism
     nv: int - number of the vertice for the derivative
     delta: float - increment in radial distance in meters
-    inc: float - inclination
-    dec: declination
 
     output
 
@@ -814,7 +808,7 @@ def derivative_amf_radial(xp, yp, zp, m, M, nv, delta, inc, dec):
 
     return df
 
-def Jacobian_amf(xp, yp, zp, m, M, L, deltax, deltay, deltar, inc, dec):
+def Jacobian_amf(xp, yp, zp, m, M, L, deltax, deltay, deltar):
     '''
     Returns the sensitivity matrix for polygonal prisms using finite
     differences.
@@ -830,8 +824,6 @@ def Jacobian_amf(xp, yp, zp, m, M, L, deltax, deltay, deltar, inc, dec):
     deltax: float - increment in x coordinate in meters
     deltay: float - increment in y coordinate in meters
     deltar: float - increment in z coordinate in meters
-    inc: float - inclination of the local-geomagnetic field
-    dec: declination of the local-geomagnetic field
 
     output
 
@@ -856,10 +848,10 @@ def Jacobian_amf(xp, yp, zp, m, M, L, deltax, deltay, deltar, inc, dec):
     
     for i, mv in enumerate(m):
         aux = i*pp
-        G[:, aux + M] = derivative_amf_x0(xp, yp, zp, mv, M, deltax, inc, dec)
-        G[:, aux + M + 1] = derivative_amf_y0(xp, yp, zp, mv, M, deltay, inc, dec)
+        G[:, aux + M] = derivative_amf_x0(xp, yp, zp, mv, M, deltax)
+        G[:, aux + M + 1] = derivative_amf_y0(xp, yp, zp, mv, M, deltay)
         for j in range(M):
-            G[:, aux + j] = derivative_amf_radial(xp, yp, zp, mv, M, j, deltar, inc, dec)
+            G[:, aux + j] = derivative_amf_radial(xp, yp, zp, mv, M, j, deltar)
 
     return G
 
