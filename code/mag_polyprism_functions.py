@@ -1130,6 +1130,31 @@ def Hessian_phi_6(M, L, H, alpha):
 
     return H
 
+def Hessian_phi_7(M, L, H, alpha):
+    '''
+    Returns the hessian matrix for Tikhonov's zero order
+    for dz parameter.
+
+    input
+
+    M: integer - number of vertices
+    L: integer - number of prisms
+    H: 2D array - hessian matrix
+    alpha: float - weight
+
+    output
+
+    H: 2D array - hessian matrix plus phi_7 constraint
+    '''
+
+    P = L*(M + 2) + 1
+
+    assert H.shape == (P, P), 'The hessian shape must be (P, P)'
+
+    H[-1,-1] += alpha
+
+    return H
+
 def gradient_phi_1(M, L, m, alpha):
     '''
     Returns the gradient vector constrained by smoothness constraint
@@ -1312,7 +1337,7 @@ def gradient_phi_6(M, L, m, alpha):
 
     assert m.size == P, 'The size of parameter vector must be equal to P'
 
-    m6 = m.copy() # the new vector m1 = gradient input + gradient of phi5
+    m6 = m.copy() # the new vector m1 = gradient input + gradient of phi6
 
     # extracting the non-zero diagonals
     d0 = diags_phi_6(M, L, alpha)
@@ -1321,6 +1346,34 @@ def gradient_phi_6(M, L, m, alpha):
     m6 += m*d0
 
     return m6
+
+def gradient_phi_7(M, L, m, alpha):
+    '''
+    Returns the gradient vector for Tikhonov's zero order
+    for dz parameter.
+
+    input
+
+    M: integer - number of vertices
+    L: integer - number of prisms
+    m: 1D array - gradient of parameter vector
+    alpha: float - weight
+
+    output
+
+    m: 1D array - gradient vector plus phi_7 constraint
+    '''
+
+    P = L*(M + 2) + 1
+
+    assert m.size == P, 'The size of parameter vector must be equal to P'
+
+    m7 = m.copy() # the new vector m1 = gradient input + gradient of phi7
+
+    # calculating the product between the diagonals and the slices of m
+    m7[-1] += m[-1]*alpha
+
+    return m7
 
 def phi_1(M, L, m, alpha):
     '''
@@ -1519,6 +1572,32 @@ def phi_6(M, L, m, alpha):
     phi_6 = np.dot(m6, m)
 
     return phi_6
+
+def phi_7(M, L, m, alpha):
+    '''
+    Returns the value for the phi7 constraint.
+
+    input
+
+    M: integer - number of vertices
+    L: integer - number of prisms
+    m: 1D array - parameter vector
+    alpha: float - weight
+
+    output
+
+    phi_7: float - value of phi_7 constraint
+    '''
+
+    P = L*(M + 2) + 1
+
+    assert m.size == P, 'The size of parameter vector must be equal to P'
+
+    m7 = m.copy()
+
+    phi_7 = m7[-1]*m7[-1]*alpha
+
+    return phi_7
 
 def diags_phi_1(M, L, alpha):
     '''
