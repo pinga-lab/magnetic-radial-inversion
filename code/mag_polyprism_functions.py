@@ -657,57 +657,7 @@ def derivative_tf_radial2(xp, yp, zp, m, M, nv, delta, inc, dec):
 
     return df
 
-def Jacobian_tf(xp, yp, zp, m, M, L, deltax, deltay, deltar, inc, dec):
-    '''
-    Returns the sensitivity matrix for polygonal prisms using finite
-    differences.
-
-    input
-
-    xp: array - x observation points
-    yp: array - y observation points
-    zp: array - z observation points
-    m: list - list of fatiando.mesher.PolygonalPrism
-    M: int - number of vertices per prism
-    L: int - number of prisms
-    deltax: float - increment for x coordinate in meters
-    deltay: float - increment for y coordinate in meters
-    deltar: float - increment for radial distances in meters
-    inc: float - inclination of the local-geomagnetic field
-    dec: declination of the local-geomagnetic field
-
-    output
-
-    G: 2D array - sensitivity matrix
-    '''
-    assert len(m) == L, 'The number of prisms must be L'
-    for mv in m:
-        assert len(mv.x) == M, 'All prisms must have M vertices'
-    assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
-
-    P = L*(M+2) + 1 # number of parameters per prism
-    pp = M+2
-    G = np.zeros((xp.size, P))
-    
-    l = np.arange(L)
-    lj = l*(M+2)
-    
-    p = np.arange(P)
-    
-    n = np.arange(M)
-    nj = n*(M+2)
-    
-
-    for i, mv in enumerate(m):
-        aux = i*pp
-        G[:, aux + M] = derivative_tf_x0(xp, yp, zp, mv, M, deltax, inc, dec)
-        G[:, aux + M + 1] = derivative_tf_y0(xp, yp, zp, mv, M, deltay, inc, dec)
-        for j in range(M):
-            G[:, aux + j] = derivative_tf_radial(xp, yp, zp, mv, M, j, deltar, inc, dec)
-    
-    return G
-
-def Jacobian_tf_with_dz(xp, yp, zp, m, M, L, deltax, deltay, deltar, deltaz, inc, dec):
+def Jacobian_tf(xp, yp, zp, m, M, L, deltax, deltay, deltar, deltaz, inc, dec):
     '''
     Returns the sensitivity matrix for polygonal prisms using finite
     differences.
@@ -953,53 +903,6 @@ def Jacobian_amf(xp, yp, zp, m, M, L, deltax, deltay, deltar):
     deltax: float - increment for x coordinate in meters
     deltay: float - increment for y coordinate in meters
     deltar: float - increment for radial distances in meters
-
-    output
-
-    G: 2D array - sensitivity matrix
-    '''
-    assert len(m) == L, 'The number of prisms must be L'
-    for mv in m:
-        assert len(mv.x) == M, 'All prisms must have M vertices'
-    assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
-
-    P = L*(M+2) # number of parameters per prism
-    pp = M+2
-    G = np.zeros((xp.size, P))
-    
-    l = np.arange(L)
-    lj = l*(M+2)
-    
-    p = np.arange(P)
-    
-    n = np.arange(M)
-    nj = n*(M+2)
-    
-    for i, mv in enumerate(m):
-        aux = i*pp
-        G[:, aux + M] = derivative_amf_x0(xp, yp, zp, mv, M, deltax)
-        G[:, aux + M + 1] = derivative_amf_y0(xp, yp, zp, mv, M, deltay)
-        for j in range(M):
-            G[:, aux + j] = derivative_amf_radial(xp, yp, zp, mv, M, j, deltar)
-
-    return G
-
-def Jacobian_amf_with_dz(xp, yp, zp, m, M, L, deltax, deltay, deltar):
-    '''
-    Returns the sensitivity matrix for polygonal prisms using finite
-    differences.
-
-    input
-
-    xp: array - x observation points
-    yp: array - y observation points
-    zp: array - z observation points
-    m: list - list of fatiando.mesher.PolygonalPrism
-    M: int - number of vertices per prism
-    L: int - number of prisms
-    deltax: float - increment for x coordinate in meters
-    deltay: float - increment for y coordinate in meters
-    deltar: float - increment for radial distances in meters
     deltaz: float - increment for z coordinate in meters
 
     output
@@ -1053,7 +956,7 @@ def Hessian_phi_1(M, L, H, alpha):
     H: 2D array - hessian matrix plus phi_1 constraint
     '''
 
-    P = L*(M + 2)
+    P = L*(M + 2) + 1
 
     assert H.shape == (P, P), 'The hessian shape must be (P, P)'
 
@@ -1090,7 +993,7 @@ def Hessian_phi_2(M, L, H, alpha):
     H: 2D array - hessian matrix plus phi_2 constraint
     '''
 
-    P = L*(M + 2)
+    P = L*(M + 2) + 1
 
     assert H.shape == (P, P), 'The hessian shape must be (P, P)'
 
@@ -1124,7 +1027,7 @@ def Hessian_phi_3(M, L, H, alpha):
     H: 2D array - hessian matrix plus phi_3 constraint
     '''
 
-    P = L*(M + 2)
+    P = L*(M + 2) + 1
 
     assert H.shape == (P, P), 'The hessian shape must be (P, P)'
 
@@ -1151,7 +1054,7 @@ def Hessian_phi_4(M, L, H, alpha):
     H: 2D array - hessian matrix plus phi_4 constraint
     '''
 
-    P = L*(M + 2)
+    P = L*(M + 2) + 1
 
     assert H.shape == (P, P), 'The hessian shape must be (P, P)'
 
@@ -1179,7 +1082,7 @@ def Hessian_phi_5(M, L, H, alpha):
     H: 2D array - hessian matrix plus phi_5 constraint
     '''
 
-    P = L*(M + 2)
+    P = L*(M + 2) + 1
 
     assert H.shape == (P, P), 'The hessian shape must be (P, P)'
 
@@ -1214,7 +1117,7 @@ def Hessian_phi_6(M, L, H, alpha):
     H: 2D array - hessian matrix plus phi_6 constraint
     '''
 
-    P = L*(M + 2)
+    P = L*(M + 2) + 1
 
     assert H.shape == (P, P), 'The hessian shape must be (P, P)'
 
@@ -1244,7 +1147,7 @@ def gradient_phi_1(M, L, m, alpha):
     m: 1D array - gradient vector plus phi_1 constraint
     '''
 
-    P = L*(M + 2)
+    P = L*(M + 2) + 1
 
     assert m.size == P, 'The size of parameter vector must be equal to P'
 
@@ -1279,11 +1182,11 @@ def gradient_phi_2(M, L, m, alpha):
     m2: 1D array - gradient vector plus phi_2 constraint
     '''
 
-    m2 = m.copy() # the new vector m2 = gradient input + gradient of phi2
-
-    P = L*(M + 2)
+    P = L*(M + 2) + 1
 
     assert m.size == P, 'The size of parameter vector must be equal to P'
+
+    m2 = m.copy() # the new vector m2 = gradient input + gradient of phi2
 
     # extracting the non-zero diagonals
     d0, d1 = diags_phi_2(M, L, alpha)
@@ -1313,7 +1216,7 @@ def gradient_phi_3(M, L, m, m0, alpha):
     m: 1D array - gradient vector plus phi_3 constraint
     '''
 
-    P = L*(M + 2)
+    P = L*(M + 2) + 1
 
     assert m.size == P, 'The size of parameter vector must be equal to P'
     assert m0.size == M + 2, 'The size of parameter vector must be equal to M + 2'
@@ -1343,7 +1246,7 @@ def gradient_phi_4(M, L, m, m0, alpha):
     m: 1D array - gradient vector plus phi_4 constraint
     '''
 
-    P = L*(M + 2)
+    P = L*(M + 2) + 1
 
     assert m.size == P, 'The size of parameter vector must be equal to P'
     assert m0.size == 2, 'The size of parameter vector must be equal to 2'
@@ -1374,7 +1277,7 @@ def gradient_phi_5(M, L, m, alpha):
 
     m5 = m.copy() # the new vector m1 = gradient input + gradient of phi5
 
-    P = L*(M + 2)
+    P = L*(M + 2) + 1
 
     assert m.size == P, 'The size of parameter vector must be equal to P'
 
@@ -1405,7 +1308,7 @@ def gradient_phi_6(M, L, m, alpha):
     m: 1D array - gradient vector plus phi_6 constraint
     '''
 
-    P = L*(M + 2)
+    P = L*(M + 2) + 1
 
     assert m.size == P, 'The size of parameter vector must be equal to P'
 
@@ -1435,7 +1338,7 @@ def phi_1(M, L, m, alpha):
     phi_1: float - value of phi_1 constraint
     '''
 
-    P = L*(M + 2)
+    P = L*(M + 2) + 1
 
     assert m.size == P, 'The size of parameter vector must be equal to P'
 
@@ -1471,7 +1374,7 @@ def phi_2(M, L, m, alpha):
     phi_2: float - value of phi_2 constraint
     '''
 
-    P = L*(M + 2)
+    P = L*(M + 2) + 1
 
     assert m.size == P, 'The size of parameter vector must be equal to P'
 
@@ -1506,7 +1409,7 @@ def phi_3(M, L, m, m0, alpha):
     phi_3: float - value of phi_3 constraint
     '''
 
-    P = L*(M + 2)
+    P = L*(M + 2) + 1
 
     assert m.size == P, 'The size of parameter vector must be equal to P'
     assert m0.size == M + 2, 'The size of parameter vector must be equal to M + 2'
@@ -1537,7 +1440,7 @@ def phi_4(M, L, m, m0, alpha):
     phi_4: float - value of phi_4 constraint
     '''
 
-    P = L*(M + 2)
+    P = L*(M + 2)  + 1
 
     assert m.size == P, 'The size of parameter vector must be equal to P'
     assert m0.size == 2, 'The size of parameter vector must be equal to 2'
@@ -1567,7 +1470,7 @@ def phi_5(M, L, m, alpha):
     phi_5: float - value of phi_5 constraint
     '''
 
-    P = L*(M + 2)
+    P = L*(M + 2) + 1
 
     assert m.size == P, 'The size of parameter vector must be equal to P'
 
@@ -1601,7 +1504,7 @@ def phi_6(M, L, m, alpha):
     phi_6: float - value of phi_6 constraint
     '''
 
-    P = L*(M + 2)
+    P = L*(M + 2) + 1
 
     assert m.size == P, 'The size of parameter vector must be equal to P'
 
@@ -1640,14 +1543,17 @@ def diags_phi_1(M, L, alpha):
     d0 = np.zeros(M+2)
     d0[:M] = 2.*alpha
     d0 = np.resize(d0, P)
+    d0 = np.insert(d0, -1, 0.)
 
     d1 = np.zeros(M+2)
     d1[:M-1] = - alpha
     d1 = np.resize(d1, P-1)
+    d1 = np.insert(d1, -1, 0.)
 
     dM = np.zeros(M+2)
     dM[0] = - alpha
     dM = np.resize(dM, P-M+1)
+    dM = np.insert(dM, -1, 0.)
 
     return d0, d1, dM
 
@@ -1740,15 +1646,18 @@ def diags_phi_2(M, L, alpha):
     if L <= 2:
         d0[:M] = alpha
         d0 = np.resize(d0, P)
+        d0 = np.insert(d0, -1, 0.)
     else:
         d0[:M] = 2.*alpha
         d0 = np.resize(d0, P)
         d0[:M] -= alpha
         d0[-M-2:-2] -= alpha
+        d0 = np.insert(d0, -1, 0.)
 
     d1 = np.zeros(M+2)
     d1[:M] = - alpha
     d1 = np.resize(d1, P-M-2)
+    d1 = np.insert(d1, -1, 0.)
 
     return d0, d1
 
@@ -1777,15 +1686,18 @@ def diags_phi_5(M, L, alpha):
     if L == 2:
         d0[M:M+2] = alpha
         d0 = np.resize(d0, P)
+        d0 = np.insert(d0, -1, 0.)
     else:
         d0[M:M+2] = 2*alpha
         d0 = np.resize(d0, P)
         d0[M:M+2] -= alpha
         d0[-2:] -= alpha
+        d0 = np.insert(d0, -1, 0.)
 
     d1 = np.zeros(M+2)
     d1[M:M+2] -= alpha
     d1 = np.resize(d1, P-M-2)
+    d1 = np.insert(d1, -1, 0.)
 
     return d0, d1
 
@@ -1812,6 +1724,7 @@ def diags_phi_6(M, L, alpha):
     d0 = np.zeros(M+2)
     d0[:M] += alpha
     d0 = np.resize(d0, P)
+    d0 = np.insert(d0, -1, 0.)
 
     return d0
 
