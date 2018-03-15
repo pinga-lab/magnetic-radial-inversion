@@ -191,6 +191,7 @@ def param_vec(l, M, L):
 
     for i in range(L):
         pv = np.hstack((pv, l[i][0], l[i][1:3]))
+    pv = np.hstack((pv, l[0][4] - l[0][3]))
 
     return pv
 
@@ -226,7 +227,7 @@ def param2model(m, M, L, z0, dz, props):
 
     return model
 
-def param2polyprism(m, M, L, z0, dz, props):
+def param2polyprism(m, M, L, z0, props):
     '''
     Returns a lis of objects of the class
     fatiando.mesher.PolygonalPrism
@@ -237,25 +238,24 @@ def param2polyprism(m, M, L, z0, dz, props):
     M: int - number of vertices
     L: int - number of prisms
     z0: float - top of the model
-    dz: float - thickness of each prism
     props: dictionary - physical property
 
     output
 
     model: list - list of fatiando.mesher.PolygonalPrism
     '''
-    P = L*(M + 2)
+    P = L*(M + 2) + 1
     assert m.size == P, 'The size of m must be equal to L*(M + 2)'
-    for i in range(P):
+    for i in range(P-1):
         assert m[i:i+M].all >= 0., 'The radial distances must be positives'
 
     r = np.zeros(M) # vector for radial distances
     model = [] # list of prisms
 
     k = 0.
-    for i in range(0, P, M + 2):
+    for i in range(0, P-1, M + 2):
         r = m[i:M+i]
-        model.append([r, m[i+M], m[i+M+1], z0 + dz*k, z0 + dz*(k + 1.), props])
+        model.append([r, m[i+M], m[i+M+1], z0 + m[-1]*k, z0 + m[-1]*(k + 1.), props])
         k = k + 1.
 
     model = pol2cart(model, M, L)
@@ -697,13 +697,12 @@ def Jacobian_tf(xp, yp, zp, m, M, L, deltax, deltay, deltar, deltaz, inc, dec):
     
     n = np.arange(M)
     nj = n*(M+2)
-    
-    G[:,-1] = derivative_tf_dz(xp, yp, zp, m, M, deltaz, inc, dec)
 
     for i, mv in enumerate(m):
         aux = i*pp
         G[:, aux + M] = derivative_tf_x0(xp, yp, zp, mv, M, deltax, inc, dec)
         G[:, aux + M + 1] = derivative_tf_y0(xp, yp, zp, mv, M, deltay, inc, dec)
+        G[:,-1] += derivative_tf_dz(xp, yp, zp, mv, M, deltaz, inc, dec)
         for j in range(M):
             G[:, aux + j] = derivative_tf_radial(xp, yp, zp, mv, M, j, deltar, inc, dec)
     
@@ -867,8 +866,8 @@ def derivative_amf_dz(xp, yp, zp, m, M, delta):
     assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
     assert m.x.size == m.y.size == M, 'The number of vertices must be M'
 
-    mp = deepcopy([m])  # m.y + delta
-    mm = deepcopy([m])  # m.y - delta
+    mp = deepcopy([m])  # m.z2 + delta
+    mm = deepcopy([m])  # m.z2 - delta
     mp[0].z2 += delta
     mm[0].z2 -= delta
 
@@ -887,7 +886,7 @@ def derivative_amf_dz(xp, yp, zp, m, M, delta):
 
     return df
 
-def Jacobian_amf(xp, yp, zp, m, M, L, deltax, deltay, deltar):
+def Jacobian_amf(xp, yp, zp, m, M, L, deltax, deltay, deltar, deltaz):
     '''
     Returns the sensitivity matrix for polygonal prisms using finite
     differences.
@@ -914,7 +913,7 @@ def Jacobian_amf(xp, yp, zp, m, M, L, deltax, deltay, deltar):
         assert len(mv.x) == M, 'All prisms must have M vertices'
     assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
 
-    P = L*(M+2) # number of parameters per prism
+    P = L*(M+2) + 1 # number of parameters per prism
     pp = M+2
     G = np.zeros((xp.size, P))
     
@@ -926,12 +925,11 @@ def Jacobian_amf(xp, yp, zp, m, M, L, deltax, deltay, deltar):
     n = np.arange(M)
     nj = n*(M+2)
 
-    G[:,-1] = derivative_amf_dz(xp, yp, zp, m, M, deltaz)
-    
     for i, mv in enumerate(m):
         aux = i*pp
         G[:, aux + M] = derivative_amf_x0(xp, yp, zp, mv, M, deltax)
         G[:, aux + M + 1] = derivative_amf_y0(xp, yp, zp, mv, M, deltay)
+        G[:,-1] += derivative_amf_dz(xp, yp, zp, mv, M, deltaz)
         for j in range(M):
             G[:, aux + j] = derivative_amf_radial(xp, yp, zp, mv, M, j, deltar)
 
@@ -1622,17 +1620,17 @@ def diags_phi_1(M, L, alpha):
     d0 = np.zeros(M+2)
     d0[:M] = 2.*alpha
     d0 = np.resize(d0, P)
-    d0 = np.insert(d0, -1, 0.)
+    d0 = np.hstack((d0, 0.))
 
     d1 = np.zeros(M+2)
     d1[:M-1] = - alpha
     d1 = np.resize(d1, P-1)
-    d1 = np.insert(d1, -1, 0.)
+    d1 = np.hstack((d1, 0.))
 
     dM = np.zeros(M+2)
     dM[0] = - alpha
     dM = np.resize(dM, P-M+1)
-    dM = np.insert(dM, -1, 0.)
+    dM = np.hstack((dM, 0.))
 
     return d0, d1, dM
 
@@ -1725,18 +1723,18 @@ def diags_phi_2(M, L, alpha):
     if L <= 2:
         d0[:M] = alpha
         d0 = np.resize(d0, P)
-        d0 = np.insert(d0, -1, 0.)
+        d0 = np.hstack((d0, 0.))
     else:
         d0[:M] = 2.*alpha
         d0 = np.resize(d0, P)
         d0[:M] -= alpha
         d0[-M-2:-2] -= alpha
-        d0 = np.insert(d0, -1, 0.)
+        d0 = np.hstack((d0, 0.))
 
     d1 = np.zeros(M+2)
     d1[:M] = - alpha
     d1 = np.resize(d1, P-M-2)
-    d1 = np.insert(d1, -1, 0.)
+    d1 = np.hstack((d1, 0.))
 
     return d0, d1
 
@@ -1765,18 +1763,18 @@ def diags_phi_5(M, L, alpha):
     if L == 2:
         d0[M:M+2] = alpha
         d0 = np.resize(d0, P)
-        d0 = np.insert(d0, -1, 0.)
+        d0 = np.hstack((d0, 0.))
     else:
         d0[M:M+2] = 2*alpha
         d0 = np.resize(d0, P)
         d0[M:M+2] -= alpha
         d0[-2:] -= alpha
-        d0 = np.insert(d0, -1, 0.)
+        d0 = np.hstack((d0, 0.))
 
     d1 = np.zeros(M+2)
     d1[M:M+2] -= alpha
     d1 = np.resize(d1, P-M-2)
-    d1 = np.insert(d1, -1, 0.)
+    d1 = np.hstack((d1, 0.))
 
     return d0, d1
 
@@ -1803,7 +1801,7 @@ def diags_phi_6(M, L, alpha):
     d0 = np.zeros(M+2)
     d0[:M] += alpha
     d0 = np.resize(d0, P)
-    d0 = np.insert(d0, -1, 0.)
+    d0 = np.hstack((d0, 0.))
 
     return d0
 
@@ -1866,16 +1864,16 @@ def trans_parameter2(m, M, L, mmax, mmin):
 
     mt: 1D array - parameters vector
     '''
-    assert mmax.size == L*(M + 2), 'The size of mmax must be equal to L*(M + 2)'
-    assert mmin.size == L*(M + 2), 'The size of mmin must be equal to L*(M + 2)'
-    assert m.size == L*(M + 2), 'The size of m must be equal to L*(M + 2)'
+    assert mmax.size == L*(M + 2) + 1, 'The size of mmax must be equal to L*(M + 2)'
+    assert mmin.size == L*(M + 2) + 1, 'The size of mmin must be equal to L*(M + 2)'
+    assert m.size == L*(M + 2) + 1, 'The size of m must be equal to L*(M + 2)'
     assert np.alltrue(m <= mmax), 'mmax must be greater than m'
     assert np.alltrue(mmin <= m), 'm must be greater than mmin'
 
     #i0 = np.argwhere(m - mmin == 0.)
     #m[i0] = 2.*mmin[i0]
     #print m - mmin
-    mt = -np.log((mmax - m)/(m - mmin + 1e-2))
+    mt = - np.log((mmax - m)/(m - mmin + 1e-2))
     
     return mt
 
@@ -1938,12 +1936,12 @@ def trans_inv_parameter2(mt, M, L, mmax, mmin):
 
     p: 1D array - parameters vector
     '''
-    assert len(mmax) == L*(M + 2), 'The size of mmax must be equal to L*(M + 2)'
-    assert len(mmin) == L*(M + 2), 'The size of mmin must be equal to L*(M + 2)'
-    assert len(mt) == L*(M + 2), 'The size of m must be equal to L*(M + 2)'
+
+    P = L*(M+2) + 1
+    assert len(mmax) == P, 'The size of mmax must be equal to P'
+    assert len(mmin) == P, 'The size of mmin must be equal to P'
+    assert len(mt) == P, 'The size of m must be equal to P'
     
-    P = L*(M+2)
-       
     i_overflow = np.argwhere(mt <= -710.)
     mt[i_overflow] = 700.
     
@@ -2044,7 +2042,7 @@ def Hessian_data(xp, yp, zp, m, M, L, deltax, deltay, deltar, inc, dec):
 
     return H
 
-def build_range_param(M, L, rmin, rmax, x0min, x0max, y0min, y0max):
+def build_range_param(M, L, rmin, rmax, x0min, x0max, y0min, y0max, dzmin, dzmax):
     '''
     Returns vectors of maximum and minimum values of
     parameters
@@ -2057,6 +2055,8 @@ def build_range_param(M, L, rmin, rmax, x0min, x0max, y0min, y0max):
     x0max: float - maximum value of x Cartesian coordinate of the origins
     y0max: float - minimum value of y Cartesian coordinate of the origins
     y0min: float - maximum value of y Cartesian coordinate of the origins
+    dzmin: float - minimum value of thickness dz of each prism
+    dzmax: float - maximum value of thickness dz of each prism
 
     output
 
@@ -2065,6 +2065,8 @@ def build_range_param(M, L, rmin, rmax, x0min, x0max, y0min, y0max):
     '''
     assert rmin >= 0., 'The minimum value of radial distances must be positive'
     assert rmax >= 0., 'The maximum value of radial distances must be positive'
+    assert dzmin >= 0., 'The maximum value of dzmin must be positive'
+    assert dzmax >= 0., 'The maximum value of dzmax must be positive'
 
     P = L*(M+2)
     mmax = np.zeros(M+2)
@@ -2078,7 +2080,9 @@ def build_range_param(M, L, rmin, rmax, x0min, x0max, y0min, y0max):
     mmin[M+1] = y0min
 
     mmax = np.resize(mmax, P)
+    mmax = np.hstack((mmax, dzmax))
     mmin = np.resize(mmin, P)
+    mmin = np.hstack((mmin, dzmin))
 
     return mmin, mmax
 
