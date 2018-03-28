@@ -1868,7 +1868,7 @@ def trans_parameter2(m, M, L, mmax, mmin):
     assert mmin.size == L*(M + 2) + 1, 'The size of mmin must be equal to L*(M + 2)'
     assert m.size == L*(M + 2) + 1, 'The size of m must be equal to L*(M + 2)'
     assert np.alltrue(m <= mmax), 'mmax must be greater than m'
-    assert np.alltrue(mmin <= m), 'm must be greater than mmin'
+    assert np.alltrue(m >= mmin), 'm must be greater than mmin'
 
     #i0 = np.argwhere(m - mmin == 0.)
     #m[i0] = 2.*mmin[i0]
@@ -1949,10 +1949,8 @@ def trans_inv_parameter2(mt, M, L, mmax, mmin):
     
     i_max = np.argwhere(m >= mmax)
     i_min = np.argwhere(m <= mmin)
-    m[i_max] *= 0.99
-    m[i_min] *= 1.01
-    
-    
+    m[i_max] = mmax[i_max] - 1e-1
+    m[i_min] = mmin[i_min] + 1e-1
     
     return m
 
