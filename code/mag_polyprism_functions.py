@@ -587,7 +587,7 @@ def derivative_tf_dz(xp, yp, zp, m, M, delta, inc, dec):
     xp: array - x observation points
     yp: array - y observation points
     zp: array - z observation points
-    m: list - list of one fatiando.mesher.PolygonalPrism
+    m: list - list of L fatiando.mesher.PolygonalPrism
     M: int - number of vertices per prism
     delta: float - increment for z coordinate in meters
     inc: float - inclination of the local-geomagnetic field
@@ -598,12 +598,11 @@ def derivative_tf_dz(xp, yp, zp, m, M, delta, inc, dec):
     df: 1D array - derivative of dz
     '''
     assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
-    assert m.x.size == m.y.size == M, 'The number of vertices must be M'
 
-    mp = deepcopy([m])  # m.y + delta
-    mm = deepcopy([m])  # m.y - delta
-    mp[0].z2 += delta
-    mm[0].z2 -= delta
+    mp = deepcopy([m])  # m.z + delta
+    mm = deepcopy([m])  # m.z - delta
+    mp[:].z2 += delta
+    mm[:].z2 -= delta
 
     df = polyprism.tf(xp, yp, zp, mp, inc, dec)
     df -= polyprism.tf(xp, yp, zp, mm, inc, dec)
@@ -698,11 +697,12 @@ def Jacobian_tf(xp, yp, zp, m, M, L, deltax, deltay, deltar, deltaz, inc, dec):
     n = np.arange(M)
     nj = n*(M+2)
 
+    G[:,-1] += derivative_tf_dz(xp, yp, zp, m, M, deltaz, inc, dec)
+
     for i, mv in enumerate(m):
         aux = i*pp
         G[:, aux + M] = derivative_tf_x0(xp, yp, zp, mv, M, deltax, inc, dec)
         G[:, aux + M + 1] = derivative_tf_y0(xp, yp, zp, mv, M, deltay, inc, dec)
-        G[:,-1] += derivative_tf_dz(xp, yp, zp, mv, M, deltaz, inc, dec)
         for j in range(M):
             G[:, aux + j] = derivative_tf_radial(xp, yp, zp, mv, M, j, deltar, inc, dec)
     
@@ -735,17 +735,14 @@ def derivative_amf_x0(xp, yp, zp, m, M, delta):
     mp[0].x += delta
     mm[0].x -= delta
 
-    df = np.sqrt(
-        polyprism.bx(xp, yp, zp, mp)**2. + \
+    df = polyprism.bx(xp, yp, zp, mp)**2. + \
         polyprism.by(xp, yp, zp, mp)**2. + \
         polyprism.bz(xp, yp, zp, mp)**2.
-    )
-    df -= np.sqrt(
-        polyprism.bx(xp, yp, zp, mm)**2. + \
+    
+    df -= polyprism.bx(xp, yp, zp, mm)**2. + \
         polyprism.by(xp, yp, zp, mm)**2. + \
         polyprism.bz(xp, yp, zp, mm)**2.
-    )
-
+    
     df /= (2.*delta)
 
     return df
@@ -777,16 +774,13 @@ def derivative_amf_y0(xp, yp, zp, m, M, delta):
     mp[0].y += delta
     mm[0].y -= delta
 
-    df = np.sqrt(
-        polyprism.bx(xp, yp, zp, mp)**2. + \
+    df = polyprism.bx(xp, yp, zp, mp)**2. + \
         polyprism.by(xp, yp, zp, mp)**2. + \
         polyprism.bz(xp, yp, zp, mp)**2.
-    )
-    df -= np.sqrt(
-        polyprism.bx(xp, yp, zp, mm)**2. + \
+    
+    df -= polyprism.bx(xp, yp, zp, mm)**2. + \
         polyprism.by(xp, yp, zp, mm)**2. + \
         polyprism.bz(xp, yp, zp, mm)**2.
-    )
 
     df /= (2.*delta)
 
@@ -835,11 +829,10 @@ def derivative_amf_radial(xp, yp, zp, m, M, nv, delta):
 
     m_fat = [PolygonalPrism(verts, m.z1, m.z2, m.props)]
 
-    df = np.sqrt(
-        polyprism.bx(xp, yp, zp, m_fat)**2. + \
+    df = polyprism.bx(xp, yp, zp, m_fat)**2. + \
         polyprism.by(xp, yp, zp, m_fat)**2. + \
         polyprism.bz(xp, yp, zp, m_fat)**2.
-    )
+
     df /= (2.*delta)
 
     return df
@@ -868,19 +861,16 @@ def derivative_amf_dz(xp, yp, zp, m, M, delta):
 
     mp = deepcopy([m])  # m.z2 + delta
     mm = deepcopy([m])  # m.z2 - delta
-    mp[0].z2 += delta
-    mm[0].z2 -= delta
+    mp[:].z2 += delta
+    mm[:].z2 -= delta
 
-    df = np.sqrt(
-        polyprism.bx(xp, yp, zp, mp)**2. + \
+    df = polyprism.bx(xp, yp, zp, mp)**2. + \
         polyprism.by(xp, yp, zp, mp)**2. + \
         polyprism.bz(xp, yp, zp, mp)**2.
-    )
-    df -= np.sqrt(
-        polyprism.bx(xp, yp, zp, mm)**2. + \
+    
+    df -= polyprism.bx(xp, yp, zp, mm)**2. + \
         polyprism.by(xp, yp, zp, mm)**2. + \
         polyprism.bz(xp, yp, zp, mm)**2.
-    )
 
     df /= (2.*delta)
 
@@ -925,11 +915,12 @@ def Jacobian_amf(xp, yp, zp, m, M, L, deltax, deltay, deltar, deltaz):
     n = np.arange(M)
     nj = n*(M+2)
 
+    G[:,-1] += derivative_amf_dz(xp, yp, zp, m, M, deltaz)
+
     for i, mv in enumerate(m):
         aux = i*pp
         G[:, aux + M] = derivative_amf_x0(xp, yp, zp, mv, M, deltax)
         G[:, aux + M + 1] = derivative_amf_y0(xp, yp, zp, mv, M, deltay)
-        G[:,-1] += derivative_amf_dz(xp, yp, zp, mv, M, deltaz)
         for j in range(M):
             G[:, aux + j] = derivative_amf_radial(xp, yp, zp, mv, M, j, deltar)
 
