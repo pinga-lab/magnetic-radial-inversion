@@ -906,7 +906,7 @@ def Jacobian_amf(xp, yp, zp, m, M, L, deltax, deltay, deltar, deltaz):
     P = L*(M+2) + 1 # number of parameters per prism
     pp = M+2
     G = np.zeros((xp.size, P))
-    G[:,-1] += derivative_amf_dz(xp, yp, zp, m, M, deltaz)
+    G[:,-1] += derivative_amf_dz(xp, yp, zp, m, L, deltaz)
 
     for i, mv in enumerate(m):
         aux = i*pp
