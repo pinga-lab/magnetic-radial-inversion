@@ -22,15 +22,19 @@ def test_area_points_diff_sizes():
     y = np.zeros(12)
     raises(AssertionError, mfun.area_polygon, x = x, y = y)
 
+def test_area_points_diff_sizes():
+    'x and y points with different shapes'
+
+    x = np.zeros(10)
+    y = np.zeros((10,1))
+    raises(AssertionError, mfun.area_polygon, x = x, y = y)
+
+    x = np.zeros((10,1))
+    y = np.zeros(10)
+    raises(AssertionError, mfun.area_polygon, x = x, y = y)
+
 def test_area_square():
-    '''
-    This function tests the area calculated
-    by sholace formula.
-    
-    output
-    
-    Assetion
-    '''
+    'This function tests the area calculated by sholace formula.'
     
     l = 2.    
     x = np.array([1., 1., -1., -1.])

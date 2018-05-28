@@ -26,6 +26,7 @@ def area_polygon(x, y):
     area: float - area of the polygon
     '''
     assert x.size == y.size, 'x and y must have the same size'
+    assert x.shape == y.shape, 'x, y and z must have the same shape'
 
     x = np.asanyarray(x)
     y = np.asanyarray(y)
@@ -63,6 +64,7 @@ def pol2cart(l, M, L):
 
     assert len(l) == L, 'The size of m and the number of prisms must be equal'
     for lv in l:
+        assert len(lv) == 6, 'Each element of l must have 6 elements'
         assert len(lv[0]) == M, 'All prisms must have M vertices'
 
     ang = 2*np.pi/M # angle between two vertices
@@ -101,7 +103,9 @@ def param_vec(l, M, L):
     assert len(l) == L, 'The size of m and the number of prisms must be equal'
 
     for lv in l:
+        assert len(lv) == 6, 'Each element of l must have 6 elements'
         assert len(lv[0]) == M, 'All prisms must have M vertices'
+        assert lv[0][:M] > 0., 'All radius must be positives'
 
     for i in range(L):
         pv = np.hstack((pv, l[i][0], l[i][1:3]))
@@ -149,25 +153,26 @@ def param2polyprism(m, M, L, z0, props):
 def derivative_tf_x0(xp, yp, zp, m, M, delta, inc, dec):
     '''
     This function calculates the derivative for total field anomaly
-    from a model of polygonal prisms using finite difference.
+    for x0 coordinate of a model of polygonal prisms using 
+    finite difference.
 
     input
 
-    xp: array - x observation points
-    yp: array - y observation points
-    zp: array - z observation points
+    xp, yp, zp: 1D array - observation points
     m: list - list of one fatiando.mesher.PolygonalPrism
     M: int - number of vertices per prism
-    delta: float - increment for x coordinate in meters
+    delta: float - increment for differentiation
     inc: float - inclination of the local-geomagnetic field
     dec: float - declination of the local-geomagnetic field
 
     output
 
-    df: 1D array - derivative of x0
+    df: 1D array - derivative of x0 coordinate
     '''
     assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
+    assert xp.shape == yp.shape == zp.shape, 'xp, yp and zp must have the same shape'
     assert m.x.size == m.y.size == M, 'The number of vertices must be M'
+    assert delta > 0., 'delta must be a positive number'
 
     mp = deepcopy([m])  # m.x + delta
     mm = deepcopy([m])  # m.x - delta
@@ -184,25 +189,26 @@ def derivative_tf_x0(xp, yp, zp, m, M, delta, inc, dec):
 def derivative_tf_y0(xp, yp, zp, m, M, delta, inc, dec):
     '''
     This function calculates the derivative for total field anomaly
-    from a model of polygonal prisms using finite difference.
+    for y0 coordinate of a model of polygonal prisms using 
+    finite difference.
 
     input
 
-    xp: array - x observation points
-    yp: array - y observation points
-    zp: array - z observation points
+    xp, yp, zp: 1D array - observation points
     m: list - list of one fatiando.mesher.PolygonalPrism
     M: int - number of vertices per prism
-    delta: float - increment for y coordinate in meters
+    delta: float - increment for differentiation
     inc: float - inclination of the local-geomagnetic field
     dec: float - declination of the local-geomagnetic field
 
     output
 
-    df: 1D array - derivative of y0
+    df: 1D array - derivative of x0 coordinate
     '''
     assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
+    assert xp.shape == yp.shape == zp.shape, 'xp, yp and zp must have the same shape'
     assert m.x.size == m.y.size == M, 'The number of vertices must be M'
+    assert delta > 0., 'delta must be a positive number'
 
     mp = deepcopy([m])  # m.y + delta
     mm = deepcopy([m])  # m.y - delta
@@ -219,17 +225,16 @@ def derivative_tf_y0(xp, yp, zp, m, M, delta, inc, dec):
 def derivative_tf_radial(xp, yp, zp, m, M, nv, delta, inc, dec):
     '''
     This function calculates the derivative for total field anomaly
-    from a model of polygonal prisms using finite difference.
+    for radial coordinate of a set of polygonal prisms using
+    finite difference.
 
     input
 
-    xp: array - x observation points
-    yp: array - y observation points
-    zp: array - z observation points
+    xp, yp, zp: 1D array - observation points
     m: list - list of a fatiando.mesher.PolygonalPrism
     M: int - number of vertices per prism
     nv: int - number of the vertice for the derivative
-    delta: float - increment for radial distance in meters
+    delta: float - increment for differentiation
     inc: float - inclination of the local-geomagnetic field
     dec: float - declination of the local-geomagnetic field
 
@@ -238,8 +243,10 @@ def derivative_tf_radial(xp, yp, zp, m, M, nv, delta, inc, dec):
     df: 1D array - derivative of radial distance
     '''
     assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
+    assert xp.shape == yp.shape == zp.shape, 'xp, yp and zp must have the same shape'
     assert m.x.size == m.y.size == M, 'The number of vertices must be M'
     assert nv < M, 'The vertice number must be smaller than the number of vertices (0 - M)'
+    assert delta > 0., 'delta must be a positive number'
 
     m_fat = [] # list of objects of the class fatiando.mesher.PolygonalPrism
     verts = [] # vertices of new prism
@@ -265,69 +272,31 @@ def derivative_tf_radial(xp, yp, zp, m, M, nv, delta, inc, dec):
 
     return df
 
-def derivative_tf_dz(xp, yp, zp, m, L, delta, inc, dec):
+def derivative_tf_radial2(xp, yp, zp, m, M, nv, delta, inc, dec):
     '''
     This function calculates the derivative for total field anomaly
-    from a model of polygonal prisms using finite difference.
+    for radial coordinate of a set of polygonal prisms using
+    finite difference.
 
     input
 
-    xp: array - x observation points
-    yp: array - y observation points
-    zp: array - z observation points
-    m: list - list of L fatiando.mesher.PolygonalPrism
-    L: int - number of prisms
-    delta: float - increment for z coordinate in meters
+    xp, yp, zp: 1D array - observation points
+    m: list - list of a fatiando.mesher.PolygonalPrism
+    M: int - number of vertices per prism
+    nv: int - number of the vertice for the derivative
+    delta: float - increment for differentiation
     inc: float - inclination of the local-geomagnetic field
     dec: float - declination of the local-geomagnetic field
 
     output
 
-    df: 1D array - derivative of dz
+    df: 1D array - derivative of radial distance
     '''
     assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
-
-    mp = deepcopy(m)  # m.z + delta
-    mm = deepcopy(m)  # m.z - delta
-    mp[0].z2 += delta
-    mm[0].z2 += delta
-    for i in range(1, L, 1):
-        mp[i].z1 += delta
-        mp[i].z2 += delta
-        mm[i].z1 -= delta
-        mm[i].z2 -= delta
-
-    df = polyprism.tf(xp, yp, zp, mp, inc, dec)
-    df -= polyprism.tf(xp, yp, zp, mm, inc, dec)
-
-    df /= (2.*delta)
-
-    return df
-
-def derivative_tf_radial2(xp, yp, zp, m, M, nv, delta, inc, dec):
-    '''
-    This function calculates the derivative for total field anomaly
-    from a model of polygonal prisms using finite difference.
-
-    input
-
-    xp: array - x observation points
-    yp: array - y observation points
-    zp: array - z observation points
-    m: list - list of a fatiando.mesher.PolygonalPrism
-    M: int - number of vertices per prism
-    nv: int - number of the vertice for the derivative
-    delta: float - increment for radial distance in meters
-    inc: float - inclination
-    dec: declination
-
-    output
-
-    df: 1D array - derivative
-    '''
-    assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
+    assert xp.shape == yp.shape == zp.shape, 'xp, yp and zp must have the same shape'
     assert m.x.size == m.y.size == M, 'The number of vertices must be M'
     assert nv < M, 'The vertice number must be smaller than the number of vertices (0 - M)'
+    assert delta > 0., 'delta must be a positive number'
 
     mp = deepcopy([m]) # list of objects of the class fatiando.mesher.PolygonalPrism
     mm = deepcopy([m])
@@ -345,6 +314,48 @@ def derivative_tf_radial2(xp, yp, zp, m, M, nv, delta, inc, dec):
 
     df = polyprism.tf(xp, yp, zp, mp, inc, dec)
     df -= polyprism.tf(xp, yp, zp, mm, inc, dec)
+    df /= (2.*delta)
+
+    return df
+
+def derivative_tf_dz(xp, yp, zp, m, L, delta, inc, dec):
+    '''
+    This function calculates the derivative for total field anomaly
+    for thickness of a set of polygonal prisms using finite difference.
+
+    input
+
+    xp: array - x observation points
+    yp: array - y observation points
+    zp: array - z observation points
+    m: list - list of L fatiando.mesher.PolygonalPrism
+    L: int - number of prisms
+    delta: float - increment for z coordinate in meters
+    inc: float - inclination of the local-geomagnetic field
+    dec: float - declination of the local-geomagnetic field
+
+    output
+
+    df: 1D array - derivative of dz
+    '''
+    assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
+    assert xp.shape == yp.shape == zp.shape, 'xp, yp and zp must have the same shape'
+    assert m.x.size == m.y.size == M, 'The number of vertices must be M'
+    assert delta > 0., 'delta must be a positive number'
+    
+    mp = deepcopy(m)  # m.z + delta
+    mm = deepcopy(m)  # m.z - delta
+    mp[0].z2 += delta
+    mm[0].z2 += delta
+    for i in range(1, L, 1):
+        mp[i].z1 += delta
+        mp[i].z2 += delta
+        mm[i].z1 -= delta
+        mm[i].z2 -= delta
+
+    df = polyprism.tf(xp, yp, zp, mp, inc, dec)
+    df -= polyprism.tf(xp, yp, zp, mm, inc, dec)
+
     df /= (2.*delta)
 
     return df
@@ -375,7 +386,7 @@ def Jacobian_tf(xp, yp, zp, m, M, L, deltax, deltay, deltar, deltaz, inc, dec):
     '''
     assert len(m) == L, 'The number of prisms must be L'
     for mv in m:
-        assert len(mv.x) == M, 'All prisms must have M vertices'
+        assert mv.x.size == mv.y.size == M, 'The number of vertices must be M'
     assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
 
     P = L*(M+2) + 1 # number of parameters per prism
@@ -395,14 +406,12 @@ def Jacobian_tf(xp, yp, zp, m, M, L, deltax, deltay, deltar, deltaz, inc, dec):
 def derivative_amf_x0(xp, yp, zp, m, M, delta):
     '''
     This function calculates the derivative for amplitude of
-    anomalous field from a model of polygonal prisms using 
-    finite difference.
+    anomalous field for x0 coordinate of a set of polygonal
+    prisms using finite difference.
 
     input
 
-    xp: array - x observation points
-    yp: array - y observation points
-    zp: array - z observation points
+    xp, yp, zp: array - x observation points
     m: list - list of one fatiando.mesher.PolygonalPrism
     M: int - number of vertices per prism
     delta: float - increment for x coordinate in meters
@@ -412,7 +421,9 @@ def derivative_amf_x0(xp, yp, zp, m, M, delta):
     df: 1D array - derivative
     '''
     assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
+    assert xp.shape == yp.shape == zp.shape, 'xp, yp and zp must have the same shape'
     assert m.x.size == m.y.size == M, 'The number of vertices must be M'
+    assert delta > 0., 'delta must be a positive number'
 
     mp = deepcopy([m])  # m.x + delta
     mm = deepcopy([m])  # m.x - delta
@@ -434,14 +445,12 @@ def derivative_amf_x0(xp, yp, zp, m, M, delta):
 def derivative_amf_y0(xp, yp, zp, m, M, delta):
     '''
     This function calculates the derivative for amplitude of
-    anomalous field from a model of polygonal prisms using 
+    anomalous field of a set of polygonal prisms using 
     finite difference.
 
     input
 
-    xp: array - x observation points
-    yp: array - y observation points
-    zp: array - z observation points
+    xp, yp, zp: array - observation points
     m: list - list of one fatiando.mesher.PolygonalPrism
     M: int - number of vertices per prism
     delta: float - increment for y coordinate in meters
@@ -451,7 +460,9 @@ def derivative_amf_y0(xp, yp, zp, m, M, delta):
     df: 1D array - derivative
     '''
     assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
+    assert xp.shape == yp.shape == zp.shape, 'xp, yp and zp must have the same shape'
     assert m.x.size == m.y.size == M, 'The number of vertices must be M'
+    assert delta > 0., 'delta must be a positive number'
 
     mp = deepcopy([m])  # m.y + delta
     mm = deepcopy([m])  # m.y - delta
@@ -473,14 +484,12 @@ def derivative_amf_y0(xp, yp, zp, m, M, delta):
 def derivative_amf_radial(xp, yp, zp, m, M, nv, delta):
     '''
     This function calculates the derivative for amplitude of
-    anomalous field from a model of polygonal prisms using 
-    finite difference.
+    anomalous field for radial coordinate of a set of 
+    polygonal prisms using finite difference.
 
     input
 
-    xp: array - x observation points
-    yp: array - y observation points
-    zp: array - z observation points
+    xp, yp, zp: array - observation points
     m: list - list of a fatiando.mesher.PolygonalPrism
     M: int - number of vertices per prism
     nv: int - number of the vertice for the derivative
@@ -491,7 +500,9 @@ def derivative_amf_radial(xp, yp, zp, m, M, nv, delta):
     df: 1D array - derivative
     '''
     assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
+    assert xp.shape == yp.shape == zp.shape, 'xp, yp and zp must have the same shape'
     assert m.x.size == m.y.size == M, 'The number of vertices must be M'
+    assert delta > 0., 'delta must be a positive number'
     assert nv < M, 'The vertice number must be smaller than the number of vertices (0 - M)'
 
     m_fat = [] # list of objects of the class fatiando.mesher.PolygonalPrism
