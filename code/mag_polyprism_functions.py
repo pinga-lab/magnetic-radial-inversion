@@ -132,6 +132,7 @@ def param2polyprism(m, M, L, z0, props):
     '''
     P = L*(M + 2) + 1
     assert m.size == P, 'The size of m must be equal to L*(M + 2) + 1'
+    #assert m[-1] > 0., 'The thickness dz must be a positive number'
     for i in range(P-1):
         assert m[i:i+M].all >= 0., 'The radial distances must be positives'
 
@@ -340,7 +341,6 @@ def derivative_tf_dz(xp, yp, zp, m, L, delta, inc, dec):
     '''
     assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
     assert xp.shape == yp.shape == zp.shape, 'xp, yp and zp must have the same shape'
-    assert m.x.size == m.y.size == M, 'The number of vertices must be M'
     assert delta > 0., 'delta must be a positive number'
     
     mp = deepcopy(m)  # m.z + delta
@@ -388,6 +388,10 @@ def Jacobian_tf(xp, yp, zp, m, M, L, deltax, deltay, deltar, deltaz, inc, dec):
     for mv in m:
         assert mv.x.size == mv.y.size == M, 'The number of vertices must be M'
     assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
+    assert xp.shape == yp.shape == zp.shape, 'xp, yp and zp must have the same shape'
+    assert deltax > 0., 'deltax must be a positive number'
+    assert deltay > 0., 'delaty must be a positive number'
+    assert deltaz > 0., 'delatz must be a positive number'
 
     P = L*(M+2) + 1 # number of parameters per prism
     pp = M+2
@@ -552,6 +556,10 @@ def derivative_amf_dz(xp, yp, zp, m, L, delta):
     df: 1D array - derivative of dz
     '''
     assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
+    assert xp.shape == yp.shape == zp.shape, 'xp, yp and zp must have the same shape'
+    for mv in m:
+        assert mv.x.size == mv.y.size == M, 'The number of vertices must be M'
+    assert delta > 0., 'delta must be a positive number'
 
     mp = deepcopy(m)  # m.z + delta
     mm = deepcopy(m)  # m.z - delta
@@ -599,8 +607,12 @@ def Jacobian_amf(xp, yp, zp, m, M, L, deltax, deltay, deltar, deltaz):
     '''
     assert len(m) == L, 'The number of prisms must be L'
     for mv in m:
-        assert len(mv.x) == M, 'All prisms must have M vertices'
+        assert mv.x.size == mv.y.size == M, 'The number of vertices must be M'
     assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
+    assert xp.shape == yp.shape == zp.shape, 'xp, yp and zp must have the same shape'
+    assert deltax > 0., 'deltax must be a positive number'
+    assert deltay > 0., 'delaty must be a positive number'
+    assert deltaz > 0., 'delatz must be a positive number'
 
     P = L*(M+2) + 1 # number of parameters per prism
     pp = M+2
@@ -637,7 +649,8 @@ def Hessian_phi_1(M, L, H, alpha):
 
     P = L*(M + 2) + 1
 
-    assert H.shape == (P, P), 'The hessian shape must be (P, P)'
+    assert H.shape == (P, P), 'The Hessians shape must be (P, P)'
+    assert alpha >= 0., 'alpha must be greater or equal to 0'
 
     # extracting the non-zero diagonals
     d0, d1, dM = diags_phi_1(M, L, alpha)
@@ -675,6 +688,7 @@ def Hessian_phi_2(M, L, H, alpha):
     P = L*(M + 2) + 1
 
     assert H.shape == (P, P), 'The hessian shape must be (P, P)'
+    assert alpha >= 0., 'alpha must be greater or equal to 0'
 
     # extracting the non-zero diagonals
     d0, d1 = diags_phi_2(M, L, alpha)
@@ -709,6 +723,7 @@ def Hessian_phi_3(M, L, H, alpha):
     P = L*(M + 2) + 1
 
     assert H.shape == (P, P), 'The hessian shape must be (P, P)'
+    assert alpha >= 0., 'alpha must be greater or equal to 0'
 
     i, j = np.diag_indices(M+2) # indices of the diagonal elements in M + 2
 
@@ -736,6 +751,7 @@ def Hessian_phi_4(M, L, H, alpha):
     P = L*(M + 2) + 1
 
     assert H.shape == (P, P), 'The hessian shape must be (P, P)'
+    assert alpha >= 0., 'alpha must be greater or equal to 0'
 
     i, j = np.diag_indices(P) # indices of the diagonal elements
 
@@ -764,6 +780,7 @@ def Hessian_phi_5(M, L, H, alpha):
     P = L*(M + 2) + 1
 
     assert H.shape == (P, P), 'The hessian shape must be (P, P)'
+    assert alpha >= 0., 'alpha must be greater or equal to 0'
 
     # extracting the non-zero diagonals
     d0, d1 = diags_phi_5(M, L, alpha)
@@ -799,6 +816,7 @@ def Hessian_phi_6(M, L, H, alpha):
     P = L*(M + 2) + 1
 
     assert H.shape == (P, P), 'The hessian shape must be (P, P)'
+    assert alpha >= 0., 'alpha must be greater or equal to 0'
 
     # extracting the non-zero diagonals
     d0 = diags_phi_6(M, L, alpha)
@@ -829,6 +847,7 @@ def Hessian_phi_7(M, L, H, alpha):
     P = L*(M + 2) + 1
 
     assert H.shape == (P, P), 'The hessian shape must be (P, P)'
+    assert alpha >= 0., 'alpha must be greater or equal to 0'
 
     H[-1,-1] += alpha
 
@@ -854,6 +873,7 @@ def gradient_phi_1(M, L, m, alpha):
     P = L*(M + 2) + 1
 
     assert m.size == P, 'The size of parameter vector must be equal to P'
+    assert alpha >= 0., 'alpha must be greater or equal to 0'
 
     m1 = m.copy() # the new vector m1 = gradient input + gradient of phi1
 
@@ -889,6 +909,7 @@ def gradient_phi_2(M, L, m, alpha):
     P = L*(M + 2) + 1
 
     assert m.size == P, 'The size of parameter vector must be equal to P'
+    assert alpha >= 0., 'alpha must be greater or equal to 0'
 
     m2 = m.copy() # the new vector m2 = gradient input + gradient of phi2
 
@@ -924,7 +945,8 @@ def gradient_phi_3(M, L, m, m0, alpha):
 
     assert m.size == P, 'The size of parameter vector must be equal to P'
     assert m0.size == M + 2, 'The size of parameter vector must be equal to M + 2'
-
+    assert alpha >= 0., 'alpha must be greater or equal to 0'
+    
     m3 = np.copy(m) # the new vector m3 = gradient input + gradient of phi3
     
     # calculating the product between the diagonals and the slices of m
@@ -954,7 +976,8 @@ def gradient_phi_4(M, L, m, m0, alpha):
 
     assert m.size == P, 'The size of parameter vector must be equal to P'
     assert m0.size == 2, 'The size of parameter vector must be equal to 2'
-    
+    assert alpha >= 0., 'alpha must be greater or equal to 0'
+
     m4 = np.copy(m) # the new vector m4 = gradient input + gradient of phi4
 
     # calculating the product between the diagonals and the slices of m
@@ -984,6 +1007,7 @@ def gradient_phi_5(M, L, m, alpha):
     P = L*(M + 2) + 1
 
     assert m.size == P, 'The size of parameter vector must be equal to P'
+    assert alpha >= 0., 'alpha must be greater or equal to 0'
 
     # extracting the non-zero diagonals
     d0, d1 = diags_phi_5(M, L, alpha)
@@ -1015,6 +1039,7 @@ def gradient_phi_6(M, L, m, alpha):
     P = L*(M + 2) + 1
 
     assert m.size == P, 'The size of parameter vector must be equal to P'
+    assert alpha >= 0., 'alpha must be greater or equal to 0'
 
     m6 = m.copy() # the new vector m1 = gradient input + gradient of phi6
 
@@ -1046,6 +1071,7 @@ def gradient_phi_7(M, L, m, alpha):
     P = L*(M + 2) + 1
 
     assert m.size == P, 'The size of parameter vector must be equal to P'
+    assert alpha >= 0., 'alpha must be greater or equal to 0'
 
     m7 = m.copy() # the new vector m1 = gradient input + gradient of phi7
 
@@ -1073,6 +1099,7 @@ def phi_1(M, L, m, alpha):
     P = L*(M + 2) + 1
 
     assert m.size == P, 'The size of parameter vector must be equal to P'
+    assert alpha >= 0., 'alpha must be greater or equal to 0'
 
     m1 = m.copy()
 
@@ -1109,6 +1136,7 @@ def phi_2(M, L, m, alpha):
     P = L*(M + 2) + 1
 
     assert m.size == P, 'The size of parameter vector must be equal to P'
+    assert alpha >= 0., 'alpha must be greater or equal to 0'
 
     # extracting the non-zero diagonals
     d0, d1 = diags_phi_2(M, L, alpha)
@@ -1145,6 +1173,7 @@ def phi_3(M, L, m, m0, alpha):
 
     assert m.size == P, 'The size of parameter vector must be equal to P'
     assert m0.size == M + 2, 'The size of parameter vector must be equal to M + 2'
+    assert alpha >= 0., 'alpha must be greater or equal to 0'
 
     m3 = np.zeros(M+2)
 
@@ -1176,6 +1205,7 @@ def phi_4(M, L, m, m0, alpha):
 
     assert m.size == P, 'The size of parameter vector must be equal to P'
     assert m0.size == 2, 'The size of parameter vector must be equal to 2'
+    assert alpha >= 0., 'alpha must be greater or equal to 0'
 
     m4 = np.zeros(2)
 
@@ -1205,6 +1235,7 @@ def phi_5(M, L, m, alpha):
     P = L*(M + 2) + 1
 
     assert m.size == P, 'The size of parameter vector must be equal to P'
+    assert alpha >= 0., 'alpha must be greater or equal to 0'
 
     m5 = m.copy()
 
@@ -1239,6 +1270,7 @@ def phi_6(M, L, m, alpha):
     P = L*(M + 2) + 1
 
     assert m.size == P, 'The size of parameter vector must be equal to P'
+    assert alpha >= 0., 'alpha must be greater or equal to 0'
 
     m6 = m.copy()
 
@@ -1271,6 +1303,7 @@ def phi_7(M, L, m, alpha):
     P = L*(M + 2) + 1
 
     assert m.size == P, 'The size of parameter vector must be equal to P'
+    assert alpha >= 0., 'alpha must be greater or equal to 0'
 
     m7 = m.copy()
 
@@ -1294,7 +1327,8 @@ def diags_phi_1(M, L, alpha):
 
     d0, d1, dM: 1D array - diagonals from phi_1 hessian
     '''
-
+    assert alpha >= 0., 'alpha must be greater or equal to 0'
+    
     P = L*(M + 2)
 
     # building the diagonals
@@ -1394,6 +1428,7 @@ def diags_phi_2(M, L, alpha):
     d0, d1: 1D array - diagonals from phi_2 hessian
     '''
     assert L >= 2, 'The number of prisms must be greater than 1'
+    assert alpha >= 0., 'alpha must be greater or equal to 0'
 
     P = L*(M + 2)
 
@@ -1435,6 +1470,7 @@ def diags_phi_5(M, L, alpha):
     d0, d1: 1D array - diagonals from phi_5 hessian
     '''
     assert L >= 2, 'The number of prisms must be greater than 1'
+    assert alpha >= 0., 'alpha must be greater or equal to 0'
 
     P = L*(M + 2)
 
@@ -1475,6 +1511,7 @@ def diags_phi_6(M, L, alpha):
 
     d0: 1D array - diagonal from phi_6 hessian
     '''
+    assert alpha >= 0., 'alpha must be greater or equal to 0'
 
     P = L*(M + 2)
 
@@ -1488,159 +1525,11 @@ def diags_phi_6(M, L, alpha):
 
 # Functions for inverse problem
 
-def trans_parameter(m, M, L, rmin, rmax, x0min, x0max, y0min, y0max):
-    '''
-    Returns transformated parameters.
-
-    input
-
-    M: integer - number of vertices
-    L: integer - number of prisms
-    m: 1D array - parameter vector with radial distances of each vertice
-                  and the Cartesian coordinates of each prism
-    rmin: float - minimum value of radial distances
-    rmax: float - maximum value of radial distances
-    x0min: float - minimum value of x coordinate of origins
-    x0max: float - maximum value of x coordinate of origins
-    y0min: float - minimum value of y coordinate of origins
-    y0max: float - maximum value of y coordinate of origins
-
-    output
-
-    mt: 1D array - transformated parameter vector
-    '''
-
-    assert len(m) == L*(M + 2), 'The size of m must be equal to L*(M + 2)'
-
-
-    mt = np.zeros_like(m)
-
-    P = L*(M+2)  # number of parameters
-
-    for i in range(0, P, M+2):
-        mt[i:M+i] = - np.log((rmax - m[i:M+i])/(m[i:M+i] - rmin))
-        mt[i+M] = - np.log((x0max - m[i+M])/(m[i+M] - x0min))
-        mt[i+M+1] = - np.log((y0max - m[i+M+1])/(m[i+M+1] - y0min))
-
-    return mt
-
-
-def trans_parameter2(m, M, L, mmax, mmin):
-    '''
-    Returns the transformated parameters.
-
-    input
-
-    M: integer - number of vertices
-    L: integer - number of prisms
-    mt: 1D array - transformated parameters vector with
-                  radial distances of each vertice
-                  and the Cartesian coordinates of each prism
-    mmax: 1D array - maximum value of each parameter
-                    (r1max,...,rMmax, x0max, y0max)
-    mmin: 1D array - minimum value of each parameter
-                    (r1min,...,rMmin, x0min, y0min)
-
-    output
-
-    mt: 1D array - parameters vector
-    '''
-    assert mmax.size == L*(M + 2) + 1, 'The size of mmax must be equal to L*(M + 2)'
-    assert mmin.size == L*(M + 2) + 1, 'The size of mmin must be equal to L*(M + 2)'
-    assert m.size == L*(M + 2) + 1, 'The size of m must be equal to L*(M + 2)'
-    assert np.alltrue(m <= mmax), 'mmax must be greater than m'
-    assert np.alltrue(m >= mmin), 'm must be greater than mmin'
-
-    #i0 = np.argwhere(m - mmin == 0.)
-    #m[i0] = 2.*mmin[i0]
-    #print m - mmin
-    mt = - np.log((mmax - m)/(m - mmin + 1e-2))
-    
-    return mt
-
-
-def trans_inv_parameter(mt, M, L, rmin, rmax, x0min, x0max, y0min, y0max):
-    '''
-    Returns the parameters from the inverse transformation.
-
-    input
-
-    M: integer - number of vertices
-    L: integer - number of prisms
-    mt: 1D array - transformated parameters vector with
-                  radial distances of each vertice
-                  and the Cartesian coordinates of each prism
-    rmin: float - minimum value of radial distances
-    rmax: float - maximum value of radial distances
-    x0min: float - minimum value of x coordinate of origins
-    x0max: float - maximum value of x coordinate of origins
-    y0min: float - minimum value of y coordinate of origins
-    y0max: float - maximum value of y coordinate of origins
-
-    output
-
-    mt: 1D array - parameters vector
-    '''
-
-    assert len(mt) == L*(M + 2), 'The size of m must be equal to L*(M + 2)'
-
-
-    m = np.zeros_like(mt)
-
-    for i in range(0, L*(M+2), M+2):
-        m[i:M+i] = 0.001*rmin + 0.001*(rmax - rmin)/(1. + np.exp(-0.001*mt[i:M+i]))
-        m[i+M] = 0.001*x0min + 0.001*(x0max - x0min)/(1. + np.exp(-0.001*mt[i+M]))
-        m[i+M+1] = 0.001*y0min + 0.001*(y0max - y0min)/(1. + np.exp(-0.001*mt[i+M+1]))
-
-    m *= 1000.
-
-    return m
-
-def trans_inv_parameter2(mt, M, L, mmax, mmin):
-    '''
-    Returns the parameters from the inverse transformation.
-
-    input
-
-    M: integer - number of vertices
-    L: integer - number of prisms
-    mt: 1D array - transformated parameters vector with
-                  radial distances of each vertice
-                  and the Cartesian coordinates of each prism
-    mmax: 1D array - maximum value of each parameter
-                    (r1max,...,rMmax, x0max, y0max)
-    mmin: 1D array - minimum value of each parameter
-                    (r1min,...,rMmin, x0min, y0min)
-
-    output
-
-    p: 1D array - parameters vector
-    '''
-
-    P = L*(M+2) + 1
-    assert len(mmax) == P, 'The size of mmax must be equal to P'
-    assert len(mmin) == P, 'The size of mmin must be equal to P'
-    assert len(mt) == P, 'The size of m must be equal to P'
-    
-    i_overflow = np.argwhere(mt <= -710.)
-    mt[i_overflow] = 700.
-    
-    m = mmin + (mmax - mmin)/(1. + np.exp(-mt))
-    
-    i_max = np.argwhere(m >= mmax)
-    i_min = np.argwhere(m <= mmin)
-    m[i_max] = mmax[i_max] - 1e-1
-    m[i_min] = mmin[i_min] + 1e-1
-    
-    return m
-
 def build_range_param(M, L, rmin, rmax, x0min, x0max, y0min, y0max, dzmin, dzmax):
     '''
     Returns vectors of maximum and minimum values of
     parameters
-
     input
-
     rmin: float - minimum value of radial distances
     rmax: float - maximum value of radial distances
     x0min: float - minimum value of x Cartesian coordinate of the origins
@@ -1649,9 +1538,7 @@ def build_range_param(M, L, rmin, rmax, x0min, x0max, y0min, y0max, dzmin, dzmax
     y0min: float - maximum value of y Cartesian coordinate of the origins
     dzmin: float - minimum value of thickness dz of each prism
     dzmax: float - maximum value of thickness dz of each prism
-
     output
-
     mmin: 1D array - vector of minimum values of parameters
     mmax: 1D array - vector of maximum values of parameters
     '''
@@ -1678,112 +1565,198 @@ def build_range_param(M, L, rmin, rmax, x0min, x0max, y0min, y0max, dzmin, dzmax
 
     return mmin, mmax
 
-def levmq(xp, yp, zp, lini, M, L, delta, lamb, mmin, mmax, mout, dobs, inc, dec):
+def log_barrier(m, M, L, mmax, mmin):
     '''
-    This function minimizes the objective function
-    using the Levenberg-Marqudt algorithm.
+    Returns the transformated parameters.
 
     input
 
-    xp: array - x observation points
-    yp: array - y observation points
-    zp: array - z observation points
-    lini: list - each element is a list of [r, x0, y0, z1, z2, 'magnetization'],
-              whrere r is an array with the radial distances of the vertices,
-              x0 and y0 are the origin cartesian coordinates of each prism,
-              z1 and z2 are the top and bottom of each prism and
-              magnetization is physical property
+    M: integer - number of vertices
+    L: integer - number of prisms
+    mt: 1D array - transformated parameters vector with
+                  radial distances of each vertice
+                  and the Cartesian coordinates of each prism
+    mmax: 1D array - maximum value of each parameter
+                    (r1max,...,rMmax, x0max, y0max)
+    mmin: 1D array - minimum value of each parameter
+                    (r1min,...,rMmin, x0min, y0min)
+
+    output
+
+    mt: 1D array - parameters vector
+    '''
+    P = L*(M+2) + 1
+    assert mmax.size == mmin.size == m.size == P, 'The size of mmax, mmin, and m must be equal to P'
+    assert mmax.shape == mmin.shape == m.shape == (P,), 'The shape of mmax, mmin, and m must be equal to (P,)'
+    assert np.alltrue(m <= mmax), 'mmax must be greater than m'
+    assert np.alltrue(m >= mmin), 'm must be greater than mmin'
+
+    mt = - np.log((mmax - m)/(m - mmin + 1e-2))
+    
+    return mt
+
+def inv_log_barrier(mt, M, L, mmax, mmin):
+    '''
+    Returns the parameters from the inverse transformation.
+
+    input
+
+    M: integer - number of vertices
+    L: integer - number of prisms
+    mt: 1D array - transformated parameters vector with
+                  radial distances of each vertice
+                  and the Cartesian coordinates of each prism
+    mmax: 1D array - maximum value of each parameter
+                    (r1max,...,rMmax, x0max, y0max)
+    mmin: 1D array - minimum value of each parameter
+                    (r1min,...,rMmin, x0min, y0min)
+
+    output
+
+    p: 1D array - parameters vector
+    '''
+
+    P = L*(M+2) + 1
+    assert mmax.size == mmin.size == mt.size == P, 'The size of mmax, mmin, and mt must be equal to P'
+    assert mmax.shape == mmin.shape == mt.shape == (P,), 'The shape of mmax, mmin, and m must be equal to (P,)'
+    
+    i_overflow = np.argwhere(mt <= -710.)
+    mt[i_overflow] = 700.
+    
+    m = mmin + (mmax - mmin)/(1. + np.exp(-mt))
+    
+    i_max = np.argwhere(m >= mmax)
+    i_min = np.argwhere(m <= mmin)
+    m[i_max] = mmax[i_max] - 1e-1
+    m[i_min] = mmin[i_min] + 1e-1
+    
+    return m
+
+def levmq(xp, yp, zp, m0, M, L, delta, lamb, mmin, mmax, m_out, dobs, inc, dec, props, alpha, z0, dz):
+    '''
+    This function minimizes the goal function of a set of polygonal prism
+    for total-field-anomaly using the Levenberg-Marqudt algorithm.
+
+    input
+
+    xp, yp, zp: 1D array - observation points
+    m0: 1D array - initial parameters vector
     M: integer - number of vertices
     L: int - number of prisms
-    delta: float - increment in x, y and z coordinate in meters
+    delta: 1D vector - (deltax, deltay, deltar, deltaz) increments for x, y, r and z coordinate in meters
     lamb: float - Marquadt's parameter
     mmin: array - minimum values for each parameters (rmin, x0min, y0min)
     mmax: array - maximum values for each parameters (rmax, x0max, y0max)
-    mout: array - parameters from the outcropping body (M+2)
-    dobs: array - observated data
-    inc: float - inclination of the local-geomagnetic field
-    dec: declination of the local-geomagnetic field
-
+    m_out: array - parameters from the outcropping body (M+2)
+    dobs: array - observed data
+    inc, dec: float - inclination and declination of the local-geomagnetic field
+    props: dictionary - direction of magnetization
+    alpha: 1D vector - (a1, a2, a3, a4 , a5, a6, a7) regularization parameters
+    z0: float - the top of the source
+    dz: float - thickness of the prisms
     output
 
     d0: array - fitted data
     m0: array - estimated parameters
-    l0: list - geometrical and physical parameters
+    model0: list - objects of fatiando.mesher.polyprisms
     phi_list: list - solutions of objective funtion
     '''
-    itmax = 50
-    itmax_marq = 20
+    P = L*(M + 2) + 1
+    assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
+    assert xp.shape == yp.shape == zp.shape, 'xp, yp and zp must have the same shape'
+    assert m0.size == P, 'The size of m0 must be equal to P'
+    assert m0.shape == (P,), 'The shape of m0 must be equal to (P,)'
+    assert np.alltrue > (alpha.all >= 0.), 'The regularization parameters must be positive or zero'
+    assert dz > 0., 'dz must be a positive number'
+
+    itmax = 30
+    itmax_marq = 15
     epsilon = 0.0001
-    lamb = 0.001
-    dlamb = 5.
-    z0 = lini[0][3]
-    dz = lini[0][4] - lini[0][3]
-    props = lini[0][5]
-    l0 = deepcopy(lini)
-    m0 = param_vec(l0, M, L) # inicial parameters vector
-    model0 = pol2cart(l0, M, L) # list of classes of prisms
+    dlamb = 10.
+    model0 = param2polyprism(m0, M, L, z0, props) # list of classes of prisms
     d0 = polyprism.tf(xp, yp, zp, model0, inc, dec) # predict data
-    dif = dobs - d0
-    phi0 = np.sum(dif*dif)/xp.size
+    res0 = dobs - d0
+    phi0 = np.sum(res0*res0)/xp.size
     phi_list = [phi0]
-    alpha1 = 0.001
-    alpha2 = 0.001
-    alpha3 = 0.
-    alpha4 = 0.
-    alpha5 = alpha1
-    alpha6 = 0.0001
-    i,j = np.diag_indices(L*(M+2))
+    i,j = np.diag_indices(P)
+    N = xp.size
 
     for it in range(itmax):
-        mt = trans_parameter2(m0, M, L, mmax, mmin)
+        mt = log_barrier(m0, M, L, mmax, mmin)
 
-        grad = gradient_data(xp, yp, zp, l0, M, L, dobs, delta, delta, delta, inc, dec)
-        grad = gradient_phi_1(M, L, grad, alpha1)
-        grad = gradient_phi_2(M, L, grad, alpha2)
-        grad = gradient_phi_3(M, L, grad, mout, alpha3)
-        grad = gradient_phi_4(M, L, grad, mout[-2:], alpha4)
-        grad = gradient_phi_5(M, L, grad, alpha5)
-        grad = gradient_phi_6(M, L, grad, alpha6)
+        # Jacobian matrix
+        G = Jacobian_tf(xp, yp, zp, model0, M, L, delta[0], delta[1], delta[2], delta[3], inc, dec)
 
-        H = Hessian_data(xp, yp, zp, l0, M, L, delta, delta, delta, inc, dec)
-        H = Hessian_phi_1(M, L, H, alpha1)
-        H = Hessian_phi_2(M, L, H, alpha2)
-        H = Hessian_phi_3(M, L, H, alpha3)
-        H = Hessian_phi_4(M, L, H, alpha4)
-        H = Hessian_phi_5(M, L, H, alpha5)
-        H = Hessian_phi_6(M, L, H, alpha6)
+        # Hessian matrix
+        H = 2.*np.dot(G.T, G)/N
+        th = np.trace(H)/P
+
+        # weighting the regularization parameters
+        alpha *= th
+
+        H = Hessian_phi_1(M, L, H, alpha[0])
+        H = Hessian_phi_2(M, L, H, alpha[1])
+        H = Hessian_phi_3(M, L, H, alpha[2])
+        H = Hessian_phi_4(M, L, H, alpha[3])
+        H = Hessian_phi_5(M, L, H, alpha[4])
+        H = Hessian_phi_6(M, L, H, alpha[5])
+        H = Hessian_phi_7(M, L, H, alpha[6])
+
+        # gradient vector
+        grad = -2.*np.dot(G.T, res0)/N
+
+        grad = gradient_phi_1(M, L, grad, alpha[0])
+        grad = gradient_phi_2(M, L, grad, alpha[1])
+        grad = gradient_phi_3(M, L, grad, m_out, alpha[2])
+        grad = gradient_phi_4(M, L, grad, m_out[-2:], alpha[3])
+        grad = gradient_phi_5(M, L, grad, alpha[4])
+        grad = gradient_phi_6(M, L, grad, alpha[5])
+        grad = gradient_phi_7(M, L, grad, alpha[6])
 
         # Diagonal da matriz de positividade
-        T = ((mmax - m0)*(m0 - mmin))/(mmax - mmin)
-
+        T = ((mmax - m0 + 1e-10)*(m0 - mmin + 1e-10))/(mmax - mmin)*np.identity(P)
+        
+        D = np.diag(1./np.sqrt(np.diag(np.dot(H,T))))
+        
+        DHTD = np.dot(np.dot(D, np.dot(H,T)), D)
+        
         for it_marq in range(itmax_marq):
 
-            S = H.copy()
-            S[i,:] *= T
-            S[i,j] += lamb
+            delta_mt = np.dot(D,np.linalg.solve(DHTD + lamb*np.identity(mt.size), -np.dot(D, grad)))
+            m_est = inv_log_barrier(mt + delta_mt, M, L, mmax, mmin)
+            model_est = param2polyprism(m_est, M, L, z0, props)
+            d_fit = polyprism.tf(xp, yp, zp, model_est, inc, dec)
+            res = dobs - d_fit
+            phi = np.sum(res*res)/N
+            phi += phi_1(M, L, m_est, alpha[0]) + \
+                phi_2(M, L, m_est, alpha[1]) + \
+                phi_3(M, L, m_est, m_out, alpha[2]) + \
+                phi_4(M, L, m_est, m_out[-2:], alpha[3]) + \
+                phi_5(M, L, m_est, alpha[4]) + \
+                phi_6(M, L, m_est, alpha[5]) + \
+                phi_7(M, L, m_est, alpha[6])
 
-            delta_mt = np.linalg.solve(S, -grad)
-            m_est = trans_inv_parameter2(mt + delta_mt, M, L, mmax, mmin)
-            l_est = param2model(m_est, M, L, z0, dz, props)
-            model_est = pol2cart(l_est, M, L)
-            d_est = polyprism.tf(xp, yp, zp, model_est, inc, dec)
-            res = dobs - d0
-            phi = np.sum(res*res)/xp.size
-            phi += (phi_1(M, L, m_est, alpha1) + phi_2(M, L, m_est, alpha2) + \
-                    phi_3(M, L, m_est, mout, alpha3) + phi_4(M, L, m_est, mout[-2:], alpha4) + \
-                    phi_5(M, L, m_est, alpha5) + phi_6(M, L, m_est, alpha6))
             dphi = phi - phi0
+
+            print '%3d %.5e %3d %.e' % (it, phi, it_marq, lamb)
 
             if (dphi > 0.):
                 lamb *= dlamb
             else:
-                lamb /= dlamb
+                if lamb/dlamb < 1e-15:
+                    lamb = 1e-15
+                else:
+                    lamb /= dlamb
+                break
 
-        if (abs((phi0 - phi)/phi0) > epsilon):
-            d0 = d_est
-            m0 = m_est
-            l0 = l_est
+        if (abs(dphi/phi0) < epsilon):
+            break
+        else:
+            d0 = d_fit.copy()
+            m0 = m_est.copy()
+            model0 = model_est
+            res0 = res.copy()
             phi0 = phi
-            phi_list.append(phi0)
+            phi_list.append(phi)
 
-        return d0, m0, l0, phi_list
+    return d0, m0, model0, phi_list

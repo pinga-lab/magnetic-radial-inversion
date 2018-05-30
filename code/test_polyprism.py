@@ -22,7 +22,7 @@ def test_area_points_diff_sizes():
     y = np.zeros(12)
     raises(AssertionError, mfun.area_polygon, x = x, y = y)
 
-def test_area_points_diff_sizes():
+def test_area_points_diff_shapes():
     'x and y points with different shapes'
 
     x = np.zeros(10)
