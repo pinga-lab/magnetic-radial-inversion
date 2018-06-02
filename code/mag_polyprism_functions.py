@@ -1632,7 +1632,7 @@ def inv_log_barrier(mt, M, L, mmax, mmin):
     
     return m
 
-def levmq(xp, yp, zp, m0, M, L, delta, lamb, mmin, mmax, m_out, dobs, inc, dec, props, alpha, z0, dz):
+def levmq(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, mmin, mmax, m_out, dobs, inc, dec, props, alpha, z0, dz):
     '''
     This function minimizes the goal function of a set of polygonal prism
     for total-field-anomaly using the Levenberg-Marqudt algorithm.
@@ -1644,7 +1644,11 @@ def levmq(xp, yp, zp, m0, M, L, delta, lamb, mmin, mmax, m_out, dobs, inc, dec, 
     M: integer - number of vertices
     L: int - number of prisms
     delta: 1D vector - (deltax, deltay, deltar, deltaz) increments for x, y, r and z coordinate in meters
+    maxit: int - number of iterations
+    maxsteps: int - number of steps
     lamb: float - Marquadt's parameter
+    dlamb: float - variation of Marquadt's parameter
+    tol: float - convergence criterion
     mmin: array - minimum values for each parameters (rmin, x0min, y0min)
     mmax: array - maximum values for each parameters (rmax, x0max, y0max)
     m_out: array - parameters from the outcropping body (M+2)
@@ -1668,11 +1672,10 @@ def levmq(xp, yp, zp, m0, M, L, delta, lamb, mmin, mmax, m_out, dobs, inc, dec, 
     assert m0.shape == (P,), 'The shape of m0 must be equal to (P,)'
     assert np.alltrue > (alpha.all >= 0.), 'The regularization parameters must be positive or zero'
     assert dz > 0., 'dz must be a positive number'
+    assert lamb > 0., 'lamb must be a positive number'
+    assert dlamb > 0., 'dlamb must be a positive number'
+    assert tol > 0., 'tol must be a positive number'
 
-    itmax = 30
-    itmax_marq = 15
-    epsilon = 0.0001
-    dlamb = 10.
     model0 = param2polyprism(m0, M, L, z0, props) # list of classes of prisms
     d0 = polyprism.tf(xp, yp, zp, model0, inc, dec) # predict data
     res0 = dobs - d0
@@ -1681,7 +1684,7 @@ def levmq(xp, yp, zp, m0, M, L, delta, lamb, mmin, mmax, m_out, dobs, inc, dec, 
     i,j = np.diag_indices(P)
     N = xp.size
 
-    for it in range(itmax):
+    for it in range(maxit):
         mt = log_barrier(m0, M, L, mmax, mmin)
 
         # Jacobian matrix
@@ -1692,35 +1695,33 @@ def levmq(xp, yp, zp, m0, M, L, delta, lamb, mmin, mmax, m_out, dobs, inc, dec, 
         th = np.trace(H)/P
 
         # weighting the regularization parameters
-        alpha *= th
+        mu = alpha*th
 
-        H = Hessian_phi_1(M, L, H, alpha[0])
-        H = Hessian_phi_2(M, L, H, alpha[1])
-        H = Hessian_phi_3(M, L, H, alpha[2])
-        H = Hessian_phi_4(M, L, H, alpha[3])
-        H = Hessian_phi_5(M, L, H, alpha[4])
-        H = Hessian_phi_6(M, L, H, alpha[5])
-        H = Hessian_phi_7(M, L, H, alpha[6])
+        H = Hessian_phi_1(M, L, H, mu[0])
+        H = Hessian_phi_2(M, L, H, mu[1])
+        H = Hessian_phi_3(M, L, H, mu[2])
+        H = Hessian_phi_4(M, L, H, mu[3])
+        H = Hessian_phi_5(M, L, H, mu[4])
+        H = Hessian_phi_6(M, L, H, mu[5])
+        H = Hessian_phi_7(M, L, H, mu[6])
 
         # gradient vector
         grad = -2.*np.dot(G.T, res0)/N
 
-        grad = gradient_phi_1(M, L, grad, alpha[0])
-        grad = gradient_phi_2(M, L, grad, alpha[1])
-        grad = gradient_phi_3(M, L, grad, m_out, alpha[2])
-        grad = gradient_phi_4(M, L, grad, m_out[-2:], alpha[3])
-        grad = gradient_phi_5(M, L, grad, alpha[4])
-        grad = gradient_phi_6(M, L, grad, alpha[5])
-        grad = gradient_phi_7(M, L, grad, alpha[6])
+        grad = gradient_phi_1(M, L, grad, mu[0])
+        grad = gradient_phi_2(M, L, grad, mu[1])
+        grad = gradient_phi_3(M, L, grad, m_out, mu[2])
+        grad = gradient_phi_4(M, L, grad, m_out[-2:], mu[3])
+        grad = gradient_phi_5(M, L, grad, mu[4])
+        grad = gradient_phi_6(M, L, grad, mu[5])
+        grad = gradient_phi_7(M, L, grad, mu[6])
 
         # Diagonal da matriz de positividade
-        T = ((mmax - m0 + 1e-10)*(m0 - mmin + 1e-10))/(mmax - mmin)*np.identity(P)
+        T = ((mmax - m0 + 1e-10)*(m0 - mmin + 1e-10))/(mmax - mmin)
+        D = np.diag(1./np.sqrt(np.diag(np.dot(H,np.diag(T)))))
+        DHTD = np.dot(np.dot(D, np.dot(H,np.diag(T))), D)
         
-        D = np.diag(1./np.sqrt(np.diag(np.dot(H,T))))
-        
-        DHTD = np.dot(np.dot(D, np.dot(H,T)), D)
-        
-        for it_marq in range(itmax_marq):
+        for it_marq in range(maxsteps):
 
             delta_mt = np.dot(D,np.linalg.solve(DHTD + lamb*np.identity(mt.size), -np.dot(D, grad)))
             m_est = inv_log_barrier(mt + delta_mt, M, L, mmax, mmin)
@@ -1728,17 +1729,15 @@ def levmq(xp, yp, zp, m0, M, L, delta, lamb, mmin, mmax, m_out, dobs, inc, dec, 
             d_fit = polyprism.tf(xp, yp, zp, model_est, inc, dec)
             res = dobs - d_fit
             phi = np.sum(res*res)/N
-            phi += phi_1(M, L, m_est, alpha[0]) + \
-                phi_2(M, L, m_est, alpha[1]) + \
-                phi_3(M, L, m_est, m_out, alpha[2]) + \
-                phi_4(M, L, m_est, m_out[-2:], alpha[3]) + \
-                phi_5(M, L, m_est, alpha[4]) + \
-                phi_6(M, L, m_est, alpha[5]) + \
-                phi_7(M, L, m_est, alpha[6])
+            phi += phi_1(M, L, m_est, mu[0]) + \
+                    phi_2(M, L, m_est, mu[1]) + \
+                    phi_3(M, L, m_est, m_out, mu[2]) + \
+                    phi_4(M, L, m_est, m_out[-2:], mu[3]) + \
+                    phi_5(M, L, m_est, mu[4]) + \
+                    phi_6(M, L, m_est, mu[5]) + \
+                    phi_7(M, L, m_est, mu[6])
 
             dphi = phi - phi0
-
-            print '%3d %.5e %3d %.e' % (it, phi, it_marq, lamb)
 
             if (dphi > 0.):
                 lamb *= dlamb
@@ -1749,7 +1748,9 @@ def levmq(xp, yp, zp, m0, M, L, delta, lamb, mmin, mmax, m_out, dobs, inc, dec, 
                     lamb /= dlamb
                 break
 
-        if (abs(dphi/phi0) < epsilon):
+        phi_list.append(phi)
+
+        if (abs(dphi/phi0) < tol):
             break
         else:
             d0 = d_fit.copy()
@@ -1757,6 +1758,5 @@ def levmq(xp, yp, zp, m0, M, L, delta, lamb, mmin, mmax, m_out, dobs, inc, dec, 
             model0 = model_est
             res0 = res.copy()
             phi0 = phi
-            phi_list.append(phi)
 
     return d0, m0, model0, phi_list
