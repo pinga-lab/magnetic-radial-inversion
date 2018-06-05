@@ -434,13 +434,13 @@ def derivative_amf_x0(xp, yp, zp, m, M, delta):
     mp[0].x += delta
     mm[0].x -= delta
 
-    df = polyprism.bx(xp, yp, zp, mp)**2. + \
-        polyprism.by(xp, yp, zp, mp)**2. + \
-        polyprism.bz(xp, yp, zp, mp)**2.
+    df = np.sqrt(polyprism.bx(xp, yp, zp, mp)**2. + \
+                 polyprism.by(xp, yp, zp, mp)**2. + \
+                 polyprism.bz(xp, yp, zp, mp)**2.)
     
-    df -= polyprism.bx(xp, yp, zp, mm)**2. + \
-        polyprism.by(xp, yp, zp, mm)**2. + \
-        polyprism.bz(xp, yp, zp, mm)**2.
+    df -= np.sqrt(polyprism.bx(xp, yp, zp, mm)**2. + \
+                  polyprism.by(xp, yp, zp, mm)**2. + \
+                  polyprism.bz(xp, yp, zp, mm)**2.)
     
     df /= (2.*delta)
 
@@ -473,13 +473,13 @@ def derivative_amf_y0(xp, yp, zp, m, M, delta):
     mp[0].y += delta
     mm[0].y -= delta
 
-    df = polyprism.bx(xp, yp, zp, mp)**2. + \
-        polyprism.by(xp, yp, zp, mp)**2. + \
-        polyprism.bz(xp, yp, zp, mp)**2.
+    df = np.sqrt(polyprism.bx(xp, yp, zp, mp)**2. + \
+                 polyprism.by(xp, yp, zp, mp)**2. + \
+                 polyprism.bz(xp, yp, zp, mp)**2.)
     
-    df -= polyprism.bx(xp, yp, zp, mm)**2. + \
-        polyprism.by(xp, yp, zp, mm)**2. + \
-        polyprism.bz(xp, yp, zp, mm)**2.
+    df -= np.sqrt(polyprism.bx(xp, yp, zp, mm)**2. + \
+                  polyprism.by(xp, yp, zp, mm)**2. + \
+                  polyprism.bz(xp, yp, zp, mm)**2.)
 
     df /= (2.*delta)
 
@@ -528,9 +528,9 @@ def derivative_amf_radial(xp, yp, zp, m, M, nv, delta):
 
     m_fat = [PolygonalPrism(verts, m.z1, m.z2, m.props)]
 
-    df = polyprism.bx(xp, yp, zp, m_fat)**2. + \
-        polyprism.by(xp, yp, zp, m_fat)**2. + \
-        polyprism.bz(xp, yp, zp, m_fat)**2.
+    df = np.sqrt(polyprism.bx(xp, yp, zp, m_fat)**2. + \
+                 polyprism.by(xp, yp, zp, m_fat)**2. + \
+                 polyprism.bz(xp, yp, zp, m_fat)**2.)
 
     df /= (2.*delta)
 
@@ -569,13 +569,13 @@ def derivative_amf_dz(xp, yp, zp, m, L, delta):
         mm[i].z1 -= delta
         mm[i].z2 -= delta
 
-    df = polyprism.bx(xp, yp, zp, mp)**2. + \
-        polyprism.by(xp, yp, zp, mp)**2. + \
-        polyprism.bz(xp, yp, zp, mp)**2.
+    df = np.sqrt(polyprism.bx(xp, yp, zp, mp)**2. + \
+                 polyprism.by(xp, yp, zp, mp)**2. + \
+                 polyprism.bz(xp, yp, zp, mp)**2.)
     
-    df -= polyprism.bx(xp, yp, zp, mm)**2. + \
-        polyprism.by(xp, yp, zp, mm)**2. + \
-        polyprism.bz(xp, yp, zp, mm)**2.
+    df -= np.sqrt(polyprism.bx(xp, yp, zp, mm)**2. + \
+                  polyprism.by(xp, yp, zp, mm)**2. + \
+                  polyprism.bz(xp, yp, zp, mm)**2.)
 
     df /= (2.*delta)
 
@@ -1619,7 +1619,7 @@ def inv_log_barrier(mt, M, L, mmax, mmin):
     assert mmax.shape == mmin.shape == mt.shape == (P,), 'The shape of mmax, mmin, and m must be equal to (P,)'
     
     i_overflow = np.argwhere(mt <= -710.)
-    mt[i_overflow] = 700.
+    mt[i_overflow] = -700.
     
     m = mmin + (mmax - mmin)/(1. + np.exp(-mt))
     
@@ -1713,14 +1713,15 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
         grad = gradient_phi_6(M, L, grad, mu[5])
         grad = gradient_phi_7(M, L, grad, mu[6])
 
-        # Diagonal da matriz de positividade
-        T = ((mmax - m0 + 1e-10)*(m0 - mmin + 1e-10))/(mmax - mmin)
-        D = np.diag(1./np.sqrt(H*T))
-        DHTD = np.dot(np.dot(D, H*T), D)
+        # positivity constraint
+        H *= ((mmax - m0 + 1e-10)*(m0 - mmin + 1e-10))/(mmax - mmin)
+
+        # Hessian normalization
+        D = 1./np.sqrt(np.diag(H))
         
         for it_marq in range(maxsteps):
-
-            delta_mt = np.dot(D,np.linalg.solve(DHTD + lamb*np.identity(mt.size), -np.dot(D, grad)))
+            
+            delta_mt = (D*(np.linalg.solve((D*(H*D).T).T + lamb*np.identity(mt.size), -D*grad)).T).T
             m_est = inv_log_barrier(mt + delta_mt, M, L, mmax, mmin)
             model_est = param2polyprism(m_est, M, L, z0, props)
             d_fit = polyprism.tf(xp, yp, zp, model_est, inc, dec)
@@ -1736,6 +1737,8 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
 
             dphi = phi - phi0
 
+            print 'it: %2d   it_marq: %2d   lambda: %.e   misfit: %.4e' % (it, it_marq, lamb, phi)
+
             if (dphi > 0.):
                 lamb *= dlamb
             else:
@@ -1745,9 +1748,14 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
                     lamb /= dlamb
                 break
 
-        phi_list.append(phi)
-
-        if (abs(dphi/phi0) < tol):
+        if (dphi > 0.):
+            phi = phi0
+            m_est = m0.copy()
+            model_est = model0
+            res = res0.copy()
+            d = d0.copy()
+            phi_list.append(phi)
+        elif (abs(dphi/phi0) < tol):
             break
         else:
             d0 = d_fit.copy()
@@ -1755,6 +1763,7 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
             model0 = model_est
             res0 = res.copy()
             phi0 = phi
+            phi_list.append(phi0)
 
     return d0, m0, model0, phi_list
 
@@ -1802,11 +1811,9 @@ def levmarq_amf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, 
     assert tol > 0., 'tol must be a positive number'
 
     model0 = param2polyprism(m0, M, L, z0, props) # list of classes of prisms
-    d0 = np.sqrt(
-            polyprism.bx(xp, yp, zp, model0)**2. + \
-            polyprism.by(xp, yp, zp, model0)**2. + \
-            polyprism.bz(xp, yp, zp, model0)**2.
-            )
+    d0 = np.sqrt(polyprism.bx(xp, yp, zp, model0)**2. + \
+                 polyprism.by(xp, yp, zp, model0)**2. + \
+                 polyprism.bz(xp, yp, zp, model0)**2.)
     res0 = dobs - d0
     phi0 = np.sum(res0*res0)/xp.size
     phi_list = [phi0]
@@ -1844,21 +1851,20 @@ def levmarq_amf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, 
         grad = gradient_phi_6(M, L, grad, mu[5])
         grad = gradient_phi_7(M, L, grad, mu[6])
 
-        # Diagonal da matriz de positividade
-        T = ((mmax - m0 + 1e-10)*(m0 - mmin + 1e-10))/(mmax - mmin)
-        D = np.diag(1./np.sqrt(np.diag(H*T)))
-        DHTD = np.dot(np.dot(D, H*T), D)
+        # positivity constraint
+        H *= ((mmax - m0 + 1e-10)*(m0 - mmin + 1e-10))/(mmax - mmin)
+
+        # Hessian normalization
+        D = 1./np.sqrt(np.diag(H))
         
         for it_marq in range(maxsteps):
-
-            delta_mt = np.dot(D,np.linalg.solve(DHTD + lamb*np.identity(mt.size), -np.dot(D, grad)))
+            
+            delta_mt = (D*(np.linalg.solve((D*(H*D).T).T + lamb*np.identity(mt.size), -D*grad)).T).T
             m_est = inv_log_barrier(mt + delta_mt, M, L, mmax, mmin)
             model_est = param2polyprism(m_est, M, L, z0, props)
-            d_fit = np.sqrt(
-                        polyprism.bx(xp, yp, zp, model_est)**2. + \
-                        polyprism.by(xp, yp, zp, model_est)**2. + \
-                        polyprism.bz(xp, yp, zp, model_est)**2.
-                        )
+            d_fit = np.sqrt(polyprism.bx(xp, yp, zp, model_est)**2. + \
+                            polyprism.by(xp, yp, zp, model_est)**2. + \
+                            polyprism.bz(xp, yp, zp, model_est)**2.)
             res = dobs - d_fit
             phi = np.sum(res*res)/N
             phi += phi_1(M, L, m_est, mu[0]) + \
@@ -1871,7 +1877,7 @@ def levmarq_amf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, 
 
             dphi = phi - phi0
 
-            print '%3d %.5e %3d %.e' % (it, phi, it_marq, lamb)
+            print 'it: %2d   it_marq: %2d   lambda: %.e   misfit: %.4e' % (it, it_marq, lamb, phi)
 
             if (dphi > 0.):
                 lamb *= dlamb
@@ -1882,9 +1888,14 @@ def levmarq_amf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, 
                     lamb /= dlamb
                 break
 
-        phi_list.append(phi)
-
-        if (abs(dphi/phi0) < tol):
+        if (dphi > 0.):
+            phi = phi0
+            m_est = m0.copy()
+            model_est = model0
+            res = res0.copy()
+            d = d0.copy()
+            phi_list.append(phi)
+        elif (abs(dphi/phi0) < tol):
             break
         else:
             d0 = d_fit.copy()
@@ -1892,5 +1903,6 @@ def levmarq_amf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, 
             model0 = model_est
             res0 = res.copy()
             phi0 = phi
+            phi_list.append(phi0)
 
     return d0, m0, model0, phi_list
