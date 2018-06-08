@@ -1748,14 +1748,7 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
                     lamb /= dlamb
                 break
 
-        if (dphi > 0.):
-            phi = phi0
-            m_est = m0.copy()
-            model_est = model0
-            res = res0.copy()
-            d = d0.copy()
-            phi_list.append(phi)
-        elif (abs(dphi/phi0) < tol):
+        if (abs(dphi/phi0) < tol):
             break
         else:
             d0 = d_fit.copy()
@@ -1888,14 +1881,7 @@ def levmarq_amf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, 
                     lamb /= dlamb
                 break
 
-        if (dphi > 0.):
-            phi = phi0
-            m_est = m0.copy()
-            model_est = model0
-            res = res0.copy()
-            d = d0.copy()
-            phi_list.append(phi)
-        elif (abs(dphi/phi0) < tol):
+        if (abs(dphi/phi0) < tol):
             break
         else:
             d0 = d_fit.copy()
