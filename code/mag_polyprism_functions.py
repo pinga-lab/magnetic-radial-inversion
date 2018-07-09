@@ -1737,7 +1737,7 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
 
             dphi = phi - phi0
 
-            #print 'it: %2d   it_marq: %2d   lambda: %.e   misfit: %.4e' % (it, it_marq, lamb, phi)
+            print 'it: %2d   it_marq: %2d   lambda: %.e   misfit: %.4e' % (it, it_marq, lamb, phi)
 
             if (dphi > 0.):
                 lamb *= dlamb
