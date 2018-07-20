@@ -1677,9 +1677,9 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
     model0 = param2polyprism(m0, M, L, z0, props) # list of classes of prisms
     d0 = polyprism.tf(xp, yp, zp, model0, inc, dec) # predict data
     res0 = dobs - d0
-    phi0 = np.sum(res0*res0)/xp.size
-    phi_list = [phi0]
     N = xp.size
+    phi0 = np.sum(res0*res0)/N
+    phi_list = [phi0]
 
     for it in range(maxit):
         mt = log_barrier(m0, M, L, mmax, mmin)
@@ -1808,9 +1808,9 @@ def levmarq_amf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, 
                  polyprism.by(xp, yp, zp, model0)**2. + \
                  polyprism.bz(xp, yp, zp, model0)**2.)
     res0 = dobs - d0
-    phi0 = np.sum(res0*res0)/xp.size
-    phi_list = [phi0]
     N = xp.size
+    phi0 = np.sum(res0*res0)/N
+    phi_list = [phi0]
 
     for it in range(maxit):
         mt = log_barrier(m0, M, L, mmax, mmin)
