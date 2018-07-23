@@ -1680,6 +1680,9 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
     N = xp.size
     phi0 = np.sum(res0*res0)/N
     phi_list = [phi0]
+    dist = np.sqrt((xp - 8212800.)**2. + (yp - 478200.)**2.)
+    W = np.ones_like(xp)
+    W[np.argwhere(dist>=2500.)] = 0.02
 
     for it in range(maxit):
         mt = log_barrier(m0, M, L, mmax, mmin)
@@ -1688,7 +1691,7 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
         G = Jacobian_tf(xp, yp, zp, model0, M, L, delta[0], delta[1], delta[2], delta[3], inc, dec)
 
         # Hessian matrix
-        H = 2.*np.dot(G.T, G)/N
+        H = 2.*np.dot(G.T*W, G)/N
         th = np.trace(H)/P
 
         # weighting the regularization parameters
@@ -1703,7 +1706,7 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
         H = Hessian_phi_7(M, L, H, mu[6])
 
         # gradient vector
-        grad = -2.*np.dot(G.T, res0)/N
+        grad = -2.*np.dot(G.T*W, res0)/N
 
         grad = gradient_phi_1(M, L, grad, mu[0])
         grad = gradient_phi_2(M, L, grad, mu[1])
