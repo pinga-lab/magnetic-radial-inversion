@@ -1682,7 +1682,7 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
     phi_list = [phi0]
     dist = np.sqrt((xp - 8212800.)**2. + (yp - 478200.)**2.)
     W = np.ones_like(xp)
-    W[np.argwhere(dist>=2500.)] = 0.02
+    W[np.argwhere(dist>=2000.)] = 0.02
 
     for it in range(maxit):
         mt = log_barrier(m0, M, L, mmax, mmin)
