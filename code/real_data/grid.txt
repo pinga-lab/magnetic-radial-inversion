@@ -1,6 +1,0 @@
-grid = 125 m
-altura de voo = 100 m
-
-1 – Montes Claros de Goiás complex; 2 – Diorama; 
-3 – Córrego dos Bois complex; 4 – Fazenda Buriti complex; 
-and 5 - Arenópolis.
