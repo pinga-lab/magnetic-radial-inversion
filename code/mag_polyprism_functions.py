@@ -105,7 +105,7 @@ def param_vec(l, M, L):
     for lv in l:
         assert len(lv) == 6, 'Each element of l must have 6 elements'
         assert len(lv[0]) == M, 'All prisms must have M vertices'
-        assert lv[0][:M] > 0., 'All radius must be positives'
+        assert lv[0][:M].all() > 0., 'All radius must be positives'
 
     for i in range(L):
         pv = np.hstack((pv, l[i][0], l[i][1:3]))
@@ -1740,7 +1740,7 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
 
             dphi = phi - phi0
 
-            print 'it: %2d   it_marq: %2d   lambda: %.e   misfit: %.4e' % (it, it_marq, lamb, phi)
+            print 'it: %2d   it_marq: %2d   lambda: %.e   misfit: %.5e' % (it, it_marq, lamb, phi)
 
             if (dphi > 0.):
                 lamb *= dlamb
