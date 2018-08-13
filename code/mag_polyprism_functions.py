@@ -1682,7 +1682,7 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
     phi_list = [phi0]
     dist = np.sqrt((xp - 8212800.)**2. + (yp - 478200.)**2.)
     W = np.ones_like(xp)
-    W[np.argwhere(dist>=2000.)] = 0.02
+    W[np.argwhere(dist>=2000.)] = 0.01
 
     for it in range(maxit):
         mt = log_barrier(m0, M, L, mmax, mmin)
@@ -1873,7 +1873,7 @@ def levmarq_amf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, 
 
             dphi = phi - phi0
 
-            #print 'it: %2d   it_marq: %2d   lambda: %.e   misfit: %.4e' % (it, it_marq, lamb, phi)
+            print 'it: %2d   it_marq: %2d   lambda: %.e   misfit: %.4e' % (it, it_marq, lamb, phi)
 
             if (dphi > 0.):
                 lamb *= dlamb
