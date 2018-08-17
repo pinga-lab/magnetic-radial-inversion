@@ -11,15 +11,30 @@ import polyprism_tests as tests
 import numpy.testing as npt
 import mag_polyprism_functions as mfun
 
+def test_area_points_diff_sizes():
+    'x and y points with different number of elements'
+
+    x = np.zeros(12)
+    y = np.zeros(10)
+    raises(AssertionError, mfun.area_polygon, x = x, y = y)
+
+    x = np.zeros(10)
+    y = np.zeros(12)
+    raises(AssertionError, mfun.area_polygon, x = x, y = y)
+
+def test_area_points_diff_shapes():
+    'x and y points with different shapes'
+
+    x = np.zeros(10)
+    y = np.zeros((10,1))
+    raises(AssertionError, mfun.area_polygon, x = x, y = y)
+
+    x = np.zeros((10,1))
+    y = np.zeros(10)
+    raises(AssertionError, mfun.area_polygon, x = x, y = y)
+
 def test_area_square():
-    '''
-    This function tests the area calculated
-    by sholace formula.
-    
-    output
-    
-    Assetion
-    '''
+    'This function tests the area calculated by sholace formula.'
     
     l = 2.    
     x = np.array([1., 1., -1., -1.])
@@ -30,6 +45,17 @@ def test_area_square():
     area_ref = l*l
     
     assert np.allclose(area, area_true), 'The area is not correct'
+    
+def test_pol2cart_points_diff_sizes():
+    'x and y points with different number of elements'
+
+    x = np.zeros(12)
+    y = np.zeros(10)
+    raises(AssertionError, mfun.area_polygon, x = x, y = y)
+
+    x = np.zeros(10)
+    y = np.zeros(12)
+    raises(AssertionError, mfun.area_polygon, x = x, y = y)
 
 def test_volume():
     '''
@@ -119,57 +145,6 @@ def test_paramvec():
     
     assert np.allclose(p, p_ref), 'The result does not match with the reference'
     
-def test_param2model():
-    '''
-    Test for function that transform a parameters vector into
-    a list of prisms.
-    
-    output
-    
-    Assertion
-    '''
-    L = 2 # number of prisms
-    M = 4 # number of vertices
-    P = L*(M + 2) # number of parameters
-
-    #r = 1000. # radial distance for each vertice
-    r = np.zeros(M) + 1000.
-        
-    # Cartesian coordinates of the origin of each prism
-    x0 = 0. 
-    y0 = 0.
-    
-    dz = 100.0    # thickness of each prism
-    
-    inc, dec = -60., 50. # inclination and declination of regional field
-    
-    props={'magnetization': utils.ang2vec(3, inc, dec)} # physical property
-    
-    z0 = 100.0    # depth of the top the shallowest prism
-    
-    m = []   # list of prisms
-    
-    ### creating the lis of prisms
-    
-    for i in range(L):
-        m.append([r, x0, y0, z0 + dz*i, z0 + dz*(i + 1), props])
-        
-    # transform the list of prisms into parameters vector
-    p = mfun.param_vec(m, M, L)
-    
-    # transform the parameters vector into list of prisms
-    model = mfun.param2model(p, M, L, z0, dz, props)
-    
-    ma = mfun.pol2cart(m,M,L)
-    moda = mfun.pol2cart(model,M,L)
-    
-    for i in range(L):
-        assert ma[i].x.all() == moda[i].x.all()
-        assert ma[i].y.all() == moda[i].y.all()
-        assert ma[i].z1 == moda[i].z1
-        assert ma[i].z2 == moda[i].z2
-        assert ma[i].props == moda[i].props
-
 def test_tfa_data():
     '''
     This function tests the total field anomaly data 
@@ -236,206 +211,6 @@ def test_tfa_data():
     tfat_recprism = prism.tf(xp, yp, zp, model_recprism, inc, dec)
     
     npt.assert_almost_equal(tfat_polyprism, tfat_recprism, decimal=5), 'The data from small rectangular prisms must be equal to a big rectangular prism'
-    
-def test_tfa_fd_x0_data():
-    '''
-    This function tests the derivative of total field anomaly data
-    between a model deslocated in x and the fd_tf_x0_polyprism
-    function.
-    
-    output
-    
-    Assertion
-    '''
-
-    #area over which the data are calculated
-    #x minimum, x maximum, y minimum and y maximum
-    area = [-10000, 10000, -10000, 10000] 
-
-    #number of data along the y and x directions
-    shape = (80,80)
-
-    #total number of data
-    N = shape[0]*shape[1]
-
-    #coordinates x and y of the data
-    x = np.linspace(area[0],area[1],shape[0]) # points in x
-    y = np.linspace(area[2],area[3],shape[0]) # points in y
-    xp,yp = np.meshgrid(x,y)    # creating mesh points
-    xp = xp.ravel()
-    yp = yp.ravel()
-
-    #vertical coordinates of the data
-    zp = -350. - 500.*utils.gaussian2d(xp, yp, 17000, 21000, 21000, 18500, angle=21) # relief
-    
-    inc, dec = -60., 50. # inclination and declination of regional field
-    
-    props={'magnetization': utils.ang2vec(3, inc, dec)} # physical property
-    
-    z1 = 100.0    # depth of the top prism
-    z2 = 1100.    # bottom of prism
-    delta = 10.   # increment 
-
-    # creating vertices
-    r = np.zeros(4) + 1000.
-
-    # origin
-    x0 = 0.
-    y0 = 0.
-
-    ### creating the prisms
-    m = [[r, x0, y0, z1, z2, props]]
-    mp = [[r, x0 + delta, y0, z1, z2, props]]   # prism plus increment
-    mm = [[r, x0 - delta, y0, z1, z2, props]]   # prism minus increment
-
-    ### creating data of the prisms
-    mpt = mfun.pol2cart(mp, r.size, len(mp))
-    mmt = mfun.pol2cart(mm, r.size, len(mm))
-
-    mp_fat = polyprism.tf(xp, yp, zp, mpt, inc, dec)   # data of prism plus increment
-    mm_fat = polyprism.tf(xp, yp, zp, mmt, inc, dec)   # data of prism minus increment
-
-    # calculating the derivatives
-
-    df_m = mfun.fd_tf_x0_polyprism(xp, yp, zp, m[0], r.size, delta, inc, dec)  # derivative from the function
-    df_mp_mm = (mp_fat - mm_fat)/(2.*delta)  # derivative from difference of data
-    
-    assert np.allclose(df_m, df_mp_mm), 'The derivative is not correct'
-    
-def test_tfa_fd_y0_data():
-    '''
-    This function tests the derivative of total field anomaly data
-    between a model deslocated in y and the fd_tf_y0_polyprism
-    function.
-    
-    output
-    
-    Assertion
-    '''
-
-    #area over which the data are calculated
-    #x minimum, x maximum, y minimum and y maximum
-    area = [-10000, 10000, -10000, 10000] 
-
-    #number of data along the y and x directions
-    shape = (80,80)
-
-    #total number of data
-    N = shape[0]*shape[1]
-
-    #coordinates x and y of the data
-    x = np.linspace(area[0],area[1],shape[0]) # points in x
-    y = np.linspace(area[2],area[3],shape[0]) # points in y
-    xp,yp = np.meshgrid(x,y)    # creating mesh points
-    xp = xp.ravel()
-    yp = yp.ravel()
-
-    #vertical coordinates of the data
-    zp = -350. - 500.*utils.gaussian2d(xp, yp, 17000, 21000, 21000, 18500, angle=21) # relief
-    
-    inc, dec = -60., 50. # inclination and declination of regional field
-    
-    props={'magnetization': utils.ang2vec(3, inc, dec)} # physical property
-    
-    z1 = 100.0    # depth of the top prism
-    z2 = 1100.0    # bottom of prism
-    delta = 10.0   # increment 
-
-    # creating vertices
-    r = np.zeros(4) + 1000.
-
-    # origin
-    x0 = 0.
-    y0 = 0.
-
-    ### creating the prisms
-    m = [[r, x0, y0, z1, z2, props]]
-    mp = [[r, x0, y0 + delta, z1, z2, props]]   # prism plus increment
-    mm = [[r, x0, y0 - delta, z1, z2, props]]   # prism minus increment
-
-    ### creating data of the prisms
-    mpt = mfun.pol2cart(mp, r.size, len(mp))
-    mmt = mfun.pol2cart(mm, r.size, len(mm))
-
-    mp_fat = polyprism.tf(xp, yp, zp, mpt, inc, dec)   # data of prism plus increment
-    mm_fat = polyprism.tf(xp, yp, zp, mmt, inc, dec)   # data of prism minus increment
-
-    # calculating the derivatives
-
-    df_m = mfun.fd_tf_y0_polyprism(xp, yp, zp, m[0], r.size, delta, inc, dec)  # derivative from the function
-    df_mp_mm = (mp_fat - mm_fat)/(2.*delta)  # derivative from difference of data
-        
-    assert np.allclose(df_m, df_mp_mm), 'The derivative is not correct'
-    
-def test_tfa_fd_radial_data():
-    '''
-    This function tests the derivative of total field anomaly data
-    between a model deslocated in a radial distance and the 
-    fd_tf_radial_polyprism function.
-    
-    output
-    
-    Assertion
-    '''
-
-    #area over which the data are calculated
-    #x minimum, x maximum, y minimum and y maximum
-    area = [-10000, 10000, -10000, 10000] 
-
-    #number of data along the y and x directions
-    shape = (80,80)
-
-    #total number of data
-    N = shape[0]*shape[1]
-
-    #coordinates x and y of the data
-    x = np.linspace(area[0],area[1],shape[0]) # points in x
-    y = np.linspace(area[2],area[3],shape[0]) # points in y
-    xp,yp = np.meshgrid(x,y)    # creating mesh points
-    xp = xp.ravel()
-    yp = yp.ravel()
-
-    #vertical coordinates of the data
-    zp = -350. - 500.*utils.gaussian2d(xp, yp, 17000, 21000, 21000, 18500, angle=21) # relief
-    
-    inc, dec = -60., 50. # inclination and declination of regional field
-    
-    props={'magnetization': utils.ang2vec(3, inc, dec)} # physical property
-    
-    z1 = 100.0    # depth of the top prism
-    z2 = 1100.0    # bottom of prism
-    delta = 10.0   # increment
-    nv = 5
-
-    # creating vertices
-    r = np.zeros(nv + 2) + 1000.
-    rp = r.copy()
-    rp[nv] += delta
-    rm = r.copy()
-    rm[nv] -= delta
-
-    # origin
-    x0 = 0.
-    y0 = 0.
-    
-    ### creating the prisms
-    m = [[r, x0, y0, z1, z2, props]]
-    mp = [[rp, x0, y0, z1, z2, props]]   # prism plus increment
-    mm = [[rm, x0, y0, z1, z2, props]]   # prism minus increment
-    
-    ### creating data of the prisms
-    mpt = mfun.pol2cart(mp, rp.size, len(mp))
-    mmt = mfun.pol2cart(mm, rm.size, len(mm))
-
-    mp_fat = polyprism.tf(xp, yp, zp, mpt, inc, dec)   # data of prism plus increment
-    mm_fat = polyprism.tf(xp, yp, zp, mmt, inc, dec)   # data of prism minus increment
-
-    # calculating the derivatives
-
-    df_m = mfun.fd_tf_radial_polyprism(xp, yp, zp, m[0], r.size, nv, delta, inc, dec)  # derivative from the function
-    df_mp_mm = (mp_fat - mm_fat)/(2.*delta)  # derivative from difference of data
-    
-    assert np.allclose(df_m, df_mp_mm, atol=1e-5), 'The derivative is not correct'
     
 def test_Hessian_phi_1():
     '''
@@ -1049,79 +824,6 @@ def test_phi_6_arranged():
     phi = mfun.phi_6(M, L, m, alpha)
         
     assert np.allclose(phi, phi_ref), 'The value of constraint is not correct'
-    
-def test_Hessian_symetry():
-    '''
-    This function tests the symetry of the Hessian matrix.
-    
-    output
-    
-    Assertion
-    '''
-    L = 1 # number of prisms
-    M = 4 # number of vertices
-    P = L*(M + 2) # number of parameters
-
-    #r = 1000. # radial distance for each vertice
-    r = np.zeros(M)
-    r[::2] = 1000.
-    r[1::2] = np.sqrt(2.)*1000./2.
-    
-    # Cartesian coordinates of the origin of each prism
-    x0 = np.zeros(L) + 1000.
-    y0 = np.zeros(L) - 1000.
-    
-    dz = 100.0    # thickness of each prism
-    
-    inc, dec = -60., 50. # inclination and declination of regional field
-    
-    props={'magnetization': utils.ang2vec(3, inc, dec)} # physical property
-    
-    z0 = 100.0    # depth of the top the shallowest prism
-    
-    m = []   # list of prisms
-    
-    ### creating the lis of prisms
-    
-    for i in range(L):
-        m.append([r, x0[i], y0[i], z0 + dz*i, z0 + dz*(i + 1), props])
-    
-    model_polyprism = mfun.pol2cart(m, M, L)
-    
-    #area over which the data are calculated
-    #x minimum, x maximum, y minimum and y maximum
-    area = [-10000, 10000, -10000, 10000] 
-
-    #number of data along the y and x directions
-    shape = (80,80)
-
-    #total number of data
-    N = shape[0]*shape[1]
-
-    #coordinates x and y of the data
-    x = np.linspace(area[0],area[1],shape[0]) # points in x
-    y = np.linspace(area[2],area[3],shape[0]) # points in y
-    xp,yp = np.meshgrid(x,y)    # creating mesh points
-    xp = xp.ravel()
-    yp = yp.ravel()
-    
-    #vertical coordinates of the data
-    zp = -350. - 500.*utils.gaussian2d(xp, yp, 17000, 21000, 21000, 18500, angle=21) # relief
-    
-    # increment for derivatives
-    delta = 10.
-
-    #predict data
-    d_fat = polyprism.tf(xp, yp, zp, model_polyprism, inc, dec)
-    
-    # sensibility matrx
-    A = mfun.fd_tf_sm_polyprism(xp, yp, zp, m, M, L, delta, delta, delta, inc, dec)
-    
-    #Hessian matrix
-    H = np.dot(A.T, A)
-    
-    for i in range(P):
-        assert np.allclose(H[i,i+1:], H[i+1:,i]), 'The sensibility matrix is not correct'
 
 def test_trans_parameter2_zeros():
     '''
@@ -1203,9 +905,5 @@ def test_trans_inv_parameter2_zeros():
     mt = mfun.trans_parameter2(m0, M, L, mmax, mmin)
     
     m = mfun.trans_inv_parameter2(mt, M, L, mmax, mmin)
-    
-    print m0
-    print mt
-    print m
     
     assert np.allclose(m0, m), 'The resultant vector is different from zero'
