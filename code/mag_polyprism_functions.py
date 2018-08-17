@@ -1618,8 +1618,8 @@ def inv_log_barrier(mt, M, L, mmax, mmin):
     assert mmax.size == mmin.size == mt.size == P, 'The size of mmax, mmin, and mt must be equal to P'
     assert mmax.shape == mmin.shape == mt.shape == (P,), 'The shape of mmax, mmin, and m must be equal to (P,)'
     
-    i_overflow = np.argwhere(mt <= -710.)
-    mt[i_overflow] = -700.
+    i_overflow = np.argwhere(mt <= -709.8)
+    mt[i_overflow] = -709.7
     
     m = mmin + (mmax - mmin)/(1. + np.exp(-mt))
     
@@ -1691,7 +1691,7 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
         G = Jacobian_tf(xp, yp, zp, model0, M, L, delta[0], delta[1], delta[2], delta[3], inc, dec)
 
         # Hessian matrix
-        H = 2.*np.dot(G.T*W, G)/N
+        H = 2.*np.dot(G.T, G)/N
         th = np.trace(H)/P
 
         # weighting the regularization parameters
@@ -1706,7 +1706,7 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
         H = Hessian_phi_7(M, L, H, mu[6])
 
         # gradient vector
-        grad = -2.*np.dot(G.T*W, res0)/N
+        grad = -2.*np.dot(G.T, res0)/N
 
         grad = gradient_phi_1(M, L, grad, mu[0])
         grad = gradient_phi_2(M, L, grad, mu[1])
@@ -1873,7 +1873,7 @@ def levmarq_amf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, 
 
             dphi = phi - phi0
 
-            #print 'it: %2d   it_marq: %2d   lambda: %.e   misfit: %.4e' % (it, it_marq, lamb, phi)
+            print 'it: %2d   it_marq: %2d   lambda: %.e   misfit: %.4e' % (it, it_marq, lamb, phi)
 
             if (dphi > 0.):
                 lamb *= dlamb
