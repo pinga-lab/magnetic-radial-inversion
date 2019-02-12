@@ -1764,7 +1764,7 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
             res0 = res.copy()
             phi0 = phi
 
-    return d_fit, m_est, model_est, phi_list, model_list
+    return d_fit, m_est, model_est, phi_list, model_list, res_list
 
 def levmarq_amf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, mmin, mmax, m_out, dobs, props, alpha, z0, dz):
     '''
@@ -1903,7 +1903,7 @@ def levmarq_amf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, 
             res0 = res.copy()
             phi0 = phi
 
-    return d_fit, m_est, model_est, phi_list, model_list
+    return d_fit, m_est, model_est, phi_list, model_list, res_list
 
 def plot_prisms(prisms):
     '''
