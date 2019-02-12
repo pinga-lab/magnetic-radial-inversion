@@ -1663,6 +1663,7 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
     model0: list - objects of fatiando.mesher.polyprisms
     phi_list: list - solutions of objective funtion
     model_list: list - estimated models at each iteration
+    res_list: list - calculated residual at each iteration
     '''
     P = L*(M + 2) + 1
     assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
@@ -1682,6 +1683,7 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
     phi0 = np.sum(res0*res0)/N
     phi_list = [phi0]
     model_list = [model0]
+    res_list = [res0]
 
     for it in range(maxit):
         mt = log_barrier(m0, M, L, mmax, mmin)
@@ -1752,6 +1754,7 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
 
         phi_list.append(phi)
         model_list.append(model_est)
+        res_list.append(res)
         if (abs(dphi/phi0) < tol):
             break
         else:
@@ -1795,6 +1798,7 @@ def levmarq_amf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, 
     model0: list - objects of fatiando.mesher.polyprisms
     phi_list: list - solutions of objective funtion
     model_list: list - estimated models at each iteration
+    res_list: list - calculated residual at each iteration
     '''
     P = L*(M + 2) + 1
     assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
@@ -1816,6 +1820,7 @@ def levmarq_amf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, 
     phi0 = np.sum(res0*res0)/N
     phi_list = [phi0]
     model_list = [model0]
+    res_list = [res0]
 
     for it in range(maxit):
         mt = log_barrier(m0, M, L, mmax, mmin)
@@ -1888,6 +1893,7 @@ def levmarq_amf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, 
 
         phi_list.append(phi)
         model_list.append(model_est)
+        res_list.append(res)
         if (abs(dphi/phi0) < tol):
             break
         else:
@@ -1898,3 +1904,41 @@ def levmarq_amf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, 
             phi0 = phi
 
     return d_fit, m_est, model_est, phi_list, model_list
+
+def plot_prisms(prisms):
+    '''
+    Returns a list of ordered vertices to build the model
+    on matplotlib 3D
+
+    input
+
+    prisms: list - objects of fatiando.mesher.polyprisms
+
+    output
+
+    verts: list - ordered vertices
+    '''
+    verts = []
+    for o in prisms:
+        top = []
+        bottom = []
+        for x, y in zip(o.x, o.y):
+            top.append(np.array([x,y,o.z1]))
+            bottom.append(np.array([x,y,o.z2]))
+        verts.append(top)
+        verts.append(bottom)
+        for i in range(o.x.size-1):
+            sides = []
+            sides.append(np.array([o.x[i], o.y[i], o.z1]))
+            sides.append(np.array([o.x[i+1], o.y[i+1], o.z1]))
+            sides.append(np.array([o.x[i+1], o.y[i+1], o.z2]))
+            sides.append(np.array([o.x[i], o.y[i], o.z2]))
+            verts.append(sides)
+        sides = []
+        sides.append(np.array([o.x[-1], o.y[-1], o.z1]))
+        sides.append(np.array([o.x[0], o.y[0], o.z1]))
+        sides.append(np.array([o.x[0], o.y[0], o.z2]))
+        sides.append(np.array([o.x[-1], o.y[-1], o.z2]))
+        verts.append(sides)
+
+    return verts
