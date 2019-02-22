@@ -54,7 +54,7 @@ def pol2cart(l, M, L):
 
     output
 
-    mk: list - list of objects of the class
+    lk: list - list of objects of the class
     fatiando.mesher.PolygonalPrism
     '''
 
