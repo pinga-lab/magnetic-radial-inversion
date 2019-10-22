@@ -1942,3 +1942,47 @@ def plot_prisms(prisms):
         verts.append(sides)
 
     return verts
+
+def varying_param(z0, varz, intensity, varint, inc, varinc, dec, vardec):
+    '''
+    Returns a list of fixed parameters for the
+    varying inversion
+
+    input
+
+    z0: float - depth to the top of the model
+    varz: float - variation for z0
+    intensity: float - magnetization intensity
+    varint: float - variation for intensity
+    inc: float - inclination
+    varinc: float - variation for inclination
+    dec: float - declination
+    vardec: float - variation for declination
+
+    output
+
+    param_list: list - list of modified fixed
+                parameters for varying the inversion
+    '''
+    param_list = []
+    param_list.append([z0, {'magnetization': utils.ang2vec(intensity, inc, dec)}])
+    param_list.append([z0+varz,{'magnetization': utils.ang2vec(intensity, inc, dec)}])
+    param_list.append([z0-varz,{'magnetization': utils.ang2vec(intensity, inc, dec)}])
+    param_list.append([z0,{'magnetization': utils.ang2vec(intensity+varint, inc, dec)}])
+    param_list.append([z0,{'magnetization': utils.ang2vec(intensity-varint, inc, dec)}])
+    param_list.append([z0,{'magnetization': utils.ang2vec(intensity, inc+varinc, dec+vardec)}])
+    param_list.append([z0,{'magnetization': utils.ang2vec(intensity, inc-varinc, dec-vardec)}])
+    param_list.append([z0+varz,{'magnetization': utils.ang2vec(intensity+varint, inc, dec)}])
+    param_list.append([z0+varz,{'magnetization': utils.ang2vec(intensity-varint, inc, dec)}])
+    param_list.append([z0+varz,{'magnetization': utils.ang2vec(intensity, inc+varinc, dec+vardec)}])
+    param_list.append([z0+varz,{'magnetization': utils.ang2vec(intensity, inc-varinc, dec-vardec)}])
+    param_list.append([z0-varz,{'magnetization': utils.ang2vec(intensity+varint, inc, dec)}])
+    param_list.append([z0-varz,{'magnetization': utils.ang2vec(intensity-varint, inc, dec)}])
+    param_list.append([z0-varz,{'magnetization': utils.ang2vec(intensity, inc+varinc, dec+vardec)}])
+    param_list.append([z0-varz,{'magnetization': utils.ang2vec(intensity, inc-varinc, dec-vardec)}])
+    param_list.append([z0,{'magnetization': utils.ang2vec(intensity+varint, inc+varinc, dec+vardec)}])
+    param_list.append([z0,{'magnetization': utils.ang2vec(intensity+varint, inc-varinc, dec-vardec)}])
+    param_list.append([z0,{'magnetization': utils.ang2vec(intensity-varint, inc+varinc, dec+vardec)}])
+    param_list.append([z0,{'magnetization': utils.ang2vec(intensity-varint, inc-varinc, dec-vardec)}])
+
+    return param_list
