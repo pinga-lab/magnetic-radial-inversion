@@ -1684,6 +1684,9 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
     phi_list = [phi0]
     model_list = [model0]
     res_list = [res0]
+    G0 = Jacobian_tf(xp, yp, zp, model0, M, L, delta[0], delta[1], delta[2], delta[3], inc, dec)
+    th = np.trace(2.*np.dot(G0.T, G0)/N)/P
+    alpha *= th
 
     for it in range(maxit):
         mt = log_barrier(m0, M, L, mmax, mmin)
@@ -1693,33 +1696,30 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
 
         # Hessian matrix
         H = 2.*np.dot(G.T, G)/N
-        th = np.trace(H)/P
 
         # weighting the regularization parameters
-        mu = alpha*th
-
-        H = Hessian_phi_1(M, L, H, mu[0])
-        H = Hessian_phi_2(M, L, H, mu[1])
-        H = Hessian_phi_3(M, L, H, mu[2])
-        H = Hessian_phi_4(M, L, H, mu[3])
-        H = Hessian_phi_5(M, L, H, mu[4])
-        H = Hessian_phi_6(M, L, H, mu[5])
-        H = Hessian_phi_7(M, L, H, mu[6])
+        H = Hessian_phi_1(M, L, H, alpha[0])
+        H = Hessian_phi_2(M, L, H, alpha[1])
+        H = Hessian_phi_3(M, L, H, alpha[2])
+        H = Hessian_phi_4(M, L, H, alpha[3])
+        H = Hessian_phi_5(M, L, H, alpha[4])
+        H = Hessian_phi_6(M, L, H, alpha[5])
+        H = Hessian_phi_7(M, L, H, alpha[6])
 
         # gradient vector
         grad = -2.*np.dot(G.T, res0)/N
 
-        grad = gradient_phi_1(M, L, grad, mu[0])
-        grad = gradient_phi_2(M, L, grad, mu[1])
-        grad = gradient_phi_3(M, L, grad, m_out, mu[2])
-        grad = gradient_phi_4(M, L, grad, m_out[-2:], mu[3])
-        grad = gradient_phi_5(M, L, grad, mu[4])
-        grad = gradient_phi_6(M, L, grad, mu[5])
-        grad = gradient_phi_7(M, L, grad, mu[6])
+        grad = gradient_phi_1(M, L, grad, alpha[0])
+        grad = gradient_phi_2(M, L, grad, alpha[1])
+        grad = gradient_phi_3(M, L, grad, m_out, alpha[2])
+        grad = gradient_phi_4(M, L, grad, m_out[-2:], alpha[3])
+        grad = gradient_phi_5(M, L, grad, alpha[4])
+        grad = gradient_phi_6(M, L, grad, alpha[5])
+        grad = gradient_phi_7(M, L, grad, alpha[6])
 
         # positivity constraint
         H *= ((mmax - m0 + 1e-10)*(m0 - mmin + 1e-10))/(mmax - mmin)
-
+        
         # Hessian normalization
         D = 1./np.sqrt(np.diag(H))
         
@@ -1731,13 +1731,13 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
             d_fit = polyprism.tf(xp, yp, zp, model_est, inc, dec)
             res = dobs - d_fit
             phi = np.sum(res*res)/N
-            phi += phi_1(M, L, m_est, mu[0]) + \
-                    phi_2(M, L, m_est, mu[1]) + \
-                    phi_3(M, L, m_est, m_out, mu[2]) + \
-                    phi_4(M, L, m_est, m_out[-2:], mu[3]) + \
-                    phi_5(M, L, m_est, mu[4]) + \
-                    phi_6(M, L, m_est, mu[5]) + \
-                    phi_7(M, L, m_est, mu[6])
+            phi += phi_1(M, L, m_est, alpha[0]) + \
+                    phi_2(M, L, m_est, alpha[1]) + \
+                    phi_3(M, L, m_est, m_out, alpha[2]) + \
+                    phi_4(M, L, m_est, m_out[-2:], alpha[3]) + \
+                    phi_5(M, L, m_est, alpha[4]) + \
+                    phi_6(M, L, m_est, alpha[5]) + \
+                    phi_7(M, L, m_est, alpha[6])
 
             dphi = phi - phi0
 
@@ -1745,6 +1745,8 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
 
             if (dphi > 0.):
                 lamb *= dlamb
+                if it_marq == maxsteps - 1:
+                    phi = phi0
             else:
                 if lamb/dlamb < 1e-15:
                     lamb = 1e-15
@@ -1821,6 +1823,9 @@ def levmarq_amf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, 
     phi_list = [phi0]
     model_list = [model0]
     res_list = [res0]
+    G0 = Jacobian_tf(xp, yp, zp, model0, M, L, delta[0], delta[1], delta[2], delta[3], inc, dec)
+    th = np.trace(2.*np.dot(G0.T, G0)/N)/P
+    alpha *= th
 
     for it in range(maxit):
         mt = log_barrier(m0, M, L, mmax, mmin)
@@ -1829,30 +1834,27 @@ def levmarq_amf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, 
         G = Jacobian_amf(xp, yp, zp, model0, M, L, delta[0], delta[1], delta[2], delta[3])
 
         # Hessian matrix
-        H = 2.*np.dot(G.T, G)/N
-        th = np.trace(H)/P
+        H = 2.*np.dot(G.T, G)/(th*N)
 
         # weighting the regularization parameters
-        mu = alpha*th
-
-        H = Hessian_phi_1(M, L, H, mu[0])
-        H = Hessian_phi_2(M, L, H, mu[1])
-        H = Hessian_phi_3(M, L, H, mu[2])
-        H = Hessian_phi_4(M, L, H, mu[3])
-        H = Hessian_phi_5(M, L, H, mu[4])
-        H = Hessian_phi_6(M, L, H, mu[5])
-        H = Hessian_phi_7(M, L, H, mu[6])
+        H = Hessian_phi_1(M, L, H, alpha[0])
+        H = Hessian_phi_2(M, L, H, alpha[1])
+        H = Hessian_phi_3(M, L, H, alpha[2])
+        H = Hessian_phi_4(M, L, H, alpha[3])
+        H = Hessian_phi_5(M, L, H, alpha[4])
+        H = Hessian_phi_6(M, L, H, alpha[5])
+        H = Hessian_phi_7(M, L, H, alpha[6])
 
         # gradient vector
-        grad = -2.*np.dot(G.T, res0)/N
+        grad = -2.*np.dot(G.T, res0)/(th*N)
 
-        grad = gradient_phi_1(M, L, grad, mu[0])
-        grad = gradient_phi_2(M, L, grad, mu[1])
-        grad = gradient_phi_3(M, L, grad, m_out, mu[2])
-        grad = gradient_phi_4(M, L, grad, m_out[-2:], mu[3])
-        grad = gradient_phi_5(M, L, grad, mu[4])
-        grad = gradient_phi_6(M, L, grad, mu[5])
-        grad = gradient_phi_7(M, L, grad, mu[6])
+        grad = gradient_phi_1(M, L, grad, alpha[0])
+        grad = gradient_phi_2(M, L, grad, alpha[1])
+        grad = gradient_phi_3(M, L, grad, m_out, alpha[2])
+        grad = gradient_phi_4(M, L, grad, m_out[-2:], alpha[3])
+        grad = gradient_phi_5(M, L, grad, alpha[4])
+        grad = gradient_phi_6(M, L, grad, alpha[5])
+        grad = gradient_phi_7(M, L, grad, alpha[6])
 
         # positivity constraint
         H *= ((mmax - m0 + 1e-10)*(m0 - mmin + 1e-10))/(mmax - mmin)
@@ -1870,13 +1872,13 @@ def levmarq_amf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, 
                             polyprism.bz(xp, yp, zp, model_est)**2.)
             res = dobs - d_fit
             phi = np.sum(res*res)/N
-            phi += phi_1(M, L, m_est, mu[0]) + \
-                    phi_2(M, L, m_est, mu[1]) + \
-                    phi_3(M, L, m_est, m_out, mu[2]) + \
-                    phi_4(M, L, m_est, m_out[-2:], mu[3]) + \
-                    phi_5(M, L, m_est, mu[4]) + \
-                    phi_6(M, L, m_est, mu[5]) + \
-                    phi_7(M, L, m_est, mu[6])
+            phi += phi_1(M, L, m_est, alpha[0]) + \
+                    phi_2(M, L, m_est, alpha[1]) + \
+                    phi_3(M, L, m_est, m_out, alpha[2]) + \
+                    phi_4(M, L, m_est, m_out[-2:], alpha[3]) + \
+                    phi_5(M, L, m_est, alpha[4]) + \
+                    phi_6(M, L, m_est, alpha[5]) + \
+                    phi_7(M, L, m_est, alpha[6])
 
             dphi = phi - phi0
 
@@ -1884,6 +1886,8 @@ def levmarq_amf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, 
 
             if (dphi > 0.):
                 lamb *= dlamb
+                if it_marq == maxsteps - 1:
+                    phi = phi0
             else:
                 if lamb/dlamb < 1e-15:
                     lamb = 1e-15
