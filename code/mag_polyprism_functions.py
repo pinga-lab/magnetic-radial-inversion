@@ -1990,3 +1990,44 @@ def varying_param(z0, varz, intensity, varint, inc, varinc, dec, vardec):
     param_list.append([z0,{'magnetization': utils.ang2vec(intensity-varint, inc-varinc, dec-vardec)}])
 
     return param_list
+
+def initial_cylinder(M, L, x0, y0, z0, dz, r, inc, dec, incs, decs, intensity):
+    '''
+    Returns an cylindrical initial guess
+    for the inversion
+
+    input
+
+    M: int - number of vertices
+    L: int - number of prisms
+    x0: float - coordinate of the center
+    y0: float - coordinate of the center
+    z0: float - depth to the top of the model
+    dz: float - depth extent of the prisms
+    r: float - radius of the cylinder
+    intensity: float - magnetization intensity
+    inc: float - inclination of the main field
+    dec: float - declination of the main field
+    inc: float - inclination of the source
+    dec: float - declination of the source
+
+    output
+
+    model0: list - prisms of the initial guess
+    d0: 1D array - initial data
+    '''
+
+    P = L*(M+2) + 1 # number of parameters
+
+    props = {'magnetization': utils.ang2vec(
+        intensity, incs, decs)}
+
+    rin = np.zeros(M) + r
+    m0 = np.hstack((rin, np.array([x0, y0])))
+    m0 = np.resize(m0, P - 1) # inicial parameters vector
+    m0 = np.hstack((m0, dz))
+
+    # list of classes of prisms
+    model0 = param2polyprism(m0, M, L, z0, props)
+
+    return model0, m0
