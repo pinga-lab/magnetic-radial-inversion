@@ -1,0 +1,244 @@
+\section{Methodology}\label{sec:metodo}
+
+\subsection{Forward problem}
+
+Let $\mathbf{d}^o$ be the observed data (Fig. \ref{fig:obs}a), whose $i$th element $d^o_i$, $i = 1, \dots, N$, is the total-field anomaly measured at the point $(x_i, y_i, z_i)$ produced by a 3-D source with known depth to the top. In a Cartesian coordinate system, wherein x points geographic north, y points east, and z points downward. We assume the total magnetization vector of the source is constant and known both its intensity and direction. We approximate the volume of the source by a set of $L$ vertically juxtaposed 3-D prisms (Fig. \ref{fig:obs}b), like \citet{oliveirajr-etal2011} and \citet{oliveirajr-barbosa2013}. The depth to the top of the shallowest prism $z_0$ is defined by the interpreter based on the knowledge of the source. The magnetization vector of each prism $\mathbf{m}^k$, $k=1,\dots ,L$, is assumed constant and known. The horizontal cross-section of each prism is described by an arbitrary and unknown polygon with a fixed number $V$ of vertices equally spaced from $0^{\circ}$ to $360^{\circ}$, whose sides describe the edges of the horizontal depth slices of the source. The vertices of the polygon are described in polar coordinates referred to an arbitrary origin $O^k$ within the polygon. 
+
+The radii of the vertices ($r^k_j$, $j=1,\dots , V$, $k=1,\dots ,L$), the horizontal coordinates ($x_0^k$ and $y_0^k$, $k=1,\dots ,L$) of the arbitrary origins $O^k$, $k=1,\dots ,L$, and the depth extent $dz$ of the L vertically stacked prisms in the ensemble are arranged in a $M$-dimensional vector $\mathbf{p}$, $M = L (V + 2) + 1$, given by
+\begin{equation}
+    \mathbf{p} =
+    \left[ \begin{array}{@{}*{12}{c}@{}}
+        r_1^1 & \dots & r_V^1 & x_0^1 & y_0^1 & \dots & r_1^L & \dots & r_V^L & x_0^L & y_0^L & dz\\
+    \end{array} \right]^{\mathsf{T}},
+\end{equation}
+which will be estimated from the total-field anomaly data set.
+
+The predicted total-field anomaly produced by the ensemble of L vertically stacked 3-D prisms is the sum of the magnetic effect of each prism at the $i$th observation point ($x_i, y_i, z_i$)
+
+\begin{equation}\label{eq:predicted}
+d_i (\mathbf{p}) \equiv \sum\limits_{k=1}^L f_i^k(\mathbf{r}^k, x_0^k, y_0^k,\mbox{\boldmath$\theta$}, \mathbf{m}^k, z^k_1, dz), \quad i=1,\dots,N,
+\end{equation}
+where $\mathbf{r}^k$ and $\mbox{\boldmath$\theta$}$ are the $V$-dimensional vectors containing the polar coordinates of the vertices of the $k$th prism whose the $j$th components are $r^k_j$ and $\theta_j = (j-1)2\pi/V$, $j=1,\dots , V$, $k=1,\dots ,L$, respectively. Additionally, $\mathbf{m}^k$ is the magnetization vector of the $k$th prism $P^k$, whose depth to the top is given by $z_1^k = z_0 + (k-1)dz$. We calculated the predicted total-field anomaly produced by the $k$th prism $P^k$, at the $i$th observation point ($x_i, y_i, z_i$), by using the Python package Fatiando a Terra \citep{uieda-etal2013}, which computes the non-linear function $f_i^k(\mathbf{r}^k, x_0^k, y_0^k,\mbox{\boldmath$\theta$}, \mathbf{m}^k, z^k_1, dz)$ based on the formulas proposed by \cite{plouff1976}.
+
+\subsection{Inverse problem}
+
+The non-linear inversion of the total field anomaly consists in estimating the parameter vector $\mathbf{p}$ that minimizes the constrained objective function given by
+
+\begin{equation}
+\Gamma (\mathbf{p}) = \phi (\mathbf{p}) + \sum\limits^{7}_{\ell =1}\alpha_{\ell}\varphi_{\ell}(\mathbf{p}),
+\label{eq:gamma}
+\end{equation}
+subject to
+\begin{equation}\label{eq:desigualdade}
+p_{n }^{min} < p_n < p_n^{max},\quad n =1, \dots, M,
+\end{equation}
+where $p_{n }^{min}$ and $p_n^{max}$ are the lower and upper limits for the $n$th element $p_n$ of the parameter vector $\mathbf{p}$, $\varphi (\mathbf{p})$ is the data-misfit function given by
+\begin{equation}\label{eq:misfit}
+\phi (\mathbf{p}) = \frac{1}{N}[\mathbf{d}^{o} - \mathbf{d}(\mathbf{p})]^2,
+\end{equation}
+where $\mathbf{d}(\mathbf{p})$ is a $N$-dimensional vector whose the $i$th element $d_i$ is the predicted total-field anomaly (equation~\ref{eq:predicted}) at the position $(x_i,y_i,z_i)$, $i = 1,\dots, N$.
+
+The limits for the radii of all vertices of all prisms ($r^k_j$, $j=1,\dots , V$, $k=1,\dots ,L$), the horizontal Cartesian coordinates of all
+arbitrary origins ($x_0^k$ , $y_0^k$ , $k = 1, \dots, L$), and the depth extent of all prisms $dz$ represented by $p_{n }^{min}$ and $p_n^{max}$ in the inequality constraints (equation \ref{eq:desigualdade}) are defined by the interpreter element by element based on both the horizontal extent of the magnetic anomaly and the knowledge about the source. 
+
+To estimate a stable solution, we introduced a set of seven constraints on the geometry of the source. The $\ell$th constraint ($\ell = 1, \dots , 7$) is represented by the function $\phi_{\ell} (\mathbf{p})$ (equation \ref{eq:gamma}), where $\alpha_{\ell}$ is a positive scalar representing its weight. We use the Marquadt's method to minimize the objective function $\Gamma (\mathbf{p})$ (equation \ref{eq:gamma}) and introduce the inequality constraints (equation \ref{eq:desigualdade}) by using a strategy similar to that presented by \citet{barbosa-etal1999}. Our method imposes the constraints:
+\begin{enumerate}
+\item Smoothness constraint on the adjacent radii defining the horizontal section of each vertical prism. This constraint imposes that adjacent radii within each prism must be close to each other. It forces the estimated prism to be approximately cylindrical. %Accurately, it requires that the $j$th estimated radius $\hat{r}_j^k$ must be as close as possible to its consecutive radius $\hat{r}_{j+1}^k$ within the $k$th vertical prism. In other words, this constraint avoids an abrupt change between two consecutive radii. 
+The matrix form of the this constraint is given by
+\begin{equation}\label{eq:phi1m}
+\varphi_{1}(\mathbf{p}) = \mathbf{p}^\mathsf{T}\mathbf{R}^\mathsf{T}_{1}\mathbf{R}_{1}\mathbf{p},
+\end{equation}
+where 
+\begin{equation}
+\mathbf{R}_{1} = 
+\begin{bmatrix}
+\mathbf{R}^{\sharp} & \mathbf{0}^{\sharp} & \mathbf{0}^{\sharp} & \cdots & \mathbf{0}^{\sharp} & \mathbf{0} \\
+\mathbf{0}^{\sharp} & \textbf{R}^{\sharp} & \mathbf{0}^{\sharp} &  \cdots & \mathbf{0}^{\sharp} & \mathbf{0}\\
+\mathbf{0}^{\sharp} & \mathbf{0}^{\sharp} & \ddots &  & \mathbf{0}^{\sharp} & \mathbf{0}\\
+\vdots & \vdots &  & \ddots & \vdots & \vdots\\
+\mathbf{0}^{\sharp} & \mathbf{0}^{\sharp} &  \cdots & \cdots & \mathbf{R}^{\sharp} & \mathbf{0}\\
+\end{bmatrix}_{VL\times M},
+\end{equation}
+where $\mathbf{0}$ is a null column matrix with size $V+2$ and $\mathbf{0}^{\sharp}$ is a null matrix with the same shape of $\mathbf{R}^{\sharp}$ which is defined by 
+\begin{equation}
+\mathbf{R}^{\sharp} = 
+\begin{bmatrix}
+1 & -1 & 0 & 0 & \cdots & 0 & 0 & 0 & 0 \\
+0 & 1 & -1 & 0 & \cdots & 0 & 0 & 0 & 0 \\
+\vdots & \vdots & \vdots & \vdots & & \vdots & \vdots & \vdots & \vdots \\
+0 & 0 & 0 & 0 & \cdots & 1 & -1 & 0 & 0 \\
+-1 & 0 & 0 & 0 & \cdots & 0 & 1 & 0 & 0 \\
+\end{bmatrix}_{V(L-1)\times (V+2)};
+\end{equation}
+
+
+\item Smoothness constraint on the adjacent radii of the vertically adjacent prisms. This constraint imposes that adjacent radii within vertically adjacent prisms must be close to each other. It forces the shape of all the estimated prisms to be similar. The matrix form of the this constraint is given by
+\begin{equation}
+\varphi_{2}(\mathbf{p}) = \mathbf{p}^\mathsf{T}\mathbf{R}^\mathsf{T}_{2}\mathbf{R}_{2}\mathbf{p} ,
+\end{equation}
+where
+\begin{equation}
+\mathbf{R}_{2} = 
+\begin{bmatrix}
+\mathbf{R}^{-}_{2} & \mathbf{R}^{+}_{2} & \mathbf{0}^{*} & \mathbf{0}^{*} & \cdots & \mathbf{0}^{*} & \mathbf{0}^{*} & \mathbf{0}\\
+\mathbf{0}^{*} & \mathbf{R}^{-}_{2} & \mathbf{R}^{+}_{2} & \mathbf{0}^{*} & \cdots & \mathbf{0}^{*} & \mathbf{0}^{*} & \mathbf{0}\\
+\mathbf{0}^{*} & \mathbf{0}^{*} & \mathbf{0}^{*} &  &  & \vdots & \vdots & \vdots\\
+\vdots & \vdots & \vdots &  &  & \vdots & \vdots & \vdots\\
+\mathbf{0}^{*} & \mathbf{0}^{*} & \mathbf{0}^{*} & \cdots & \cdots & \mathbf{R}^{-}_{2} & \mathbf{R}^{+}_{2} & \mathbf{0}\\
+\end{bmatrix}_{V(L-1)\times M},
+\end{equation}
+where $\mathbf{0}^{*}$ is a null matrix with the same shape of $\mathbf{R}^{-}_2$ and $\mathbf{R}^{+}_2$ which are defined by 
+\begin{equation}
+\mathbf{R}^{-}_{2} = 
+\begin{bmatrix}
+-1 & 0 & 0 & \cdots & 0 & 0 \\
+0 & -1 & 0 & \cdots & 0 & 0 \\
+0 & 0 & \ddots &  & \vdots & \vdots \\
+\vdots & \vdots  &  & \ddots & \vdots & \vdots\\
+0 & 0 & \cdots & 0 & -1 & 0 \\
+\end{bmatrix}_{V\times (V+2)}
+\end{equation}
+and
+\begin{equation}
+\mathbf{R}^{+}_{2} = 
+\begin{bmatrix}
+1 & 0 & 0 & \cdots & 0 & 0 \\
+0 & 1 & 0 & \cdots & 0 & 0 \\
+0 & 0 & \ddots &  & \vdots & \vdots \\
+\vdots & \vdots  &  & \ddots & \vdots & \vdots\\
+0 & 0 & \cdots & 0 & 1 & 0 \\
+\end{bmatrix}_{V\times (V+2)};
+\end{equation}
+
+\item The source’s outcrop constraint. In the case of outcropping sources, this constraint imposes that the estimated horizontal cross-section of the shallowest prism must be close to the intersection of the geologic source with the known outcropping boundary. The matrix form of the this constraint is given by
+\begin{equation}
+\varphi_{3}(\mathbf{p}) = \left(\mathbf{A}\mathbf{p} - \mathbf{p}"\right)^\mathsf{T}\left(\mathbf{A}\mathbf{p} - \mathbf{p}"\right) ,
+\end{equation}
+where $\mathbf{p}"$ is a vector containing the parameters defining the polygon that represents the outcropping body given by
+\begin{equation}
+\mathbf{p}" = 
+\begin{bmatrix}
+r_{1}^{0} \\
+r_{2}^{0} \\
+\vdots \\
+r_{M}^{0} \\
+x_{0}^{0} \\
+y_{0}^{0}
+\end{bmatrix}_{(V+2)\times 1},
+\end{equation}
+and
+
+\begin{equation}
+\mathbf{A} = 
+\begin{bmatrix}
+\mathbf{I} & \hat{\mathbf{0}} \\
+\end{bmatrix}_{(V+2)\times M},
+\end{equation}
+where $\mathbf{I}$ is an identity matrix with shape $V+2$ and $\hat{\mathbf{0}}$ is null matrix with shape $M -(V+2)$;
+
+\item The source's horizontal location constraint. In the case of outcropping sources, this constraint imposes that the estimated horizontal Cartesian coordinates of the arbitrary origin within the shallowest prism must be as close as possible to the known horizontal Cartesian coordinates of a point on the outcropping body. The matrix form of the this constraint is given by
+\begin{equation}
+\varphi_{4}(\mathbf{p}) = \left(\mathbf{B}\mathbf{p} - \mathbf{p}'\right)^\mathsf{T}\left(\mathbf{B}\mathbf{p} - \mathbf{p}'\right) ,
+\end{equation}
+where
+\begin{equation}
+\mathbf{B} = 
+\begin{bmatrix}
+\mathbf{B}^{\sharp} & \hat{\mathbf{0}} \\
+\end{bmatrix}_{2\times M} ,
+\end{equation}
+
+\begin{equation}
+\textbf{B}^{\sharp} = 
+\begin{bmatrix}
+0 & \cdots & 0 & 1 & 0 \\
+0 & \cdots & 0 & 0 & 1
+\end{bmatrix}_{2\times (V+2)},
+\end{equation}
+and $\textbf{p}'$ is a vector containing the Cartesian coordinates of the horizontal location of the source given by
+
+\begin{equation}
+\textbf{p}' = 
+\begin{bmatrix}
+x^0_0 \\
+y^0_0
+\end{bmatrix}_{2\times 1} ;
+\end{equation}
+
+\item Smoothness constraint on the horizontal position of the arbitrary origins of the vertically adjacent prisms. This constraint imposes that the estimated horizontal Cartesian coordinates of vertically adjacent prisms must be close to each other. It forces the estimated prisms to be approximately vertically aligned. The matrix form of the this constraint is given by
+\begin{equation}
+\varphi_{5}(\textbf{p}) = \textbf{p}^\mathsf{T}\textbf{R}^\mathsf{T}_{5}\textbf{R}_{5}\textbf{p} ,
+\end{equation}
+where
+\begin{equation}
+\mathbf{R}_{5} = 
+\begin{bmatrix}
+\mathbf{R}^{-}_{5} & \mathbf{R}^{+}_{5} & \mathbf{0}^{\pm} & \mathbf{0}^{\pm} & \cdots & \mathbf{0}^{\pm} & \mathbf{0}^{\pm} & \mathbf{0}\\
+\mathbf{0}^{\pm} & \mathbf{R}^{-}_{5} & \mathbf{R}^{+}_{5} & \mathbf{0}^{\pm} & \cdots & \mathbf{0}^{\pm} & \mathbf{0}^{\pm} & \mathbf{0}\\
+\mathbf{0}^{\pm} & \mathbf{0}^{\pm} & \mathbf{0}^{\pm} &  &  & \vdots & \vdots & \vdots\\
+\vdots & \vdots & \vdots &  &  & \vdots & \vdots & \vdots\\
+\mathbf{0}^{\pm} & \mathbf{0}^{\pm} & \mathbf{0}^{\pm} & \cdots & \cdots & \mathbf{R}^{-}_{5} & \mathbf{R}^{+}_{5} & \mathbf{0}\\
+\end{bmatrix}_{2(L-1)\times M},
+\end{equation}
+where $\mathbf{0}^{\pm}$ is a null matrix with the same shape of $\mathbf{R}^{-}_{5}$ and $\mathbf{R}^{+}_{5}$ which are given by
+\begin{equation}
+\textbf{R}^{-}_{5} = 
+\begin{bmatrix}
+0 & 0 & \cdots & 0 & -1 & 0 \\
+0 & 0 & \cdots & 0 & 0 & -1 \\
+\end{bmatrix}_{2\times (V+2)},
+\end{equation}
+
+\begin{equation}
+\textbf{R}^{+}_{5} = 
+\begin{bmatrix}
+0 & 0 & \cdots & 0 & 1 & 0 \\
+0 & 0 & \cdots & 0 & 0 & 1 \\
+\end{bmatrix}_{2\times (V+2)};
+\end{equation}
+
+\item Minimum Euclidean norm constraint on the adjacent radii within each vertical prism. This constraint imposes that all estimated radii within each prism must be close to null values. The matrix form of the this constraint is given by
+\begin{equation}
+\varphi_{6}(\textbf{p}) = \textbf{p}^\mathsf{T}\textbf{C}^\mathsf{T}\textbf{C}\textbf{p},
+\end{equation}
+where
+\begin{equation}
+\textbf{C} = 
+\begin{bmatrix}
+\textbf{C}^{\sharp} & \mathbf{0} & \mathbf{0} & \cdots & \mathbf{0} & \mathbf{0}\\
+\mathbf{0} & \textbf{C}^{\sharp} &  \mathbf{0} & \cdots & \mathbf{0} & \mathbf{0}\\
+\mathbf{0} & \mathbf{0} & \ddots & & \vdots & \vdots\\
+\vdots & \vdots & & \ddots & \vdots & \vdots\\
+\mathbf{0} & \mathbf{0} &  \cdots & \cdots & \textbf{C}^{\sharp} & \mathbf{0}\\
+\mathbf{0} & \mathbf{0} &  \cdots &  \cdots & \mathbf{0} & 0\\
+\end{bmatrix}_{M\times M} ,
+\end{equation}
+
+\begin{equation}
+\textbf{C}^{\sharp} = 
+\begin{bmatrix}
+1 & & & & \\
+& \ddots &  & &  \\
+&  & 1 & & \\
+&  & & 0 &  \\
+&  & & & 0 \\
+\end{bmatrix}_{(V+2)\times (V+2)};
+\end{equation}
+
+\item Minimum Euclidean norm constraint on the depth extent of all prisms. This constraint imposes that the estimated depth extent of the prisms must be close to a null value. The matrix form of the this constraint is given by
+\begin{equation}\label{eq:phi7}
+\varphi_7 = \mathbf{p}^\mathsf{T}\mathbf{D}^\mathsf{T}\mathbf{D}\mathbf{p},
+\end{equation}
+where
+\begin{equation}
+\mathbf{D} =
+\begin{bmatrix}
+ 0 & \cdots  & 0 \\
+ \vdots & \ddots & \vdots\\
+ 0  & \cdots  & 1\\
+\end{bmatrix}_{M\times M}.
+\end{equation}
+
+\end{enumerate}
+
+Most of these constraints are defined by using the Tikhonov regularizing functions of order zero and one \citep{aster-etal2019}, by following the same approach presented by \citet{oliveirajr-etal2011}. Here, we present the constraint on the depth extent of all prisms.
