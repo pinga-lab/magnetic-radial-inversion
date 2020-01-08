@@ -2,60 +2,73 @@
 
 \subsection{Forward problem}
 
-Let $\mathbf{d}^{o}$ be the observed data, whose $i$th element $d^{o}_{i}$, $i = 1, \dots, N$, is the total-field anomaly 
-produced by a 3-D source (Fig. \ref{fig:obs}a) at the point $(x_{i}, y_{i}, z_{i})$ of a Cartesian coordinate 
-system with $x$, $y$ and $z$ axes pointing to north, east and down, respectively. We assume that the direction of the total magnetization 
-vector of the source is constant and known. 
-
+Let $\mathbf{d}^{o}$ be the observed data vector, whose $i$th element $d^{o}_{i}$, $i = 1, \dots, N$, is the total-field 
+anomaly produced by a 3-D source (Fig. \ref{fig:obs}a) at the point $(x_{i}, y_{i}, z_{i})$ of a Cartesian coordinate 
+system with $x$, $y$ and $z$ axes pointing to north, east and down, respectively. We assume that the direction of the 
+total magnetization vector of the source is constant and known. 
 We approximate the volume of the source by a set of $L$ vertically juxtaposed 3-D prisms 
 (Fig. \ref{fig:obs}b) by following the same approach of \citet{oliveirajr-etal2011} and \citet{oliveirajr-barbosa2013}. 
-
-The depth-to-the-top of the shallowest prism is defined by $z_{0}$ and we consider that the magnetization vector of all prisms 
-has an intensity $m_{0}$ and a constant and known direction. 
-
+The depth to the top of the shallowest prism is defined by $z_{0}$ and $m_{0}$ is the constant total-magnetization 
+intensity of all prisms. We consider that the total-magnetization direction is constant and known.
 The horizontal cross-section of each prism is described by an arbitrary and unknown polygon with a fixed number 
 $V$ of vertices equally spaced from $0^{\circ}$ to $360^{\circ}$, which are described in polar coordinates 
 referred to an internal origin $O^{k}$ . 
-
 The radii of the vertices ($r^{k}_{j}$, $j=1,\dots , V$, $k=1,\dots ,L$), the horizontal coordinates ($x_{0}^{k}$ and $y_{0}^{k}$, $k=1,\dots ,L$) 
-of the origins $O^{k}$, $k=1,\dots ,L$, and the depth extent $dz$ of the $L$ vertically stacked prisms forming the ensemble are arranged in a 
-$M$-dimensional vector $\mathbf{p}$, $M = L (V + 2) + 1$, given by
+of the origins $O^{k}$, $k=1,\dots ,L$, and the depth extent $dz$ of the $L$ vertically stacked prisms (Fig. \ref{fig:obs}b) are arranged in a 
+$M \times 1$ parameter vector $\mathbf{p}$, $M = L (V + 2) + 1$, given by
+%\begin{equation}
+%\mathbf{p} = \left[ \begin{array}{@{}*{12}{c}@{}}
+%r_{1}^{1} & \dots & r_{V}^{1} & x_{0}^{1} & y_{0}^{1} & \dots & r_{1}^{L} & \dots & r_{V}^{L} & x_{0}^{L} & y_{0}^{L} & dz \\ 
+%\end{array} \right]^{\mathsf{T}} \: .
+%\end{equation}
 \begin{equation}
-\mathbf{p} = \begin{bmatrix}
-r_{1}^{1} & \dots & r_{V}^{1} & x_{0}^{1} & y_{0}^{1} & \dots & r_{1}^{L} & \dots & r_{V}^{L} & x_{0}^{L} & y_{0}^{L} & dz 
-\end{bmatrix}^{\mathsf{T}} \: ,
+\mathbf{p} = \left[ \begin{array}{@{}*{12}{c}@{}}
+{\mathbf{r}^{1}}^{\mathsf{T}} & x_{0}^{1} & y_{0}^{1} & \dots & {\mathbf{r}^{L}}^{\mathsf{T}} & x_{0}^{L} & y_{0}^{L} & dz \\
+\end{array} \right]^{\mathsf{T}} \: ,
+\label{eq:p-vector}
 \end{equation}
-which will be estimated from the total-field anomaly data set.
-
-The predicted total-field anomaly produced by the ensemble of L vertically stacked 3-D prisms is the sum of the magnetic effect of each prism at the $i$th observation point ($x_i, y_i, z_i$)
-
-\begin{equation}\label{eq:predicted}
-d_i (\mathbf{p}) \equiv \sum\limits_{k=1}^L f_i^k(\mathbf{r}^k, x_0^k, y_0^k,\mbox{\boldmath$\theta$}, \mathbf{m}^k, z^k_1, dz), \quad i=1,\dots,N,
+where $^{\mathsf{T}}$ denotes transposition and $\mathbf{r}^{k}$ is a $V \times 1$ vector containing the radii $r^{k}_{j}$ 
+of the $k$th prism.
+Let $\mathbf{d} (\mathbf{p})$ be the predicted data vector, whose $i$th element 
+\begin{equation}
+d_{i} (\mathbf{p}) \equiv \sum\limits_{k=1}^{L} f_{i}^{k}(\mathbf{r}^{k}, x_{0}^{k}, y_{0}^{k}, dz, z_{1}^{k}, m_{0}), \quad i = 1, \dots, N \: ,
+\label{eq:predicted-data-i}
 \end{equation}
-where $\mathbf{r}^k$ and $\mbox{\boldmath$\theta$}$ are the $V$-dimensional vectors containing the polar coordinates of the vertices of the $k$th prism whose the $j$th components are $r^k_j$ and $\theta_j = (j-1)2\pi/V$, $j=1,\dots , V$, $k=1,\dots ,L$, respectively. Additionally, $\mathbf{m}^k$ is the magnetization vector of the $k$th prism $P^k$, whose depth to the top is given by $z_1^k = z_0 + (k-1)dz$. We calculated the predicted total-field anomaly produced by the $k$th prism $P^k$, at the $i$th observation point ($x_i, y_i, z_i$), by using the Python package Fatiando a Terra \citep{uieda-etal2013}, which computes the non-linear function $f_i^k(\mathbf{r}^k, x_0^k, y_0^k,\mbox{\boldmath$\theta$}, \mathbf{m}^k, z^k_1, dz)$ based on the formulas proposed by \cite{plouff1976}.
+is the total-field anomaly produced by the ensemble of $L$ prisms at the $i$th observation point ($x_{i}, y_{i}, z_{i}$). 
+In eq. \ref{eq:predicted-data-i}, $f_{i}^{k}(\mathbf{r}^{k}, x_{0}^{k}, y_{0}^{k}, dz, z_{1}^{k}, m_{0})$ is the total-field anomaly 
+produced by the $k$th prism, with depth to the top $z_{1}^{k} = z_{0} + (k-1)dz$, at the observation point ($x_{i}, y_{i}, z_{i}$).
+We calculate $d_{i} (\mathbf{p})$ (eq. \ref{eq:predicted-data-i}) by using the Python package Fatiando a Terra \citep{uieda-etal2013}, 
+which implements the formulas proposed by \cite{plouff1976}.
 
 \subsection{Inverse problem}
 
-The non-linear inversion of the total field anomaly consists in estimating the parameter vector $\mathbf{p}$ that minimizes the constrained objective function given by
-
+Given tentative values for depth to the top of the shallowest prism $z_{0}$ and for the intensity of the total-magnetization of the source
+$m_{0}$, we solve a constrained non-linear problem to estimate the parameter vector $\mathbf{p}$ (eq. \ref{eq:p-vector}) by minimizing the 
+objective function
 \begin{equation}
-\Gamma (\mathbf{p}) = \phi (\mathbf{p}) + \sum\limits^{7}_{\ell =1}\alpha_{\ell}\varphi_{\ell}(\mathbf{p}),
+\Gamma (\mathbf{p}) = \phi (\mathbf{p}) + \sum\limits^{7}_{\ell =1} \alpha_{\ell} \, \varphi_{\ell}(\mathbf{p}) \: ,
 \label{eq:gamma}
 \end{equation}
 subject to
-\begin{equation}\label{eq:desigualdade}
-p_{n }^{min} < p_n < p_n^{max},\quad n =1, \dots, M,
+\begin{equation}
+p_{l}^{min} < p_{l} < p_{l}^{max}, \quad l = 1, \dots, M \: ,
+\label{eq:inequality-constraint}
 \end{equation}
-where $p_{n }^{min}$ and $p_n^{max}$ are the lower and upper limits for the $n$th element $p_n$ of the parameter vector $\mathbf{p}$, $\varphi (\mathbf{p})$ is the data-misfit function given by
+where $\varphi (\mathbf{p})$ is the data-misfit function given by
 \begin{equation}\label{eq:misfit}
-\phi (\mathbf{p}) = \frac{1}{N}[\mathbf{d}^{o} - \mathbf{d}(\mathbf{p})]^2,
+\phi (\mathbf{p}) = \frac{1}{N} \| \mathbf{d}^{o} - \mathbf{d}(\mathbf{p}) \|_{2}^{2} \: ,
 \end{equation}
-where $\mathbf{d}(\mathbf{p})$ is a $N$-dimensional vector whose the $i$th element $d_i$ is the predicted total-field anomaly (equation~\ref{eq:predicted}) at the position $(x_i,y_i,z_i)$, $i = 1,\dots, N$.
+which represents the normalized squared Euclidean norm of the difference between the observed data vector $\mathbf{d}^{o}$ and 
+the predicted data vector $\mathbf{d}(\mathbf{p})$, $\alpha_{\ell}$ is a small positive number representing the weight of the 
+$\ell$th constraint function $\varphi_{\ell}(\mathbf{p})$ and $p_{l}^{min}$ and $p_{l}^{max}$ are, respectively, the lower and 
+upper limits for the $l$th element $p_{l}$ of the parameter vector $\mathbf{p}$ (eq. \ref{eq:p-vector}). 
+These limits are defined by the interpreter based on both the horizontal extent of the magnetic anomaly and the knowledge 
+about the source.
 
-The limits for the radii of all vertices of all prisms ($r^k_j$, $j=1,\dots , V$, $k=1,\dots ,L$), the horizontal Cartesian coordinates of all
-arbitrary origins ($x_0^k$ , $y_0^k$ , $k = 1, \dots, L$), and the depth extent of all prisms $dz$ represented by $p_{n }^{min}$ and $p_n^{max}$ in the inequality constraints (equation \ref{eq:desigualdade}) are defined by the interpreter element by element based on both the horizontal extent of the magnetic anomaly and the knowledge about the source. 
+PAREI AQUI
 
 To estimate a stable solution, we introduced a set of seven constraints on the geometry of the source. The $\ell$th constraint ($\ell = 1, \dots , 7$) is represented by the function $\phi_{\ell} (\mathbf{p})$ (equation \ref{eq:gamma}), where $\alpha_{\ell}$ is a positive scalar representing its weight. We use the Marquadt's method to minimize the objective function $\Gamma (\mathbf{p})$ (equation \ref{eq:gamma}) and introduce the inequality constraints (equation \ref{eq:desigualdade}) by using a strategy similar to that presented by \citet{barbosa-etal1999}. Our method imposes the constraints:
+
 \begin{enumerate}
 \item Smoothness constraint on the adjacent radii defining the horizontal section of each vertical prism. This constraint imposes that adjacent radii within each prism must be close to each other. It forces the estimated prism to be approximately cylindrical. %Accurately, it requires that the $j$th estimated radius $\hat{r}_j^k$ must be as close as possible to its consecutive radius $\hat{r}_{j+1}^k$ within the $k$th vertical prism. In other words, this constraint avoids an abrupt change between two consecutive radii. 
 The matrix form of the this constraint is given by
