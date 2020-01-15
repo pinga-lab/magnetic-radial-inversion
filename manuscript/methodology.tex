@@ -73,7 +73,8 @@ obtain stable solutions and introduce a priori information about the magnetic so
 This group is formed by variations of the first-order Tikhonov regularization \citep[][ p. 103]{aster-etal2019}
 and impose smoothness on the radii $r_{j}^{k}$ and the Cartesian coordinates $x_{0}^{k}$ and $y_{0}^{k}$ of the origin 
 $O^{k}$, $j = 1, \dots, V$, $k = 1, \dots, L$, defining the horizontal section of each prism (Fig. \ref{fig:obs}b).
-They were proposed by \citet{oliveirajr-etal2011} and \citet{oliveirajr-barbosa2013}.
+They were proposed by \citet{oliveirajr-etal2011} and \citet{oliveirajr-barbosa2013} and play a very 
+role in introducing a priori information about the shape of the source. 
 
 The first constraint of this group is the \textit{Smoothness constraint on the adjacent radii defining the horizontal 
 section of each vertical prism}. This constraint imposes that adjacent radii $r_{j}^{k}$ and $r_{j+1}^{k}$ within each 
@@ -165,32 +166,25 @@ $\mathbf{I}_{2}$ is the identity matrix of order $2$.
 
 \subsubsection{Equality constraints}
 
-PAREI AQUI
-
 This group if formed by two constraints that were proposed by \citet{oliveirajr-etal2011} and 
 \citet{oliveirajr-barbosa2013} by following the same approach proposed \citet{barbosa-etal1997} and 
 \citet{barbosa-etal1999}. They introduce a priori information about the shallowest prism and are 
 suitable for outcropping sources.
 
-The \textit{Source’s outcrop constraint} imposes that the estimated horizontal cross-section of the shallowest prism 
+The \textit{Source’s outcrop constraint} imposes that the horizontal cross-section of the shallowest prism 
 must be close to the intersection of the geologic source with the known outcropping boundary. 
 The matrix form of the this constraint is given by
 \begin{equation}
 \varphi_{4}(\mathbf{p}) = \left(\mathbf{R}_{4} \mathbf{p} - \mathbf{a} \right)^{\mathsf{T}} 
 \left(\mathbf{R}_{4} \mathbf{p} - \mathbf{a} \right) ,
 \end{equation}
-where $\mathbf{a}$ is a vector containing the parameters defining the polygon that represents the 
-outcropping body
+where $\mathbf{a}$ is a vector containing the radii and the horizontal Cartesian coordinates of the 
+polygon defining the outcropping boundary
 \begin{equation}
-\mathbf{a} = 
-\begin{bmatrix}
-\tilde{r}_{1}^{0} \\
-\tilde{r}_{2}^{0} \\
-\vdots \\
-\tilde{r}_{M}^{0} \\
-\tilde{x}_{0}^{0} \\
-\tilde{y}_{0}^{0}
-\end{bmatrix}_{(V+2)\times 1} \quad ,
+\mathbf{a} = \left[ \begin{array}{@{}*{12}{c}@{}}
+\tilde{r}_{1}^{0} & \dots & \tilde{r}_{V}^{0} & \tilde{x}_{0}^{0} & \tilde{y}_{0}^{0} \\
+\end{array} \right]^{\mathsf{T}} \: ,
+\label{eq:a-vector}
 \end{equation}
 and
 \begin{equation}
@@ -198,81 +192,80 @@ and
 \begin{bmatrix}
 \mathbf{I}_{V+2} & \mathbf{0}_{(V+2) \times (M-V-2)} \\
 \end{bmatrix}_{(V+2)\times M},
+\label{eq:R4-matrix}
 \end{equation}
 where $\mathbf{I}_{V+2}$ is the identity matrix of order $V+2$ and $\mathbf{0}_{(V+2) \times (M-V-2)}$ is a matrix 
 with null elements.
 
-The \textit{Source's horizontal location constraint} imposes that the estimated horizontal Cartesian coordinates of the origin within 
+The \textit{Source's horizontal location constraint} imposes that the horizontal Cartesian coordinates of the origin within 
 the shallowest prism must be as close as possible to a known outcropping point. The matrix form of the this constraint is given by
 \begin{equation}
 \varphi_{5}(\mathbf{p}) = \left(\mathbf{R}_{5} \mathbf{p} - \mathbf{b} \right)^{\mathsf{T}}
 \left(\mathbf{R}_{5} \mathbf{p} - \mathbf{b}\right) \quad ,
 \end{equation}
-where
+where $\mathbf{b}$ is a vector containing the horizontal Cartesian coordinates of the outcropping point 
+\begin{equation}
+\mathbf{b} = \left[ \begin{array}{@{}*{12}{c}@{}}
+\tilde{x}_{0}^{0} & \tilde{y}_{0}^{0} \\
+\end{array} \right]^{\mathsf{T}} \: ,
+\label{eq:b-vector}
+\end{equation}
+and
 \begin{equation}
 \mathbf{R}_{5} = 
 \begin{bmatrix}
-\mathbf{B}^{\sharp} & \hat{\mathbf{0}} \\
-\end{bmatrix}_{2\times M} ,
+\mathbf{0}_{2 \times V} & \mathbf{I}_{2} & \mathbf{0}_{2 \times (M-V-2)} \\
+\end{bmatrix}_{2 \times M},
+\label{eq:R5-matrix}
 \end{equation}
-
-\begin{equation}
-\textbf{B}^{\sharp} = 
-\begin{bmatrix}
-0 & \cdots & 0 & 1 & 0 \\
-0 & \cdots & 0 & 0 & 1
-\end{bmatrix}_{2\times (V+2)},
-\end{equation}
-and $\textbf{p}'$ is a vector containing the Cartesian coordinates of the horizontal location of the source given by
-
-\begin{equation}
-\textbf{p}' = 
-\begin{bmatrix}
-x^0_0 \\
-y^0_0
-\end{bmatrix}_{2\times 1} ;
-\end{equation}
+where $\mathbf{I}_{2}$ is the identity matrix of order $2$ and $\mathbf{0}_{2 \times (M-V-2)}$ and 
+$\mathbf{0}_{2 \times V}$ are matrices with null elements.
 
 \subsubsection{Minimum Euclidean norm constraints}
 
-Minimum Euclidean norm constraint on the adjacent radii within each vertical prism. This constraint imposes that all estimated radii within each prism must be close to null values. The matrix form of the this constraint is given by
+Two constraints use the zeroth-order Tikhonov regularization with the purpose of 
+obtaining stable solutions without necessarily introducing significant a priori information 
+about the source. 
+
+The \textit{Minimum Euclidean norm of the radii} imposes that 
+all estimated radii within each prism must be close to null values. This constraint were proposed by 
+\citet{oliveirajr-etal2011} and \citet{oliveirajr-barbosa2013} and can be rewritten in matrix form 
+as follows
 \begin{equation}
-\varphi_{6}(\textbf{p}) = \textbf{p}^\mathsf{T}\textbf{C}^\mathsf{T}\textbf{C}\textbf{p},
+\varphi_{6}(\mathbf{p}) = \mathbf{p}^{\mathsf{T}} \mathbf{R}_{6}^{\mathsf{T}} \mathbf{R}_{6} \mathbf{p},
 \end{equation}
 where
 \begin{equation}
-\textbf{C} = 
+\mathbf{R}_{6} = 
 \begin{bmatrix}
-\textbf{C}^{\sharp} & \mathbf{0} & \mathbf{0} & \cdots & \mathbf{0} & \mathbf{0}\\
-\mathbf{0} & \textbf{C}^{\sharp} &  \mathbf{0} & \cdots & \mathbf{0} & \mathbf{0}\\
-\mathbf{0} & \mathbf{0} & \ddots & & \vdots & \vdots\\
-\vdots & \vdots & & \ddots & \vdots & \vdots\\
-\mathbf{0} & \mathbf{0} &  \cdots & \cdots & \textbf{C}^{\sharp} & \mathbf{0}\\
-\mathbf{0} & \mathbf{0} &  \cdots &  \cdots & \mathbf{0} & 0\\
-\end{bmatrix}_{M\times M} ,
+\mathbf{S}_{6} & \mathbf{0}_{(M-1) \times 1} \\
+\mathbf{0}_{1 \times (M-1)} & 0 \\
+\end{bmatrix}_{M\times M} \quad ,
+\label{eq:R6-matrix}
 \end{equation}
-
+and 
 \begin{equation}
-\textbf{C}^{\sharp} = 
+\mathbf{S}_{6} = 
 \begin{bmatrix}
-1 & & & & \\
-& \ddots &  & &  \\
-&  & 1 & & \\
-&  & & 0 &  \\
-&  & & & 0 \\
-\end{bmatrix}_{(V+2)\times (V+2)};
+\mathbf{I}_{V} & \mathbf{0}_{V \times 2} \\
+\mathbf{0}_{2 \times V} & \mathbf{I}_{2} \\
+\end{bmatrix}_{ (V+2)\times (V+2)} \quad .
+\label{eq:S6-matrix}
 \end{equation}
 
-Minimum Euclidean norm constraint on the depth extent of all prisms. This constraint imposes that the estimated depth extent of the prisms must be close to a null value. The matrix form of the this constraint is given by
-\begin{equation}\label{eq:phi7}
-\varphi_7 = \mathbf{p}^\mathsf{T}\mathbf{D}^\mathsf{T}\mathbf{D}\mathbf{p},
+The other constraint, the \textit{Minimum Euclidean norm of the thickness}, imposes 
+that the thickness of all prisms must be close to zero. This constraint were developed here 
+to introduce a priori information about the maximum depth of the source. Its matrix form 
+is given by
+\begin{equation}
+\varphi_7 = \mathbf{p}^{\mathsf{T}} \mathbf{R}_{7}^{\mathsf{T}} \mathbf{R}_{7} \mathbf{p} \quad ,
+\label{eq:phi7}
 \end{equation}
 where
 \begin{equation}
-\mathbf{D} =
+\mathbf{R}_{7} =
 \begin{bmatrix}
- 0 & \cdots  & 0 \\
- \vdots & \ddots & \vdots\\
- 0  & \cdots  & 1\\
-\end{bmatrix}_{M\times M}.
+\mathbf{0}_{(M-1) \times (M-1)} & \mathbf{0}_{(M-1) \times 1} \\
+\mathbf{0}_{1 \times (M-1)} & 1 \\
+\end{bmatrix}_{ M \times M } \quad .
 \end{equation}
