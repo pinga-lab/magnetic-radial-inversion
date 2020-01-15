@@ -1,0 +1,30 @@
+Field
+
+23000 Inc -20 Dec -15
+
+Ellipsoid 1
+S 2.0 SI
+centre 0,0, 150
+A
+length 300
+plunge 0
+Azimuth 90
+B
+length 150
+rotation -45
+C
+Length 25
+
+
+Ellipsoid 2
+S 2.0 SI
+centre 0,0,200
+A
+length 150
+plunge 0
+Azimuth 0
+B
+length 75
+rotation 0
+C
+length 60
