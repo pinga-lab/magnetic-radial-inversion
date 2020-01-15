@@ -7,8 +7,6 @@ manuscript/output/*
 *.cache
 *.coverage
 
-=======
-
 # Tex files
 *.synctex.gz
 *.fls
