@@ -1,4 +1,3 @@
-*~
 .*~
 *.pyc
 *-eps-converted-to-pdf.pdf
@@ -7,3 +6,22 @@ manuscript/output/*
 *.ipynb_checkpoints
 *.cache
 *.coverage
+
+# Tex files
+*.synctex.gz
+*.fls
+*.bbl
+*.blg
+*.fff
+*.log
+*.lof
+*.aux
+*.pyc
+*.out
+*.lot
+*.toc
+*.ttt
+*~
+*-eps-converted-to.pdf
+*.fdb_latexmk
+*.tiff
