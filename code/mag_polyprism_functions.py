@@ -847,7 +847,7 @@ def Hessian_phi_7(M, L, H, alpha):
     assert H.shape == (P, P), 'The hessian shape must be (P, P)'
     assert alpha >= 0., 'alpha must be greater or equal to 0'
 
-    H[-1,-1] += alpha
+    H[-1,-1] += 2.*alpha
 
     return H
 
