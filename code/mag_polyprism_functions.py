@@ -54,7 +54,7 @@ def pol2cart(l, M, L):
 
     output
 
-    mk: list - list of objects of the class
+    lk: list - list of objects of the class
     fatiando.mesher.PolygonalPrism
     '''
 
@@ -1662,6 +1662,8 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
     m0: array - estimated parameters
     model0: list - objects of fatiando.mesher.polyprisms
     phi_list: list - solutions of objective funtion
+    model_list: list - estimated models at each iteration
+    res_list: list - calculated residual at each iteration
     '''
     P = L*(M + 2) + 1
     assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
@@ -1680,9 +1682,11 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
     N = xp.size
     phi0 = np.sum(res0*res0)/N
     phi_list = [phi0]
-    dist = np.sqrt((xp - 8212800.)**2. + (yp - 478200.)**2.)
-    W = np.ones_like(xp)
-    W[np.argwhere(dist>=2000.)] = 0.02
+    model_list = [model0]
+    res_list = [res0]
+    G0 = Jacobian_tf(xp, yp, zp, model0, M, L, delta[0], delta[1], delta[2], delta[3], inc, dec)
+    th = np.trace(2.*np.dot(G0.T, G0)/N)/P
+    alpha *= th
 
     for it in range(maxit):
         mt = log_barrier(m0, M, L, mmax, mmin)
@@ -1692,33 +1696,30 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
 
         # Hessian matrix
         H = 2.*np.dot(G.T, G)/N
-        th = np.trace(H)/P
 
         # weighting the regularization parameters
-        mu = alpha*th
-
-        H = Hessian_phi_1(M, L, H, mu[0])
-        H = Hessian_phi_2(M, L, H, mu[1])
-        H = Hessian_phi_3(M, L, H, mu[2])
-        H = Hessian_phi_4(M, L, H, mu[3])
-        H = Hessian_phi_5(M, L, H, mu[4])
-        H = Hessian_phi_6(M, L, H, mu[5])
-        H = Hessian_phi_7(M, L, H, mu[6])
+        H = Hessian_phi_1(M, L, H, alpha[0])
+        H = Hessian_phi_2(M, L, H, alpha[1])
+        H = Hessian_phi_3(M, L, H, alpha[2])
+        H = Hessian_phi_4(M, L, H, alpha[3])
+        H = Hessian_phi_5(M, L, H, alpha[4])
+        H = Hessian_phi_6(M, L, H, alpha[5])
+        H = Hessian_phi_7(M, L, H, alpha[6])
 
         # gradient vector
         grad = -2.*np.dot(G.T, res0)/N
 
-        grad = gradient_phi_1(M, L, grad, mu[0])
-        grad = gradient_phi_2(M, L, grad, mu[1])
-        grad = gradient_phi_3(M, L, grad, m_out, mu[2])
-        grad = gradient_phi_4(M, L, grad, m_out[-2:], mu[3])
-        grad = gradient_phi_5(M, L, grad, mu[4])
-        grad = gradient_phi_6(M, L, grad, mu[5])
-        grad = gradient_phi_7(M, L, grad, mu[6])
+        grad = gradient_phi_1(M, L, grad, alpha[0])
+        grad = gradient_phi_2(M, L, grad, alpha[1])
+        grad = gradient_phi_3(M, L, grad, m_out, alpha[2])
+        grad = gradient_phi_4(M, L, grad, m_out[-2:], alpha[3])
+        grad = gradient_phi_5(M, L, grad, alpha[4])
+        grad = gradient_phi_6(M, L, grad, alpha[5])
+        grad = gradient_phi_7(M, L, grad, alpha[6])
 
         # positivity constraint
         H *= ((mmax - m0 + 1e-10)*(m0 - mmin + 1e-10))/(mmax - mmin)
-
+        
         # Hessian normalization
         D = 1./np.sqrt(np.diag(H))
         
@@ -1730,13 +1731,13 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
             d_fit = polyprism.tf(xp, yp, zp, model_est, inc, dec)
             res = dobs - d_fit
             phi = np.sum(res*res)/N
-            phi += phi_1(M, L, m_est, mu[0]) + \
-                    phi_2(M, L, m_est, mu[1]) + \
-                    phi_3(M, L, m_est, m_out, mu[2]) + \
-                    phi_4(M, L, m_est, m_out[-2:], mu[3]) + \
-                    phi_5(M, L, m_est, mu[4]) + \
-                    phi_6(M, L, m_est, mu[5]) + \
-                    phi_7(M, L, m_est, mu[6])
+            phi += phi_1(M, L, m_est, alpha[0]) + \
+                    phi_2(M, L, m_est, alpha[1]) + \
+                    phi_3(M, L, m_est, m_out, alpha[2]) + \
+                    phi_4(M, L, m_est, m_out[-2:], alpha[3]) + \
+                    phi_5(M, L, m_est, alpha[4]) + \
+                    phi_6(M, L, m_est, alpha[5]) + \
+                    phi_7(M, L, m_est, alpha[6])
 
             dphi = phi - phi0
 
@@ -1744,6 +1745,8 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
 
             if (dphi > 0.):
                 lamb *= dlamb
+                if it_marq == maxsteps - 1:
+                    phi = phi0
             else:
                 if lamb/dlamb < 1e-15:
                     lamb = 1e-15
@@ -1751,6 +1754,9 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
                     lamb /= dlamb
                 break
 
+        phi_list.append(phi)
+        model_list.append(model_est)
+        res_list.append(res)
         if (abs(dphi/phi0) < tol):
             break
         else:
@@ -1759,9 +1765,8 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
             model0 = model_est
             res0 = res.copy()
             phi0 = phi
-            phi_list.append(phi0)
 
-    return d0, m0, model0, phi_list
+    return d_fit, m_est, model_est, phi_list, model_list, res_list
 
 def levmarq_amf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, mmin, mmax, m_out, dobs, props, alpha, z0, dz):
     '''
@@ -1794,6 +1799,8 @@ def levmarq_amf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, 
     m0: array - estimated parameters
     model0: list - objects of fatiando.mesher.polyprisms
     phi_list: list - solutions of objective funtion
+    model_list: list - estimated models at each iteration
+    res_list: list - calculated residual at each iteration
     '''
     P = L*(M + 2) + 1
     assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
@@ -1814,6 +1821,11 @@ def levmarq_amf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, 
     N = xp.size
     phi0 = np.sum(res0*res0)/N
     phi_list = [phi0]
+    model_list = [model0]
+    res_list = [res0]
+    G0 = Jacobian_tf(xp, yp, zp, model0, M, L, delta[0], delta[1], delta[2], delta[3], inc, dec)
+    th = np.trace(2.*np.dot(G0.T, G0)/N)/P
+    alpha *= th
 
     for it in range(maxit):
         mt = log_barrier(m0, M, L, mmax, mmin)
@@ -1822,30 +1834,27 @@ def levmarq_amf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, 
         G = Jacobian_amf(xp, yp, zp, model0, M, L, delta[0], delta[1], delta[2], delta[3])
 
         # Hessian matrix
-        H = 2.*np.dot(G.T, G)/N
-        th = np.trace(H)/P
+        H = 2.*np.dot(G.T, G)/(th*N)
 
         # weighting the regularization parameters
-        mu = alpha*th
-
-        H = Hessian_phi_1(M, L, H, mu[0])
-        H = Hessian_phi_2(M, L, H, mu[1])
-        H = Hessian_phi_3(M, L, H, mu[2])
-        H = Hessian_phi_4(M, L, H, mu[3])
-        H = Hessian_phi_5(M, L, H, mu[4])
-        H = Hessian_phi_6(M, L, H, mu[5])
-        H = Hessian_phi_7(M, L, H, mu[6])
+        H = Hessian_phi_1(M, L, H, alpha[0])
+        H = Hessian_phi_2(M, L, H, alpha[1])
+        H = Hessian_phi_3(M, L, H, alpha[2])
+        H = Hessian_phi_4(M, L, H, alpha[3])
+        H = Hessian_phi_5(M, L, H, alpha[4])
+        H = Hessian_phi_6(M, L, H, alpha[5])
+        H = Hessian_phi_7(M, L, H, alpha[6])
 
         # gradient vector
-        grad = -2.*np.dot(G.T, res0)/N
+        grad = -2.*np.dot(G.T, res0)/(th*N)
 
-        grad = gradient_phi_1(M, L, grad, mu[0])
-        grad = gradient_phi_2(M, L, grad, mu[1])
-        grad = gradient_phi_3(M, L, grad, m_out, mu[2])
-        grad = gradient_phi_4(M, L, grad, m_out[-2:], mu[3])
-        grad = gradient_phi_5(M, L, grad, mu[4])
-        grad = gradient_phi_6(M, L, grad, mu[5])
-        grad = gradient_phi_7(M, L, grad, mu[6])
+        grad = gradient_phi_1(M, L, grad, alpha[0])
+        grad = gradient_phi_2(M, L, grad, alpha[1])
+        grad = gradient_phi_3(M, L, grad, m_out, alpha[2])
+        grad = gradient_phi_4(M, L, grad, m_out[-2:], alpha[3])
+        grad = gradient_phi_5(M, L, grad, alpha[4])
+        grad = gradient_phi_6(M, L, grad, alpha[5])
+        grad = gradient_phi_7(M, L, grad, alpha[6])
 
         # positivity constraint
         H *= ((mmax - m0 + 1e-10)*(m0 - mmin + 1e-10))/(mmax - mmin)
@@ -1863,13 +1872,13 @@ def levmarq_amf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, 
                             polyprism.bz(xp, yp, zp, model_est)**2.)
             res = dobs - d_fit
             phi = np.sum(res*res)/N
-            phi += phi_1(M, L, m_est, mu[0]) + \
-                    phi_2(M, L, m_est, mu[1]) + \
-                    phi_3(M, L, m_est, m_out, mu[2]) + \
-                    phi_4(M, L, m_est, m_out[-2:], mu[3]) + \
-                    phi_5(M, L, m_est, mu[4]) + \
-                    phi_6(M, L, m_est, mu[5]) + \
-                    phi_7(M, L, m_est, mu[6])
+            phi += phi_1(M, L, m_est, alpha[0]) + \
+                    phi_2(M, L, m_est, alpha[1]) + \
+                    phi_3(M, L, m_est, m_out, alpha[2]) + \
+                    phi_4(M, L, m_est, m_out[-2:], alpha[3]) + \
+                    phi_5(M, L, m_est, alpha[4]) + \
+                    phi_6(M, L, m_est, alpha[5]) + \
+                    phi_7(M, L, m_est, alpha[6])
 
             dphi = phi - phi0
 
@@ -1877,6 +1886,8 @@ def levmarq_amf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, 
 
             if (dphi > 0.):
                 lamb *= dlamb
+                if it_marq == maxsteps - 1:
+                    phi = phi0
             else:
                 if lamb/dlamb < 1e-15:
                     lamb = 1e-15
@@ -1884,6 +1895,9 @@ def levmarq_amf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, 
                     lamb /= dlamb
                 break
 
+        phi_list.append(phi)
+        model_list.append(model_est)
+        res_list.append(res)
         if (abs(dphi/phi0) < tol):
             break
         else:
@@ -1892,6 +1906,128 @@ def levmarq_amf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, 
             model0 = model_est
             res0 = res.copy()
             phi0 = phi
-            phi_list.append(phi0)
 
-    return d0, m0, model0, phi_list
+    return d_fit, m_est, model_est, phi_list, model_list, res_list
+
+def plot_prisms(prisms):
+    '''
+    Returns a list of ordered vertices to build the model
+    on matplotlib 3D
+
+    input
+
+    prisms: list - objects of fatiando.mesher.polyprisms
+
+    output
+
+    verts: list - ordered vertices
+    '''
+    verts = []
+    for o in prisms:
+        top = []
+        bottom = []
+        for x, y in zip(o.x, o.y):
+            top.append(np.array([x,y,o.z1]))
+            bottom.append(np.array([x,y,o.z2]))
+        verts.append(top)
+        verts.append(bottom)
+        for i in range(o.x.size-1):
+            sides = []
+            sides.append(np.array([o.x[i], o.y[i], o.z1]))
+            sides.append(np.array([o.x[i+1], o.y[i+1], o.z1]))
+            sides.append(np.array([o.x[i+1], o.y[i+1], o.z2]))
+            sides.append(np.array([o.x[i], o.y[i], o.z2]))
+            verts.append(sides)
+        sides = []
+        sides.append(np.array([o.x[-1], o.y[-1], o.z1]))
+        sides.append(np.array([o.x[0], o.y[0], o.z1]))
+        sides.append(np.array([o.x[0], o.y[0], o.z2]))
+        sides.append(np.array([o.x[-1], o.y[-1], o.z2]))
+        verts.append(sides)
+
+    return verts
+
+def varying_param(z0, varz, intensity, varint, inc, varinc, dec, vardec):
+    '''
+    Returns a list of fixed parameters for the
+    varying inversion
+
+    input
+
+    z0: float - depth to the top of the model
+    varz: float - variation for z0
+    intensity: float - magnetization intensity
+    varint: float - variation for intensity
+    inc: float - inclination
+    varinc: float - variation for inclination
+    dec: float - declination
+    vardec: float - variation for declination
+
+    output
+
+    param_list: list - list of modified fixed
+                parameters for varying the inversion
+    '''
+    param_list = []
+    param_list.append([z0, {'magnetization': utils.ang2vec(intensity, inc, dec)}])
+    param_list.append([z0+varz,{'magnetization': utils.ang2vec(intensity, inc, dec)}])
+    param_list.append([z0-varz,{'magnetization': utils.ang2vec(intensity, inc, dec)}])
+    param_list.append([z0,{'magnetization': utils.ang2vec(intensity+varint, inc, dec)}])
+    param_list.append([z0,{'magnetization': utils.ang2vec(intensity-varint, inc, dec)}])
+    param_list.append([z0,{'magnetization': utils.ang2vec(intensity, inc+varinc, dec+vardec)}])
+    param_list.append([z0,{'magnetization': utils.ang2vec(intensity, inc-varinc, dec-vardec)}])
+    param_list.append([z0+varz,{'magnetization': utils.ang2vec(intensity+varint, inc, dec)}])
+    param_list.append([z0+varz,{'magnetization': utils.ang2vec(intensity-varint, inc, dec)}])
+    param_list.append([z0+varz,{'magnetization': utils.ang2vec(intensity, inc+varinc, dec+vardec)}])
+    param_list.append([z0+varz,{'magnetization': utils.ang2vec(intensity, inc-varinc, dec-vardec)}])
+    param_list.append([z0-varz,{'magnetization': utils.ang2vec(intensity+varint, inc, dec)}])
+    param_list.append([z0-varz,{'magnetization': utils.ang2vec(intensity-varint, inc, dec)}])
+    param_list.append([z0-varz,{'magnetization': utils.ang2vec(intensity, inc+varinc, dec+vardec)}])
+    param_list.append([z0-varz,{'magnetization': utils.ang2vec(intensity, inc-varinc, dec-vardec)}])
+    param_list.append([z0,{'magnetization': utils.ang2vec(intensity+varint, inc+varinc, dec+vardec)}])
+    param_list.append([z0,{'magnetization': utils.ang2vec(intensity+varint, inc-varinc, dec-vardec)}])
+    param_list.append([z0,{'magnetization': utils.ang2vec(intensity-varint, inc+varinc, dec+vardec)}])
+    param_list.append([z0,{'magnetization': utils.ang2vec(intensity-varint, inc-varinc, dec-vardec)}])
+
+    return param_list
+
+def initial_cylinder(M, L, x0, y0, z0, dz, r, inc, dec, incs, decs, intensity):
+    '''
+    Returns an cylindrical initial guess
+    for the inversion
+
+    input
+
+    M: int - number of vertices
+    L: int - number of prisms
+    x0: float - coordinate of the center
+    y0: float - coordinate of the center
+    z0: float - depth to the top of the model
+    dz: float - depth extent of the prisms
+    r: float - radius of the cylinder
+    intensity: float - magnetization intensity
+    inc: float - inclination of the main field
+    dec: float - declination of the main field
+    inc: float - inclination of the source
+    dec: float - declination of the source
+
+    output
+
+    model0: list - prisms of the initial guess
+    d0: 1D array - initial data
+    '''
+
+    P = L*(M+2) + 1 # number of parameters
+
+    props = {'magnetization': utils.ang2vec(
+        intensity, incs, decs)}
+
+    rin = np.zeros(M) + r
+    m0 = np.hstack((rin, np.array([x0, y0])))
+    m0 = np.resize(m0, P - 1) # inicial parameters vector
+    m0 = np.hstack((m0, dz))
+
+    # list of classes of prisms
+    model0 = param2polyprism(m0, M, L, z0, props)
+
+    return model0, m0
