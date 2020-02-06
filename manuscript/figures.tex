@@ -1,7 +1,7 @@
 \begin{figure}
     \centering
     \includegraphics[scale=0.3]{figures/observed_data.png}
-    \caption{Schematic representation of (a) total-filed anomaly (grey surface) produced by (b) a 3-D anomalous source (dark grey volume). The interpretation model in (b) consists of a set of L vertical, juxtaposed 3-D prisms $P^k$ , $k = 1,\dots, L$, (light grey prisms) in the vertical direction of a right-handed coordinate system.}
+    \caption{Schematic representation of (a) total-filed anomaly (gray surface) produced by (b) a 3-D anomalous source (dark gray volume). The interpretation model in (b) consists of a set of L vertical, juxtaposed 3-D prisms $P^k$ , $k = 1,\dots, L$, (light gray prisms) in the vertical direction of a right-handed coordinate system.}
     \label{fig:obs}
 \end{figure}
 
@@ -14,24 +14,48 @@
 
 \begin{figure}
     \centering
-    \includegraphics[scale=.75]{figures/kimberlite_4figures.png}
-    \caption{(a) Perspective view of the simple model with the depth to the top $z_0 = 50$ m and the depth extent $1200$ m. (b) Synthetic noise-corrupted total-field anomaly produced by the simple model blue prisms in (a). The data was contaminated by a pseudorandom Gaussian noise with mean zero and standard deviation $1$ nT. (c) Perspective view of the true (blue lines) and estimated body (red prisms) obtained by inverting the noise-corrupted total-field anomaly in (b). (d) Residuals defined as the difference between the noisy and the predicted (not shown) total-field anomalies; the latter was produced by the estimated body (red prisms in b). The inset in d shows the histogram and the Gaussian curve for the residuals with mean $\mu=0.1$ nT and standard deviation $\sigma=5.23$ nT.
+    \includegraphics[scale=.5]{figures/wedding_cake_model_data.png}
+    \caption{Simple model simulation. (a) noise-corrupted total-field anomaly produced by the simple model (blue prisms) in (b). The black dots represent the observation points that simulate an airborne survey.
 }
-    \label{fig:kimb}
+    \label{fig:kimb_model}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[scale=.75]{figures/wedding_cake_obj_func_map.png}
+	\caption{Map of the objective function values due to the inverse solutions for the simple model. Each square is a value of the objective function of a solution of the inverse problem for a pair of the total-magnetization intensity and the depth to the top of the source. The red triangle represents the true values for $m_0$ and $z_0$.
+	}
+	\label{fig:kimb_map}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[scale=.5]{figures/wedding_cake_results.png}
+	\caption{Application to simple model data. (a) residual data given by the difference between the noise-corrupted data (Fig. \ref{fig:kimb_model}(a)) and the predicted data (not shown) produced by the inverse model (red prisms) in (c) and (d). The red prisms in (b) represent the input model of the inversion.
+	}
+	\label{fig:kimb_results}
 \end{figure}
 
 \begin{figure}
     \centering
-    \includegraphics[scale=.75]{figures/complex_3d_ini_data.png}
-    \caption{(a) Perspective view of the complex model (blue prisms) with the depth to the top $z_0 = 200$ m and the depth extent $4000$ m and the initial guess (red prisms) for the inversion which is a cylinder with radius $500$ m and depth extent $4800$ m. (b) Synthetic noise-corrupted total-field anomaly produced by the complex model blue prisms in (a). The data was contaminated by a pseudorandom Gaussian noise with mean zero and standard deviation $5$ nT.
+    \includegraphics[scale=.5]{figures/complex_model_data.png}
+    \caption{Complex model simulation. (a) noise-corrupted total-field anomaly produced by the complex model (blue prisms) in (c) and (d). The black dots represent the observation points that simulate an airborne survey.
 }
     \label{fig:complex_model}
 \end{figure}
 
 \begin{figure}
+	\centering
+	\includegraphics[scale=.75]{figures/complex_obj_func_map.png}
+	\caption{Map of the objective function values due to the inverse solutions for the complex model. Each square is a value of the objective function of a solution of the inverse problem for a pair of the total-magnetization intensity and the depth to the top of the source. The red triangle represents the true values for $m_0$ and $z_0$. The cyan diamond represents the solution with the lowest function value.
+	}
+	\label{fig:complex_map}
+\end{figure}
+
+\begin{figure}
     \centering
-    \includegraphics[scale=.75]{figures/complex_estimates_residual.png}
-    \caption{Perspective views of the complex model (blue lines) and the estimate (red prisms) in (a), (b) and (c). (d) Residuals defined as the difference between the noisy and the predicted (not shown) total-field anomalies and the histogram of the residuals (inset in d) with mean $\mu=0.1$ nT and standard deviation $\sigma=5.23$ nT. The dashed line on the inset is the Gaussian curve for the residuals.
+    \includegraphics[scale=.5]{figures/complex_results.png}
+    \caption{Application to complex model data. (a) residual data given by the difference between the noise-corrupted data (Fig. \ref{fig:complex_model}(a)) and the predicted data (not shown) produced by the inverse model (red prisms) in (c) and (d). The red prisms in (b) represent the input model of the inversion.
 }
     \label{fig:complex_result}
 \end{figure}
