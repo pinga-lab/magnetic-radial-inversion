@@ -154,7 +154,7 @@ def param2polyprism(m, M, L, z0, props):
 def derivative_tf_x0(xp, yp, zp, m, M, delta, inc, dec):
     '''
     This function calculates the derivative for total field anomaly
-    for x0 coordinate of a model of polygonal prisms using 
+    for x0 coordinate of a model of polygonal prisms using
     finite difference.
 
     input
@@ -190,7 +190,7 @@ def derivative_tf_x0(xp, yp, zp, m, M, delta, inc, dec):
 def derivative_tf_y0(xp, yp, zp, m, M, delta, inc, dec):
     '''
     This function calculates the derivative for total field anomaly
-    for y0 coordinate of a model of polygonal prisms using 
+    for y0 coordinate of a model of polygonal prisms using
     finite difference.
 
     input
@@ -342,7 +342,7 @@ def derivative_tf_dz(xp, yp, zp, m, L, delta, inc, dec):
     assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
     assert xp.shape == yp.shape == zp.shape, 'xp, yp and zp must have the same shape'
     assert delta > 0., 'delta must be a positive number'
-    
+
     mp = deepcopy(m)  # m.z + delta
     mm = deepcopy(m)  # m.z - delta
     mp[0].z2 += delta
@@ -404,7 +404,7 @@ def Jacobian_tf(xp, yp, zp, m, M, L, deltax, deltay, deltar, deltaz, inc, dec):
         G[:, aux + M + 1] = derivative_tf_y0(xp, yp, zp, mv, M, deltay, inc, dec)
         for j in range(M):
             G[:, aux + j] = derivative_tf_radial(xp, yp, zp, mv, M, j, deltar, inc, dec)
-    
+
     return G
 
 def derivative_amf_x0(xp, yp, zp, m, M, delta):
@@ -437,11 +437,11 @@ def derivative_amf_x0(xp, yp, zp, m, M, delta):
     df = np.sqrt(polyprism.bx(xp, yp, zp, mp)**2. + \
                  polyprism.by(xp, yp, zp, mp)**2. + \
                  polyprism.bz(xp, yp, zp, mp)**2.)
-    
+
     df -= np.sqrt(polyprism.bx(xp, yp, zp, mm)**2. + \
                   polyprism.by(xp, yp, zp, mm)**2. + \
                   polyprism.bz(xp, yp, zp, mm)**2.)
-    
+
     df /= (2.*delta)
 
     return df
@@ -449,7 +449,7 @@ def derivative_amf_x0(xp, yp, zp, m, M, delta):
 def derivative_amf_y0(xp, yp, zp, m, M, delta):
     '''
     This function calculates the derivative for amplitude of
-    anomalous field of a set of polygonal prisms using 
+    anomalous field of a set of polygonal prisms using
     finite difference.
 
     input
@@ -476,7 +476,7 @@ def derivative_amf_y0(xp, yp, zp, m, M, delta):
     df = np.sqrt(polyprism.bx(xp, yp, zp, mp)**2. + \
                  polyprism.by(xp, yp, zp, mp)**2. + \
                  polyprism.bz(xp, yp, zp, mp)**2.)
-    
+
     df -= np.sqrt(polyprism.bx(xp, yp, zp, mm)**2. + \
                   polyprism.by(xp, yp, zp, mm)**2. + \
                   polyprism.bz(xp, yp, zp, mm)**2.)
@@ -488,7 +488,7 @@ def derivative_amf_y0(xp, yp, zp, m, M, delta):
 def derivative_amf_radial(xp, yp, zp, m, M, nv, delta):
     '''
     This function calculates the derivative for amplitude of
-    anomalous field for radial coordinate of a set of 
+    anomalous field for radial coordinate of a set of
     polygonal prisms using finite difference.
 
     input
@@ -539,7 +539,7 @@ def derivative_amf_radial(xp, yp, zp, m, M, nv, delta):
 def derivative_amf_dz(xp, yp, zp, m, L, delta):
     '''
     This function calculates the derivative for amplitude of
-    anomalous field from a model of polygonal prisms using 
+    anomalous field from a model of polygonal prisms using
     finite difference.
 
     input
@@ -572,7 +572,7 @@ def derivative_amf_dz(xp, yp, zp, m, L, delta):
     df = np.sqrt(polyprism.bx(xp, yp, zp, mp)**2. + \
                  polyprism.by(xp, yp, zp, mp)**2. + \
                  polyprism.bz(xp, yp, zp, mp)**2.)
-    
+
     df -= np.sqrt(polyprism.bx(xp, yp, zp, mm)**2. + \
                   polyprism.by(xp, yp, zp, mm)**2. + \
                   polyprism.bz(xp, yp, zp, mm)**2.)
@@ -651,18 +651,18 @@ def Hessian_phi_1(M, L, H, alpha):
     assert alpha >= 0., 'alpha must be greater or equal to 0'
 
     # extracting the non-zero diagonals
-    d0, d1, dM = diags_phi_1(M, L, alpha)
+    d0, d1, dM = diags_phi_1(M, L)
 
     i, j = np.diag_indices_from(H) # indices of the diagonal elements
 
     k = np.full(P-1, 1, dtype=np.int) # array iterable
     l = np.full(P-M+1, M-1, dtype=np.int) # array iterable
 
-    H[i,j] += d0
-    H[i[:P-1],j[:P-1] + k] += d1
-    H[i[:P-1] + k,j[:P-1]] += d1
-    H[i[:P-M+1],j[:P-M+1] + l] += dM
-    H[i[:P-M+1] + l,j[:P-M+1]] += dM
+    H[i,j] += alpha*d0
+    H[i[:P-1],j[:P-1] + k] += alpha*d1
+    H[i[:P-1] + k,j[:P-1]] += alpha*d1
+    H[i[:P-M+1],j[:P-M+1] + l] += alpha*dM
+    H[i[:P-M+1] + l,j[:P-M+1]] += alpha*dM
 
     return H
 
@@ -689,15 +689,15 @@ def Hessian_phi_2(M, L, H, alpha):
     assert alpha >= 0., 'alpha must be greater or equal to 0'
 
     # extracting the non-zero diagonals
-    d0, d1 = diags_phi_2(M, L, alpha)
+    d0, d1 = diags_phi_2(M, L)
 
     i, j = np.diag_indices_from(H) # indices of the diagonal elements
 
     k = np.full(P-M-2, M+2, dtype=np.int) # array iterable
 
-    H[i,j] += d0
-    H[i[:P-M-2],j[:P-M-2] + k] += d1
-    H[i[:P-M-2] + k,j[:P-M-2]] += d1
+    H[i,j] += alpha*d0
+    H[i[:P-M-2],j[:P-M-2] + k] += alpha*d1
+    H[i[:P-M-2] + k,j[:P-M-2]] += alpha*d1
 
     return H
 
@@ -725,7 +725,7 @@ def Hessian_phi_3(M, L, H, alpha):
 
     i, j = np.diag_indices(M+2) # indices of the diagonal elements in M + 2
 
-    H[i,j] += alpha
+    H[i,j] += 2.*alpha
 
     return H
 
@@ -753,8 +753,8 @@ def Hessian_phi_4(M, L, H, alpha):
 
     i, j = np.diag_indices(P) # indices of the diagonal elements
 
-    H[M,M] += alpha
-    H[M+1,M+1] += alpha
+    H[M,M] += 2.*alpha
+    H[M+1,M+1] += 2.*alpha
 
     return H
 
@@ -781,16 +781,16 @@ def Hessian_phi_5(M, L, H, alpha):
     assert alpha >= 0., 'alpha must be greater or equal to 0'
 
     # extracting the non-zero diagonals
-    d0, d1 = diags_phi_5(M, L, alpha)
+    d0, d1 = diags_phi_5(M, L)
 
     i, j = np.diag_indices_from(H) # indices of the diagonal elements
 
     k = np.full(P-1, 1, dtype=np.int) # array iterable
     l = np.full(P-M-2, M+2, dtype=np.int) # array iterable
 
-    H[i,j] += d0
-    H[i[:P-M-2],j[:P-M-2] + l] += d1
-    H[i[:P-M-2] + l,j[:P-M-2]] += d1
+    H[i,j] += alpha*d0
+    H[i[:P-M-2],j[:P-M-2] + l] += alpha*d1
+    H[i[:P-M-2] + l,j[:P-M-2]] += alpha*d1
 
     return H
 
@@ -817,11 +817,11 @@ def Hessian_phi_6(M, L, H, alpha):
     assert alpha >= 0., 'alpha must be greater or equal to 0'
 
     # extracting the non-zero diagonals
-    d0 = diags_phi_6(M, L, alpha)
+    d0 = diags_phi_6(M, L)
 
     i, j = np.diag_indices_from(H) # indices of the diagonal elements
 
-    H[i,j] += d0
+    H[i,j] += alpha*d0
 
     return H
 
@@ -847,7 +847,7 @@ def Hessian_phi_7(M, L, H, alpha):
     assert H.shape == (P, P), 'The hessian shape must be (P, P)'
     assert alpha >= 0., 'alpha must be greater or equal to 0'
 
-    H[-1,-1] += alpha
+    H[-1,-1] += 2.*alpha
 
     return H
 
@@ -876,14 +876,14 @@ def gradient_phi_1(M, L, m, alpha):
     m1 = m.copy() # the new vector m1 = gradient input + gradient of phi1
 
     # extracting the non-zero diagonals
-    d0, d1, dM = diags_phi_1(M, L, alpha)
+    d0, d1, dM = diags_phi_1(M, L)
 
     # calculating the product between the diagonals and the slices of m
-    m1 += m*d0
-    m1[:P-1] += m[1:]*d1
-    m1[1:] += m[:P-1]*d1
-    m1[:P-M+1] += m[M-1:]*dM
-    m1[M-1:] += m[:P-M+1]*dM
+    m1 += alpha*m*d0
+    m1[:P-1] += alpha*m[1:]*d1
+    m1[1:] += alpha*m[:P-1]*d1
+    m1[:P-M+1] += alpha*m[M-1:]*dM
+    m1[M-1:] += alpha*m[:P-M+1]*dM
 
     return m1
 
@@ -912,12 +912,12 @@ def gradient_phi_2(M, L, m, alpha):
     m2 = m.copy() # the new vector m2 = gradient input + gradient of phi2
 
     # extracting the non-zero diagonals
-    d0, d1 = diags_phi_2(M, L, alpha)
+    d0, d1 = diags_phi_2(M, L)
 
     # calculating the product between the diagonals and the slices of m
-    m2 += m*d0
-    m2[:P-M-2] += m[M+2:]*d1
-    m2[M+2:] += m[:P-M-2]*d1
+    m2 += alpha*m*d0
+    m2[:P-M-2] += alpha*m[M+2:]*d1
+    m2[M+2:] += alpha*m[:P-M-2]*d1
 
     return m2
 
@@ -944,11 +944,11 @@ def gradient_phi_3(M, L, m, m0, alpha):
     assert m.size == P, 'The size of parameter vector must be equal to P'
     assert m0.size == M + 2, 'The size of parameter vector must be equal to M + 2'
     assert alpha >= 0., 'alpha must be greater or equal to 0'
-    
+
     m3 = np.copy(m) # the new vector m3 = gradient input + gradient of phi3
-    
+
     # calculating the product between the diagonals and the slices of m
-    m3[:M+2] += (m[:M+2] - m0)*alpha
+    m3[:M+2] += (m[:M+2] - m0)*2.*alpha
 
     return m3
 
@@ -979,7 +979,7 @@ def gradient_phi_4(M, L, m, m0, alpha):
     m4 = np.copy(m) # the new vector m4 = gradient input + gradient of phi4
 
     # calculating the product between the diagonals and the slices of m
-    m4[M:M+2] += (m[M:M+2] - m0)*alpha
+    m4[M:M+2] += (m[M:M+2] - m0)*2.*alpha
 
     return m4
 
@@ -1008,12 +1008,12 @@ def gradient_phi_5(M, L, m, alpha):
     assert alpha >= 0., 'alpha must be greater or equal to 0'
 
     # extracting the non-zero diagonals
-    d0, d1 = diags_phi_5(M, L, alpha)
+    d0, d1 = diags_phi_5(M, L)
 
     # calculating the product between the diagonals and the slices of m
-    m5 += m*d0
-    m5[:P-M-2] += m[M+2:]*d1
-    m5[M+2:] += m[:P-M-2]*d1
+    m5 += alpha*m*d0
+    m5[:P-M-2] += alpha*m[M+2:]*d1
+    m5[M+2:] += alpha*m[:P-M-2]*d1
 
     return m5
 
@@ -1042,10 +1042,10 @@ def gradient_phi_6(M, L, m, alpha):
     m6 = m.copy() # the new vector m1 = gradient input + gradient of phi6
 
     # extracting the non-zero diagonals
-    d0 = diags_phi_6(M, L, alpha)
+    d0 = diags_phi_6(M, L)
 
     # calculating the product between the diagonals and the slices of m
-    m6 += m*d0
+    m6 += alpha*m*d0
 
     return m6
 
@@ -1074,7 +1074,7 @@ def gradient_phi_7(M, L, m, alpha):
     m7 = m.copy() # the new vector m1 = gradient input + gradient of phi7
 
     # calculating the product between the diagonals and the slices of m
-    m7[-1] += m[-1]*alpha
+    m7[-1] += m[-1]*2.*alpha
 
     return m7
 
@@ -1102,14 +1102,14 @@ def phi_1(M, L, m, alpha):
     m1 = m.copy()
 
     # extracting the non-zero diagonals
-    d0, d1, dM = diags_phi_1(M, L, alpha)
+    d0, d1, dM = diags_phi_1(M, L)
 
     # calculating the product between the diagonals and the slices of m
-    m1 = m*d0
-    m1[:P-1] += m[1:]*d1
-    m1[1:] += m[:P-1]*d1
-    m1[:P-M+1] += m[M-1:]*dM
-    m1[M-1:] += m[:P-M+1]*dM
+    m1 = m*alpha*d0
+    m1[:P-1] += m[1:]*alpha*d1
+    m1[1:] += m[:P-1]*alpha*d1
+    m1[:P-M+1] += m[M-1:]*alpha*dM
+    m1[M-1:] += m[:P-M+1]*alpha*dM
 
     phi_1 = np.dot(m1, m)
 
@@ -1137,14 +1137,14 @@ def phi_2(M, L, m, alpha):
     assert alpha >= 0., 'alpha must be greater or equal to 0'
 
     # extracting the non-zero diagonals
-    d0, d1 = diags_phi_2(M, L, alpha)
+    d0, d1 = diags_phi_2(M, L)
 
     m2 = m.copy()
 
     # calculating the product between the diagonals and the slices of m
-    m2 = m*d0
-    m2[:P-M-2] += m[M+2:]*d1
-    m2[M+2:] += m[:P-M-2]*d1
+    m2 = alpha*m*d0
+    m2[:P-M-2] += alpha*m[M+2:]*d1
+    m2[M+2:] += alpha*m[:P-M-2]*d1
 
     phi_2 = np.dot(m2, m)
 
@@ -1238,12 +1238,12 @@ def phi_5(M, L, m, alpha):
     m5 = m.copy()
 
     # extracting the non-zero diagonals
-    d0, d1 = diags_phi_5(M, L, alpha)
+    d0, d1 = diags_phi_5(M, L)
 
     # calculating the product between the diagonals and the slices of m
-    m5 = m*d0
-    m5[:P-M-2] += m[M+2:]*d1
-    m5[M+2:] += m[:P-M-2]*d1
+    m5 = alpha*m*d0
+    m5[:P-M-2] += alpha*m[M+2:]*d1
+    m5[M+2:] += alpha*m[:P-M-2]*d1
 
     phi_5 = np.dot(m5, m)
 
@@ -1273,10 +1273,10 @@ def phi_6(M, L, m, alpha):
     m6 = m.copy()
 
     # extracting the non-zero diagonals
-    d0 = diags_phi_6(M, L, alpha)
+    d0 = diags_phi_6(M, L)
 
     # calculating the product between the diagonals and the slices of m
-    m6 = m*d0
+    m6 = alpha*m*d0
 
     phi_6 = np.dot(m6, m)
 
@@ -1309,7 +1309,7 @@ def phi_7(M, L, m, alpha):
 
     return phi_7
 
-def diags_phi_1(M, L, alpha):
+def diags_phi_1(M, L):
     '''
     Returns the non-zero diagonals of hessian matrix for
     the smoothness constraint on adjacent radial distances
@@ -1319,31 +1319,33 @@ def diags_phi_1(M, L, alpha):
 
     M: integer - number of vertices
     L: integer - number of prisms
-    alpha: float - weight
 
     output
 
     d0, d1, dM: 1D array - diagonals from phi_1 hessian
     '''
-    assert alpha >= 0., 'alpha must be greater or equal to 0'
-    
+
     P = L*(M + 2)
 
     # building the diagonals
     d0 = np.zeros(M+2)
-    d0[:M] = 2.*alpha
+    d0[:M] = 2.
     d0 = np.resize(d0, P)
     d0 = np.hstack((d0, 0.))
 
     d1 = np.zeros(M+2)
-    d1[:M-1] = - alpha
+    d1[:M-1] = -1.
     d1 = np.resize(d1, P-1)
     d1 = np.hstack((d1, 0.))
 
     dM = np.zeros(M+2)
-    dM[0] = - alpha
+    dM[0] = -1.
     dM = np.resize(dM, P-M+1)
     dM = np.hstack((dM, 0.))
+
+    d0 = 2.*d0
+    d1 = 2.*d1
+    dM = 2.*dM
 
     return d0, d1, dM
 
@@ -1410,7 +1412,7 @@ def norm_regul_param(M, L, th, m0, a1, a2, a3, a4, a5, a6):
 
     return alpha1, alpha2, alpha3, alpha4, alpha5, alpha6
 
-def diags_phi_2(M, L, alpha):
+def diags_phi_2(M, L):
     '''
     Returns the non-zero diagonals of hessian matrix for
     the smoothness constraint on adjacent radial distances
@@ -1426,7 +1428,6 @@ def diags_phi_2(M, L, alpha):
     d0, d1: 1D array - diagonals from phi_2 hessian
     '''
     assert L >= 2, 'The number of prisms must be greater than 1'
-    assert alpha >= 0., 'alpha must be greater or equal to 0'
 
     P = L*(M + 2)
 
@@ -1435,24 +1436,27 @@ def diags_phi_2(M, L, alpha):
     d0 = np.zeros(M+2)
 
     if L <= 2:
-        d0[:M] = alpha
+        d0[:M] = 1.
         d0 = np.resize(d0, P)
         d0 = np.hstack((d0, 0.))
     else:
-        d0[:M] = 2.*alpha
+        d0[:M] = 2.
         d0 = np.resize(d0, P)
-        d0[:M] -= alpha
-        d0[-M-2:-2] -= alpha
+        d0[:M] -= 1.
+        d0[-M-2:-2] -= 1.
         d0 = np.hstack((d0, 0.))
 
     d1 = np.zeros(M+2)
-    d1[:M] = - alpha
+    d1[:M] = -1.
     d1 = np.resize(d1, P-M-2)
     d1 = np.hstack((d1, 0.))
 
+    d0 = 2.*d0
+    d1 = 2.*d1
+
     return d0, d1
 
-def diags_phi_5(M, L, alpha):
+def diags_phi_5(M, L):
     '''
     Returns the non-zero diagonals of hessian matrix for
     the smoothness constraint on origin in the adjacent prisms.
@@ -1461,14 +1465,12 @@ def diags_phi_5(M, L, alpha):
 
     M: integer - number of vertices
     L: integer - number of prisms
-    alpha: float - weight
 
     output
 
     d0, d1: 1D array - diagonals from phi_5 hessian
     '''
     assert L >= 2, 'The number of prisms must be greater than 1'
-    assert alpha >= 0., 'alpha must be greater or equal to 0'
 
     P = L*(M + 2)
 
@@ -1476,24 +1478,27 @@ def diags_phi_5(M, L, alpha):
     d0 = np.zeros(M+2)
 
     if L == 2:
-        d0[M:M+2] = alpha
+        d0[M:M+2] = 1.
         d0 = np.resize(d0, P)
         d0 = np.hstack((d0, 0.))
     else:
-        d0[M:M+2] = 2*alpha
+        d0[M:M+2] = 2.
         d0 = np.resize(d0, P)
-        d0[M:M+2] -= alpha
-        d0[-2:] -= alpha
+        d0[M:M+2] -= 1.
+        d0[-2:] -= 1.
         d0 = np.hstack((d0, 0.))
 
     d1 = np.zeros(M+2)
-    d1[M:M+2] -= alpha
+    d1[M:M+2] -= 1.
     d1 = np.resize(d1, P-M-2)
     d1 = np.hstack((d1, 0.))
 
+    d0 = 2.*d0
+    d1 = 2.*d1
+
     return d0, d1
 
-def diags_phi_6(M, L, alpha):
+def diags_phi_6(M, L):
     '''
     Returns the non-zero diagonals of hessian matrix for
     an minimum Euclidian norm on adjacent radial distances
@@ -1503,21 +1508,21 @@ def diags_phi_6(M, L, alpha):
 
     M: integer - number of vertices
     L: integer - number of prisms
-    alpha: float - weight
 
     output
 
     d0: 1D array - diagonal from phi_6 hessian
     '''
-    assert alpha >= 0., 'alpha must be greater or equal to 0'
 
     P = L*(M + 2)
 
     # building the diagonal
     d0 = np.zeros(M+2)
-    d0[:M] += alpha
+    d0[:M] += 1.
     d0 = np.resize(d0, P)
     d0 = np.hstack((d0, 0.))
+
+    d0 = 2.*d0
 
     return d0
 
@@ -1590,7 +1595,7 @@ def log_barrier(m, M, L, mmax, mmin):
     assert np.alltrue(m >= mmin), 'm must be greater than mmin'
 
     mt = - np.log((mmax - m)/(m - mmin + 1e-2))
-    
+
     return mt
 
 def inv_log_barrier(mt, M, L, mmax, mmin):
@@ -1617,17 +1622,17 @@ def inv_log_barrier(mt, M, L, mmax, mmin):
     P = L*(M+2) + 1
     assert mmax.size == mmin.size == mt.size == P, 'The size of mmax, mmin, and mt must be equal to P'
     assert mmax.shape == mmin.shape == mt.shape == (P,), 'The shape of mmax, mmin, and m must be equal to (P,)'
-    
+
     i_overflow = np.argwhere(mt <= -709.8)
     mt[i_overflow] = -709.7
-    
+
     m = mmin + (mmax - mmin)/(1. + np.exp(-mt))
-    
+
     i_max = np.argwhere(m >= mmax)
     i_min = np.argwhere(m <= mmin)
     m[i_max] = mmax[i_max] - 1e-1
     m[i_min] = mmin[i_min] + 1e-1
-    
+
     return m
 
 def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, mmin, mmax, m_out, dobs, inc, dec, props, alpha, z0, dz):
@@ -1685,8 +1690,25 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
     model_list = [model0]
     res_list = [res0]
     G0 = Jacobian_tf(xp, yp, zp, model0, M, L, delta[0], delta[1], delta[2], delta[3], inc, dec)
-    th = np.trace(2.*np.dot(G0.T, G0)/N)/P
-    alpha *= th
+
+    # Scale factor of misfit function
+    th = np.trace(2.*np.dot(G0.T, G0)/N)
+
+    # Scale factors of the constraint functions
+    th_constraints = []
+    d0, d1, dM = diags_phi_1(M, L)
+    th_constraints.append(np.sum(d0)) # phi1
+    d0, d1 = diags_phi_2(M, L)
+    th_constraints.append(np.sum(d0)) # phi2
+    th_constraints.append(2.*(M+2)) # phi3
+    th_constraints.append(2.*2) # phi4
+    d0, d1 = diags_phi_5(M, L)
+    th_constraints.append(np.sum(d0)) # phi5
+    d0 = diags_phi_6(M, L)
+    th_constraints.append(np.sum(d0)) # phi6
+    th_constraints.append(2.) # phi7
+
+    alpha *= th/th_constraints
 
     for it in range(maxit):
         mt = log_barrier(m0, M, L, mmax, mmin)
@@ -1719,12 +1741,12 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
 
         # positivity constraint
         H *= ((mmax - m0 + 1e-10)*(m0 - mmin + 1e-10))/(mmax - mmin)
-        
+
         # Hessian normalization
         D = 1./np.sqrt(np.diag(H))
-        
+
         for it_marq in range(maxsteps):
-            
+
             delta_mt = (D*(np.linalg.solve((D*(H*D).T).T + lamb*np.identity(mt.size), -D*grad)).T).T
             m_est = inv_log_barrier(mt + delta_mt, M, L, mmax, mmin)
             model_est = param2polyprism(m_est, M, L, z0, props)
@@ -1861,9 +1883,9 @@ def levmarq_amf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, 
 
         # Hessian normalization
         D = 1./np.sqrt(np.diag(H))
-        
+
         for it_marq in range(maxsteps):
-            
+
             delta_mt = (D*(np.linalg.solve((D*(H*D).T).T + lamb*np.identity(mt.size), -D*grad)).T).T
             m_est = inv_log_barrier(mt + delta_mt, M, L, mmax, mmin)
             model_est = param2polyprism(m_est, M, L, z0, props)
