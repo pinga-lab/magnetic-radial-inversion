@@ -65,32 +65,31 @@ $\Gamma (\mathbf{p})$ (equation \ref{eq:gamma}) and introduce the inequality con
 
 \subsection{Computational procedures}
 
-The regularization constraints depend on the weights $\tilde{\alpha}_\ell$ which are set by the interpret based on the prior information about the source. We set the vector $\tilde{\boldsymbol{\alpha}}$ that contains each constraint weight.
+The regularization constraints depend on the weights $\tilde{\alpha}_\ell$ which are set by the interpret based on the prior information about the source. We set the vector $\tilde{\boldsymbol{\alpha}}$ that contains each constraint weight to stabilize the inverse problem. The linear system solved by this method is given by
+
+\begin{equation}\label{eq:linear-system}
+\Delta\hat{\mathbf{p}}^{\dagger}_k = \mathbf{D}_k\left(\mathbf{D}_k\mathbf{H}^\dagger_k\mathbf{D}_k+\lambda_k\mathbf{I}\right)^{-1}\mathbf{D}_k\mathbf{J}_k
+\end{equation}
+
 
 The proposed methodology was implemented using the Marquardt's method:
 
 \begin{enumerate}
-	\item Iteration $k = 0$: input $\mathbf{d}^o$, $\mathbf{r}$, $z_0$, $dz$, $\mathbf{p}^{min}$, $\mathbf{p}^{max}$, $\boldsymbol{\alpha}$, and an initial approximation $\mathbf{p}_0$ satisfying the inequality constraints (equation \ref{eq:inequality-constraint}).
-	\item Obtain $\breve{\mathbf{p}}^k = f(\mathbf{p}^k)$ using the strategy proposed by \cite{barbosa-etal1999}.
-	\item Obtain $\Delta\breve{\mathbf{p}}^k$ at the $k$th iteration by solving equation \ref{eq:gamma} using Marquardt’s method.
-	\item Compute: $\breve{\mathbf{p}}^{k+1} = \breve{\mathbf{p}}^k + \Delta\breve{\mathbf{p}}$.
-	\item Obtain $\mathbf{p}^{k+1}$ using the inverse inequality function \citet{barbosa-etal1999}.
-	\item Test for algorithm convergence. Evaluate 
+	\item Iteration $k = 0$: input $\mathbf{d}^o$, $\mathbf{r}$, $z_0$, $dz$, $\mathbf{p}^{min}$, $\mathbf{p}^{max}$, $\boldsymbol{\alpha}$, and an initial approximation $\mathbf{p}_0$ satisfying the inequality constraints (equation \ref{eq:inequality-constraint});
+	\item Obtain $\hat{\mathbf{p}}_k = f(\mathbf{p}_k)$ using the strategy proposed by \cite{barbosa-etal1999};
+	\item Obtain $\Delta\hat{\mathbf{p}}^{\dagger}_k$ at the $k$th iteration by solving equation \ref{eq:gamma} using Marquardt’s method;
+	\item Compute: $\hat{\mathbf{p}}_{k+1}^{\dagger} = \hat{\mathbf{p}}^{\dagger}_k + \Delta\hat{\mathbf{p}}^{\dagger}$;
+	\item Obtain $\mathbf{p}_{k+1}^{\dagger}$ using the inverse inequality function \citet{barbosa-etal1999};
+	\item Test for algorithm convergence. Evaluate $\left|\Gamma(\hat{\mathbf{p}}_{k+1}) - \Gamma(\hat{\mathbf{p}}_k)\right|$.
 \end{enumerate}
-%1) Iteration k = 0: input g o , R, A, p a , p min , p max , μ a , μ r , and
-%an initial approximation p 0 satisfying the inequality con-
-%straints. For all k, set W (k) equal to the identity matrix.
-%2) Obtain p̂ † (k) = f ( p̂ (k) ) using equation (14).
-%3) Obtain ∆ p̂ † (k) at the kth iteration by solving equation (14)
-%using Marquardt’s (1963) method.
-%4) Compute: p̂ † (k+1) = p̂ † (k) + ∆ p̂ † (k) .
-%5) Obtain p̂ (k+1) using equation (5).
-%6) Test for algorithm convergence. Evaluate 
+where  $ \Gamma(\mathbf{p}^{k+1}) $ and $\Gamma(\mathbf{p}^{k})$ are the goal function (equation \ref{eq:gamma}) evaluated at the iteration $k+1$ and $k$, respectively.
 
 \subsection{Constraint functions}
 
 We have divided the constraint functions $\varphi_{\ell}(\mathbf{p})$ (eq. \ref{eq:gamma}), $\ell = 1, \dots, 7$, used here to 
-obtain stable solutions and introduce a priori information about the magnetic source into three groups. 
+obtain stable solutions and introduce a priori information about the magnetic source into three groups.
+
+
 
 \subsubsection{Smoothness constraints}
 
