@@ -54,7 +54,7 @@ where $\varphi (\mathbf{p})$ is the data-misfit function given by
 \phi (\mathbf{p}) = \frac{1}{N} \| \mathbf{d}^{o} - \mathbf{d}(\mathbf{p}) \|_{2}^{2} \: ,
 \end{equation}
 which represents the normalized squared Euclidean norm of the difference between the observed data vector $\mathbf{d}^{o}$ and 
-the predicted data vector $\mathbf{d}(\mathbf{p})$, $\alpha_{\ell}$ is a small positive number representing the weight of the 
+the predicted data vector $\mathbf{d}(\mathbf{p})$, $\alpha_{\ell}$ is a positive number representing the weight of the 
 $\ell$th constraint function $\varphi_{\ell}(\mathbf{p})$ and $p_{l}^{min}$ and $p_{l}^{max}$ are, respectively, the lower and 
 upper limits for the $l$th element $p_{l}$ of the parameter vector $\mathbf{p}$ (eq. \ref{eq:p-vector}). 
 These limits are defined by the interpreter based on both the horizontal extent of the magnetic anomaly and the knowledge 
@@ -63,10 +63,33 @@ We use the Levenberg–Marquardt method \citep[][ p. 240]{aster-etal2019} to min
 $\Gamma (\mathbf{p})$ (equation \ref{eq:gamma}) and introduce the inequality constraints 
 (equation \ref{eq:inequality-constraint}) by using a strategy similar to that presented by \citet{barbosa-etal1999}.
 
+\subsection{Computational procedures}
+
+The regularization constraints depend on the weights $\tilde{\alpha}_\ell$ which are set by the interpret based on the prior information about the source. We set the vector $\tilde{\boldsymbol{\alpha}}$ that contains each constraint weight to stabilize the inverse problem. The linear system solved by this method is given by
+
+\begin{equation}\label{eq:linear-system}
+\Delta\hat{\mathbf{p}}^{\dagger}_k = \mathbf{D}_k\left(\mathbf{D}_k\mathbf{H}^\dagger_k\mathbf{D}_k+\lambda_k\mathbf{I}\right)^{-1}\mathbf{D}_k\mathbf{J}_k
+\end{equation}
+
+
+The proposed methodology was implemented using the Marquardt's method:
+
+\begin{enumerate}
+	\item Iteration $k = 0$: input $\mathbf{d}^o$, $\mathbf{r}$, $z_0$, $dz$, $\mathbf{p}^{min}$, $\mathbf{p}^{max}$, $\boldsymbol{\alpha}$, and an initial approximation $\mathbf{p}_0$ satisfying the inequality constraints (equation \ref{eq:inequality-constraint});
+	\item Obtain $\hat{\mathbf{p}}_k = f(\mathbf{p}_k)$ using the strategy proposed by \cite{barbosa-etal1999};
+	\item Obtain $\Delta\hat{\mathbf{p}}^{\dagger}_k$ at the $k$th iteration by solving equation \ref{eq:gamma} using Marquardt’s method;
+	\item Compute: $\hat{\mathbf{p}}_{k+1}^{\dagger} = \hat{\mathbf{p}}^{\dagger}_k + \Delta\hat{\mathbf{p}}^{\dagger}$;
+	\item Obtain $\mathbf{p}_{k+1}^{\dagger}$ using the inverse inequality function \citet{barbosa-etal1999};
+	\item Test for algorithm convergence. Evaluate $\left|\Gamma(\hat{\mathbf{p}}_{k+1}) - \Gamma(\hat{\mathbf{p}}_k)\right|$.
+\end{enumerate}
+where  $ \Gamma(\mathbf{p}^{k+1}) $ and $\Gamma(\mathbf{p}^{k})$ are the goal function (equation \ref{eq:gamma}) evaluated at the iteration $k+1$ and $k$, respectively.
+
 \subsection{Constraint functions}
 
 We have divided the constraint functions $\varphi_{\ell}(\mathbf{p})$ (eq. \ref{eq:gamma}), $\ell = 1, \dots, 7$, used here to 
-obtain stable solutions and introduce a priori information about the magnetic source into three groups. 
+obtain stable solutions and introduce a priori information about the magnetic source into three groups.
+
+
 
 \subsubsection{Smoothness constraints}
 
