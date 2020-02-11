@@ -39,7 +39,7 @@ which implements the formulas proposed by \cite{plouff1976}.
 
 Given a set of tentative values for depth to the top of the shallowest prism $z_{0}$ and for the intensity of the 
 total-magnetization of the source $m_{0}$, we solve a constrained non-linear problem to estimate the parameter 
-vector $\mathbf{p}$ (eq. \ref{eq:p-vector}) by minimizing the objective function
+vector $\mathbf{p}$ (eq. \ref{eq:p-vector}) by minimizing the goal function
 \begin{equation}
 \Gamma (\mathbf{p}) = \phi (\mathbf{p}) + \sum\limits^{7}_{\ell =1} \alpha_{\ell} \, \varphi_{\ell}(\mathbf{p}) \: ,
 \label{eq:gamma}
@@ -60,7 +60,7 @@ upper limits for the $l$th element $p_{l}$ of the parameter vector $\mathbf{p}$ 
 These limits are defined by the interpreter based on both the horizontal extent of the magnetic anomaly and the knowledge 
 about the source. Details about the regularizing functions $\varphi_\ell(\mathbf{p})$, $\ell = 1, \dots, 7$, and the numerical procedure to solve this nonlinear inverse problem are given in the following sections.
 
-\subsection{Constraint functions}
+\subsection{Constraint functions}\label{sec:constraints}
 
 We have divided the constraint functions $\varphi_{\ell}(\mathbf{p})$ (eq. \ref{eq:gamma}), $\ell = 1, \dots, 7$, used here to 
 obtain stable solutions and introduce a priori information about the magnetic source into three groups.
@@ -78,7 +78,6 @@ role in introducing a prior information about the shape of the source.
 The first constraint of this group is the \textit{Smoothness constraint on the adjacent radii defining the horizontal 
 section of each vertical prism}. This constraint imposes that adjacent radii $r_{j}^{k}$ and $r_{j+1}^{k}$ within each 
 prism must be close to each other. It forces the estimated prism to be approximately cylindrical. Mathematically, the constraint is given by
-
 \begin{equation}\label{eq:phi1_sum}
 \varphi_{1}(\mathbf{p}) = \sum\limits^{L}_{k=1}\left[\left(r^{k}_{V}-r^{k}_{1}\right)^2 + \sum\limits^{V-1}_{j=1}\left(r^{k}_{j}-r^{k}_{j+1}\right)^2\right] .
 \end{equation}
@@ -147,7 +146,7 @@ Cartesian coordinates $(x_{0}^{k}, y_{0}^{k})$ and $(x_{0}^{k+1}, y_{0}^{k+1})$ 
 of adjacent prisms must be close to each other. It forces the prisms to be vertically aligned. This constraint 
 is given by
 \begin{equation}\label{eq:phi3_sum}
-\varphi_{3}(\mathbf{p}) = \left[\left(x_{0}^{1} - x_{0}^{0}\right)^2 + \left(y_{0}^{1} - y_{0}^{0}\right)^2 + \sum\limits^{V}_{j=1}\left(r^{1}_{j}-r^{0}_{j}\right)^2\right] ,
+\varphi_{3}(\textbf{p}) = \sum\limits^{L-1}_{k=1}\left[\left(x_{0}^{k+1} - x_{0}^{k}\right)^2 + \left(y_{0}^{k+1} - y_{0}^{k}\right)^2 \right] ,
 \end{equation}
 in matrix form:
 \begin{equation}
@@ -183,11 +182,12 @@ This group if formed by two constraints that were proposed by \cite{oliveirajr-e
 The \textit{Source’s outcrop constraint} imposes that the horizontal cross-section of the shallowest prism 
 must be close to the intersection of the geologic source with the known outcropping boundary. 
 The matrix form of the this constraint is given by
-\begin{equation}\label{eq:phi4}
-\varphi_{4}(\mathbf{p}) = \left[\left(x_{0}^{1} - x_{0}^{0}\right)^2 + \left(y_{0}^{1} - y_0^0\right)^2\right] ,
+\begin{equation}\label{eq:phi4_sum}
+\varphi_{4}(\mathbf{p}) = \left[\left(x_{0}^{1} - x_{0}^{0}\right)^2 + \left(y_{0}^{1} - y_{0}^{0}\right)^2 + \sum\limits^{V}_{j=1}\left(r^{1}_{j}-r^{0}_{j}\right)^2\right] ,
 \end{equation}
+
 in matrix form:
-\begin{equation}
+\begin{equation}\label{eq:phi4}
 \varphi_{4}(\mathbf{p}) = \left(\mathbf{R}_{4} \mathbf{p} - \mathbf{a} \right)^{\mathsf{T}} 
 \left(\mathbf{R}_{4} \mathbf{p} - \mathbf{a} \right) ,
 \end{equation}
@@ -212,11 +212,11 @@ with null elements.
 
 The \textit{Source's horizontal location constraint} imposes that the horizontal Cartesian coordinates of the origin within 
 the shallowest prism must be as close as possible to a known outcropping point. The matrix form of the this constraint is given by
-\begin{equation}\label{eq:phi5}
-\varphi_{5}(\textbf{p}) = \sum\limits^{L-1}_{k=1}\left[\left(x_{0}^{k+1} - x_{0}^{k}\right)^2 + \left(y_{0}^{k+1} - y_{0}^{k}\right)^2 \right] ,
+\begin{equation}\label{eq:phi5_sum}
+\varphi_{5}(\mathbf{p}) = \left[\left(x_{0}^{1} - x_{0}^{0}\right)^2 + \left(y_{0}^{1} - y_0^0\right)^2\right] ,
 \end{equation}
 in matrix form:
-\begin{equation}
+\begin{equation}\label{eq:phi5}
 \varphi_{5}(\mathbf{p}) = \left(\mathbf{R}_{5} \mathbf{p} - \mathbf{b} \right)^{\mathsf{T}}
 \left(\mathbf{R}_{5} \mathbf{p} - \mathbf{b}\right) \quad ,
 \end{equation}
@@ -244,11 +244,11 @@ Two constraints use the zeroth-order Tikhonov regularization with the purpose of
 
 The \textit{Minimum Euclidean norm of the radii} imposes that 
 all estimated radii within each prism must be close to null values. This constraint were proposed by \cite{oliveirajr-etal2011} and \cite{oliveirajr-barbosa2013} and can be rewritten in matrix form as follows
-\begin{equation}\label{eq:phi6}
+\begin{equation}\label{eq:phi6_sum}
 \varphi_{6}(\textbf{p}) = \sum\limits^{L}_{k=1}\sum\limits^{V}_{j=1}\left(r_{j}^{k}\right)^2 .
 \end{equation}
 in matrix form:
-\begin{equation}
+\begin{equation}\label{eq:phi6}
 \varphi_{6}(\mathbf{p}) = \mathbf{p}^{\mathsf{T}} \mathbf{R}_{6}^{\mathsf{T}} \mathbf{R}_{6} \mathbf{p},
 \end{equation}
 where
@@ -272,7 +272,7 @@ and
 
 The other constraint, the \textit{Minimum Euclidean norm of the thickness}, imposes that the thickness of all prisms must be close to zero. This constraint were developed here to introduce a priori information about the maximum depth of the source. Its matrix form 
 is given by
-\begin{equation}
+\begin{equation}\label{eq:phi7_sum}
 \varphi_7 = dz^2 ,
 \end{equation}
 in matrix form:
@@ -291,27 +291,70 @@ where
 
 \subsection{Computational procedures}
 
-The parameter vector $\mathbf{p}$ (equation 1) minimizing the goal function $\gamma(\mathbf{p})$ (equation 3), subjected to the inequality constraint (equation 4), is estimated in three steps (steps 1, 2, and 3 are described in the following subsections). At each step, the goal function is minimized using the Levenberg-Marquardt method (Silva et al., 2001; Aster et al., 2005), and the inequality constraint (equation 4) is incorporated using the same strategy used by Barbosa et al. (1999b). All derivatives of the misfit function $\phi(\mathbf{p})$ (equation 5) with respect to the parameters are computed using a finite-difference approximation.
+To estimate the parameter vector $\mathbf{p}$ (eq. \ref{eq:p-vector}) that minimizes the goal function $\Gamma(\mathbf{p})$ (eq. \ref{eq:gamma}), subjected to the inequality constraint (eq. \ref{eq:inequality-constraint}), we use the Levenberg-Marquardt method \cite[ p. 240]{aster-etal2019}, and the inequality constraint (eq. \ref{eq:inequality-constraint}) is incorporated using the same strategy used by \cite{barbosa-1999b}. All derivatives of the misfit function $\phi(\mathbf{p})$ (eq. \ref{eq:misfit}) with respect to the parameters are computed using a finite-difference approximation.
 
-We use the Levenberg–Marquardt method \citep[][ p. 240]{aster-etal2019} to minimize the objective function 
-$\Gamma (\mathbf{p})$ (equation \ref{eq:gamma}) and introduce the inequality constraints 
-(equation \ref{eq:inequality-constraint}) by using a strategy similar to that presented by \cite{barbosa-etal1999}.
+\subsubsection{Considerations about the weights $\alpha_1$, $\alpha_2$, $\alpha_3$, $\alpha_4$, $\alpha_5$, $\alpha_6$, and $\alpha_7$}
 
-The regularization constraints depend on the weights $\tilde{\alpha}_\ell$ which are set by the interpret based on the prior information about the source. We set the vector $\tilde{\boldsymbol{\alpha}}$ that contains each constraint weight to stabilize the inverse problem. The linear system solved by this method is given by
+Attributing the values to the weights $ \alpha_{\ell} $ (eq. \ref{eq:gamma}) consists in an important feature of our method. However, there is no analytical rule to define them, so their values can be dependent on the particular characteristics of the interpretation model. To overcome this problem, we normalize the $ \alpha_{\ell} $ values as follows:
+\begin{equation}\label{eq:alphas}
+\alpha_{\ell} = \tilde{\alpha}_\ell\frac{E_\phi}{E_\ell}, \quad \ell = 1,\dots, 7,
+\end{equation}
+where $\tilde{\alpha}_\ell$ is a positive scalar and $ E_\phi/E_\ell $ is a normalizing constant. In this equation, $ E_\ell $ represents the median of the elements forming the main diagonal of the Hessian matrix of the $\ell$th constraining function $\varphi_{\ell}(\mathbf{p})$ (eqs \ref{eq:phi1_sum}, \ref{eq:phi2_sum}, \ref{eq:phi3_sum}, \ref{eq:phi4_sum}, \ref{eq:phi5_sum}, \ref{eq:phi6_sum}, and \ref{eq:phi7_sum}). The constant $E_\phi$ is defined in a similar way using the Hessian matrix of the misfit function $\phi(\mathbf{p})$ (eq. \ref{eq:misfit}) computed with the initial approximation $ \mathbf{p}_0 $ for the parameter vector $ \mathbf{p} $ (eq. \ref{eq:p-vector}) at the inversion algorithm. According to this empirical strategy, the weights $ \alpha_{\ell} $ are defined using the positive scalars $\tilde{\alpha}_\ell$ (eq. \ref{eq:alphas}), which are less dependent on the particular characteristics of the interpretation model.
 
-\begin{equation}\label{eq:linear-system}
-\Delta\hat{\mathbf{p}}^{\dagger}_k = \mathbf{D}_k\left(\mathbf{D}_k\mathbf{H}^\dagger_k\mathbf{D}_k+\lambda_k\mathbf{I}\right)^{-1}\mathbf{D}_k\mathbf{J}_k
+\subsubsection{Inversion algorithm}
+
+At first, the inequality constraint (eq. \ref{eq:inequality-constraint}) is incorporated on the parameter vector $\mathbf{p}$ element by element obtaining the transformed parameter vector $\mathbf{p}^\dagger = f(\mathbf{p})$ as follows
+\begin{equation}\label{eq:inequality-function}
+p^\dagger_l = f(p_l) = -\ln\left(\frac{p_l^{max} - p_l}{p_l - p_l^{min}}\right),
+\end{equation}
+where $pl$, $p_l^{max}$, and $p_l^{min}$ are the $l$th elements of $\mathbf{p}$, $\mathbf{p}^{max}$ and $\mathbf{p}^{min}$, respectively. This equation is a homeomorphic transformation that has the inverse transformation given by
+\begin{equation}\label{eq:inv-inequality-function}
+p_l = p_l^{min} + \left(\frac{p_l^{max} - p_l^{min}}{ 1 + e^{-p^\dagger_l} }\right).
 \end{equation}
 
+The estimated correction $\boldsymbol{\Delta}\hat{\mathbf{p}}_k$ (where ``\^{}" denotes estimated) for the parameter vector $\mathbf{p}_k$ for the nonlinear inverse problem at the $k$th iteration is obtained by solving the linear system given by
+\begin{equation}\label{eq:linear-system}
+\mathbf{D}_k\left[\mathbf{D}_k\mathbf{H}^\dagger(\hat{\mathbf{p}}_k)\mathbf{D}_k + \lambda_k\mathbf{I}\right]\mathbf{D}_k\boldsymbol{\Delta}\hat{\mathbf{p}}^\dagger_k = -\boldsymbol{\nabla}\Gamma(\hat{\mathbf{p}}),
+\end{equation}
+$\lambda_k$ is a positive scalar to regularize the steps of the inversion ensuring the convergence of the algorithm which varies at each iteration by a scalar $d\lambda$ described in the algorithm, $\mathbf{I}$ is a identity matrix with dimension $M\times M$, and $\boldsymbol{\nabla}\Gamma(\hat{\mathbf{p}})$ is the gradient of the goal function (eq. \ref{eq:gamma}) plus the gradient of each constraint function (eqss \ref{eq:phi1_sum}, \ref{eq:phi2_sum}, \ref{eq:phi3_sum}, \ref{eq:phi4_sum}, \ref{eq:phi5_sum}, \ref{eq:phi6_sum}, and \ref{eq:phi7_sum}). In this equation, $\mathbf{H}^\dagger(\mathbf{p}^\dagger_k)$ is given by
+\begin{equation}\label{eq:H-dagger}
+\mathbf{H}^\dagger(\mathbf{p}_k) = \mathbf{H}(\mathbf{p}_k)\mathbf{T}(\mathbf{p}_k),
+\end{equation}
+where $\mathbf{H}(\mathbf{p}_k)$ is the Hessian matrix of $\Gamma(\mathbf{p})$ plus the Hessian matrix of each constraint function (eqss \ref{eq:phi1_sum}, \ref{eq:phi2_sum}, \ref{eq:phi3_sum}, \ref{eq:phi4_sum}, \ref{eq:phi5_sum}, \ref{eq:phi6_sum}, and \ref{eq:phi7_sum}) and $\mathbf{T}(\mathbf{p}_k)$ is a diagonal matrix that incorporates the inequality constraint on $\mathbf{H}^\dagger(\mathbf{p}_k)$ which the $l$th non-zero element given by
+\begin{equation}\label{eq:inequality-diag}
+\mathbf{T}_{ll} = \frac{(p_l^{max} - p_l)(p_l - p_l^{min})}{p_l^{max} - p_l^{min}}, \quad l = 1, \dots, M .
+\end{equation}
 
-The proposed methodology was implemented using the Marquardt's method:
+\cite{marquardt_algorithm_1963} suggests a normalization on $\mathbf{H}^\dagger(\mathbf{p}_k)$ to balance the magnitude of $\lambda_k$ and the diagonal of $\mathbf{H}^\dagger(\mathbf{p}_k)$. To introduce this normalization, we use the diagonal matrix $\mathbf{D}_k$ whose $l$th non-zero element $d_{ll}$ given by
+
+\begin{equation}\label{eq:D-matrix}
+d_{ll} = \frac{1}{\sqrt{h^\dagger_{ll}}},
+\end{equation}
+where $h^\dagger_{ll}$ is the $l$th element of the diagonal of $\mathbf{H}^\dagger(\mathbf{p}_k)$. The effect of this normalization is introduced and removed in the equation \ref{eq:linear-system}. 
+
+The proposed methodology was implemented using the following algorithm:
 
 \begin{enumerate}
-	\item Iteration $k = 0$: input $\mathbf{d}^o$, $\mathbf{r}$, $z_0$, $dz$, $\mathbf{p}^{min}$, $\mathbf{p}^{max}$, $\boldsymbol{\alpha}$, and an initial approximation $\mathbf{p}_0$ satisfying the inequality constraints (equation \ref{eq:inequality-constraint});
-	\item Obtain $\hat{\mathbf{p}}_k = f(\mathbf{p}_k)$ using the strategy proposed by \cite{barbosa-etal1999};
-	\item Obtain $\Delta\hat{\mathbf{p}}^{\dagger}_k$ at the $k$th iteration by solving equation \ref{eq:gamma} using Marquardt’s method;
-	\item Compute: $\hat{\mathbf{p}}_{k+1}^{\dagger} = \hat{\mathbf{p}}^{\dagger}_k + \Delta\hat{\mathbf{p}}^{\dagger}$;
-	\item Obtain $\mathbf{p}_{k+1}^{\dagger}$ using the inverse inequality function \citep{barbosa-etal1999};
+	\item Iteration $k = 0$: input $z_0$, $m_0$, $\mathbf{d}^o$, $\mathbf{p}^{min}$, $\mathbf{p}^{max}$, $\tilde{\alpha}_1$, $\tilde{\alpha}_2$, $\tilde{\alpha}_3$, $\tilde{\alpha}_4$, $\tilde{\alpha}_5$, $\tilde{\alpha}_6$, $\tilde{\alpha}_7$, and an initial approximation $\mathbf{p}_0$ satisfying the inequality constraints (eq. \ref{eq:inequality-constraint});
+	\item obtain $\mathbf{H}_0$ and $\alpha_1$, $\alpha_2$, $\alpha_3$, $\alpha_4$, $\alpha_5$, $\alpha_6$, and $\alpha_7$ (eq. \ref{eq:alphas});
+	\item obtain $\mathbf{p}^\dagger_k$ and $\mathbf{H}^\dagger(\mathbf{p}_k)$ using equations \ref{eq:inequality-function} and \ref{eq:H-dagger}, respectively;
+	\item obtain $\Delta\hat{\mathbf{p}}^{\dagger}_k$ at the $k$th iteration by solving equation \ref{eq:linear-system};
+	\item compute: $\hat{\mathbf{p}}_{k+1}^{\dagger} = \hat{\mathbf{p}}^{\dagger}_k + \Delta\hat{\mathbf{p}}^{\dagger}$;
+	\item obtain $\hat{\mathbf{p}}_{k+1}$ using the inverse inequality function (eq. \ref{eq:inv-inequality-function});
 	\item Test for algorithm convergence. Evaluate $\left|\Gamma(\hat{\mathbf{p}}_{k+1}) - \Gamma(\hat{\mathbf{p}}_k)\right|$.
 \end{enumerate}
-where  $ \Gamma(\mathbf{p}^{k+1}) $ and $\Gamma(\mathbf{p}^{k})$ are the goal function (equation \ref{eq:gamma}) evaluated at the iteration $k+1$ and $k$, respectively.
+where  $ \Gamma(\mathbf{p}^{k+1}) $ and $\Gamma(\mathbf{p}^{k})$ are the goal function (eq. \ref{eq:gamma}) evaluated at the iteration $k+1$ and $k$, respectively.
+
+\subsubsection{Practical considerations}
+
+Our algorithm depends on several parameters that significantly impact the estimated models and cannot be automatically set without the interpreter’s judgment. They are the parameters $\tilde{\alpha}_1$, $\tilde{\alpha}_2$, $\tilde{\alpha}_3$, $\tilde{\alpha}_4$, $\tilde{\alpha}_5$, $\tilde{\alpha}_6$, and $\tilde{\alpha}_7$. Based on our practical experience, we suggest some empirical procedures for setting these parameters.
+
+The parameters $\tilde{\alpha}_1$ and $\tilde{\alpha}_2$ impose priori information on the shape of the horizontal cross-section of the prisms. Generally, they have values close to each other varying from $10^{-5}$ to $10^{-4}$. If $\tilde{\alpha}_1 > \tilde{\alpha}_2$ the prisms will have a very smooth horizontal cross-section, close to a circular shape. On the other hand, if $\tilde{\alpha}_1 < \tilde{\alpha}_2$, than the difference on the shape of the horizontal cross-sections of the estimated model between vertically adjacent prisms will be smooth.
+
+To control the alignment of the estimated model, the parameter $\tilde{\alpha}_3$ should be in a range from $10^{-5}$ to $10^{-3}$. This parameter allows or forbids the estimated model to dip. Empirically, the value for this parameter follows the value for $\tilde{\alpha}_1$ and $\tilde{\alpha}_2$, they are usually close.
+
+The parameter $\tilde{\alpha}_6$ imposes mathematical priori information on the inverse problem to control the convergence of the algorithm. We suggest that the value for this parameter should be two or three orders of magnitude greater than $\tilde{\alpha}_1$ and $\tilde{\alpha}_2$.
+
+To control the depth extent of the estimated model, the parameter $\tilde{\alpha}_7$ should be in a range from $10^{-6}$ to $10^{-4}$. This parameter depends on the depth extent of the initial approximate, it can decrease the depth extent or keep it close to the initial one. Normally, we suggest $\tilde{\alpha}_7=10^{-5}$ for a initial value.
+
+An important aspect of our method is the choice of the initial approximation. For simplicity, we use a cylinder shape as an initial approximation located the initial cylinder on the center of the anomaly. We suggest that the cylinder radius should involves a great part, both positive and negative, of the horizontal size of the anomaly. Also, the depth extent $dz$ of the cylinder should be greater than the true source. We suggest that the data produced by the initial approximation fit qualitatively the observations.
