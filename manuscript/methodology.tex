@@ -58,7 +58,31 @@ the predicted data vector $\mathbf{d}(\mathbf{p})$, $\alpha_{\ell}$ is a positiv
 $\ell$th constraint function $\varphi_{\ell}(\mathbf{p})$ and $p_{l}^{min}$ and $p_{l}^{max}$ are, respectively, the lower and 
 upper limits for the $l$th element $p_{l}$ of the parameter vector $\mathbf{p}$ (eq. \ref{eq:p-vector}). 
 These limits are defined by the interpreter based on both the horizontal extent of the magnetic anomaly and the knowledge 
-about the source. Details about the regularizing functions $\varphi_\ell(\mathbf{p})$, $\ell = 1, \dots, 7$, and the numerical procedure to solve this nonlinear inverse problem are given in the following sections.
+about the source.
+
+To solve our nonlinear inverse problem, we use a gradient-based  method and, consequently, we need to define the gradient vector $\nabla \Gamma(\mathbf{p})$ and Hessian matrix $\mathbf{H}(\mathbf{p})$ of the goal function $\Gamma(\mathbf{p})$ (eq. \ref{eq:gamma}). They are given by:
+
+\begin{equation}\label{eq:gamma_gradient}
+\nabla\Gamma (\mathbf{p}) = \nabla\phi (\mathbf{p}) + \sum\limits^{7}_{\ell =1} \alpha_{\ell} \, \nabla\varphi_{\ell}(\mathbf{p}) \: ,
+\end{equation}
+
+and
+
+\begin{equation}\label{eq:gamma_hessian}
+\mathbf{H}\Gamma (\mathbf{p}) = \mathbf{H}_\phi (\mathbf{p}) + \sum\limits^{7}_{\ell =1} \alpha_{\ell} \, \mathbf{H}_\ell(\mathbf{p}) \: ,
+\end{equation}
+where $\mathbf{G}(\mathbf{p})$ is an $N \times M$ matrix whose element $ij$ is the derivative of the predicted data $d_{i}(\mathbf{p})$ (eq. \ref{eq:predicted-data-i}) with respect to the $j$ element $p_{j}$ of the parameter vector $\mathbf{p}$ (eq. \ref{eq:p-vector}). In eqs \ref{eq:gamma_gradient} and \ref{eq:gamma_hessian}, 
+
+\begin{equation}\label{eq:phi_gradient}
+\nabla \phi(\mathbf{p}) =  - \frac{2}{N}\mathbf{G}^{\mathsf{T}}(\hat{\mathbf{p}}_k)[\mathbf{d}^o - \boldsymbol{\psi}(\hat{\mathbf{p}}_k)];
+\end{equation} 
+
+and 
+
+\begin{equation}\label{eq:phi_hessian}
+\mathbf{H}_{\phi}(\mathbf{p}) = \frac{2}{N}\mathbf{G}^{\mathsf{T}}(\hat{\mathbf{p}}_k)\mathbf{G}(\hat{\mathbf{p}}_k);
+\end{equation}
+are the gradient vector of the Hessian matrix of the misfit function $\phi(\mathbf{p})$ (eq. 5), respectively, and the terms $\nabla \varphi_{\ell}(\mathbf{p})$ and $\mathbf{H}_{\ell}$, $\ell = 1, \dots, 7$, are the gradient vectors and Hessian matrices of the constraint functions. Details about the regularizing functions $\varphi_\ell(\mathbf{p})$, $\ell = 1, \dots, 7$, as well as the numerical procedure to solve this nonlinear inverse problem are given in the following sections.
 
 \subsection{Constraint functions}\label{sec:constraints}
 
@@ -78,21 +102,13 @@ role in introducing a prior information about the shape of the source.
 The first constraint of this group is the \textit{Smoothness constraint on the adjacent radii defining the horizontal 
 section of each vertical prism}. This constraint imposes that adjacent radii $r_{j}^{k}$ and $r_{j+1}^{k}$ within each 
 prism must be close to each other. It forces the estimated prism to be approximately cylindrical. Mathematically, the constraint is given by
-\begin{equation}\label{eq:phi1_sum}
-\varphi_{1}(\mathbf{p}) = \sum\limits^{L}_{k=1}\left[\left(r^{k}_{V}-r^{k}_{1}\right)^2 + \sum\limits^{V-1}_{j=1}\left(r^{k}_{j}-r^{k}_{j+1}\right)^2\right] .
+\begin{equation}\label{eq:ph1}
+\begin{split}
+\varphi_{2}(\mathbf{p}) &= \sum\limits^{L}_{k=1}\left[\left(r^{k}_{V}-r^{k}_{1}\right)^2 + \sum\limits^{V-1}_{j=1}\left(r^{k}_{j}-r^{k}_{j+1}\right)^2\right]\\
+ &= \mathbf{p}^{\mathsf{T}} \mathbf{R}^{\mathsf{T}}_{1}\mathbf{R}_{1} \mathbf{p} \quad ,
+\end{split}
 \end{equation}
-We have conveniently rewritten this constraint in matrix form as follows:
-\begin{equation}
-\varphi_{1}(\mathbf{p}) = \mathbf{p}^{\mathsf{T}} \mathbf{R}^{\mathsf{T}}_{1}\mathbf{R}_{1} \mathbf{p} \: ,
-\label{eq:phi1}
-\end{equation}
-where 
-\begin{equation}
-\mathbf{R}_{1} = \begin{bmatrix} 
-\mathbf{S}_{1} & \mathbf{0}_{LV \times 1} \\
-\end{bmatrix}_{LV \times M} \quad ,
-\label{eq:R1-matrix}
-\end{equation}
+where
 \begin{equation}
 \mathbf{S}_{1} = 
 \mathbf{I}_{L} \otimes 
@@ -105,19 +121,24 @@ $\mathbf{0}_{LV \times 1}$ is an $LV \times 1$ vector with null elements,
 $\mathbf{I}_{L}$ is the identity matrix of order $L$, ``$\otimes$" denotes the Kronecker product 
 \citep[][ p. 243]{horn_johnson1991}, $\mathbf{0}_{V \times 2}$ is a $V \times 2$ matrix with null elements, 
 $\mathbf{I}_{V}$ is the identity matrix of order $V$ and $\mathbf{D}_{V}^\mathsf{T}$ is the upshift permutation 
-matrix of order $V$ \citep[][ p. 20]{golub-vanloan2013}.
+matrix of order $V$ \citep[][ p. 20]{golub-vanloan2013}. The gradient and Hessian of function $\varphi_{1}(\mathbf{p})$ (eq. \ref{eq:phi1}) are given by:
+\begin{equation}\label{eq:phi1_grad}
+\boldsymbol{\nabla\varphi}_{1}(\mathbf{p}) = 2 \mathbf{R}^\mathsf{T}_{1}\mathbf{R}_{1}\mathbf{p} \quad ,
+\end{equation}
+and
+\begin{equation}\label{eq:phi1_hessian}
+\mathbf{H}_{1}(\mathbf{p}) = 2\mathbf{R}^\mathsf{T}_{1}\mathbf{R}_{1} \quad .
+\end{equation}
 
 The second constraint of this group is the \textit{Smoothness constraint on the adjacent radii of the 
 vertically adjacent prisms}, which imposes that adjacent radii $r_{j}^{k}$ and $r_{j}^{k+1}$ within vertically 
 adjacent prisms must be close to each other. This constraint forces the shape of all prisms to be similar to each other
 and is given by
-\begin{equation}\label{eq:phi2_sum}
-\varphi_{2}(\mathbf{p}) = \sum\limits^{L-1}_{k=1}\left[\sum\limits^{V}_{j=1}\left(r^{k+1}_{j}-r^{k}_{j}\right)^2\right],
-\end{equation}
-in matrix form:
-\begin{equation}
-\varphi_{2}(\mathbf{p}) = \mathbf{p}^{\mathsf{T}} \mathbf{R}^{\mathsf{T}}_{2}\mathbf{R}_{2}\mathbf{p} \quad ,
-\label{eq:phi2}
+\begin{equation}\label{eq:phi2}
+\begin{split}
+\varphi_{2}(\mathbf{p}) &= \sum\limits^{L-1}_{k=1}\left[\sum\limits^{V}_{j=1}\left(r^{k+1}_{j}-r^{k}_{j}\right)^2\right] \\
+&= \mathbf{p}^{\mathsf{T}} \mathbf{R}^{\mathsf{T}}_{2}\mathbf{R}_{2}\mathbf{p}
+\end{split} \quad ,
 \end{equation}
 where 
 \begin{equation}
@@ -138,20 +159,25 @@ where
 \end{equation}
 $\mathbf{0}_{(L-1)V \times 1}$ is an $(L-1)V \times 1$ vector with null elements,
 $\mathbf{0}_{(L-1) \times 1}$ is an $(L-1) \times 1$ vector with null elements and 
-$\mathbf{I}_{L-1}$ is the identity matrix of order $L-1$.
+$\mathbf{I}_{L-1}$ is the identity matrix of order $L-1$. The gradient and Hessian of function $\varphi_{2}(\mathbf{p})$ (eq. \ref{eq:phi2}) are given by:
+\begin{equation}\label{eq:phi2_grad}
+\boldsymbol{\nabla\varphi}_{2}(\mathbf{p}) = 2\mathbf{R}^\mathsf{T}_{2}\mathbf{R}_{2}\mathbf{p} \quad ,
+\end{equation}
+and
+\begin{equation}\label{eq:phi2_hessian}
+\mathbf{H}_{2}(\mathbf{p}) = 2\mathbf{R}^\mathsf{T}_{2}\mathbf{R}_{2} \quad .
+\end{equation}
 
 The last constraint of this group is the \textit{Smoothness constraint on the horizontal position of 
 the arbitrary origins of the vertically adjacent prisms}. This constraint imposes that the estimated horizontal 
 Cartesian coordinates $(x_{0}^{k}, y_{0}^{k})$ and $(x_{0}^{k+1}, y_{0}^{k+1})$ of the origins $O^{k}$ and $O^{k+1}$ 
 of adjacent prisms must be close to each other. It forces the prisms to be vertically aligned. This constraint 
 is given by
-\begin{equation}\label{eq:phi3_sum}
-\varphi_{3}(\textbf{p}) = \sum\limits^{L-1}_{k=1}\left[\left(x_{0}^{k+1} - x_{0}^{k}\right)^2 + \left(y_{0}^{k+1} - y_{0}^{k}\right)^2 \right] ,
-\end{equation}
-in matrix form:
-\begin{equation}
-\varphi_{3}(\mathbf{p}) = \mathbf{p}^{\mathsf{T}} \mathbf{R}^{\mathsf{T}}_{3}\mathbf{R}_{3}\mathbf{p} \quad ,
-\label{eq:phi3}
+\begin{equation}\label{eq:phi3}
+\begin{split}
+\varphi_{3}(\mathbf{p}) &= \sum\limits^{L-1}_{k=1}\left[\left(x_{0}^{k+1} - x_{0}^{k}\right)^2 + \left(y_{0}^{k+1} - y_{0}^{k}\right)^2 \right] \\
+&= \mathbf{p}^{\mathsf{T}} \mathbf{R}^{\mathsf{T}}_{3}\mathbf{R}_{3}\mathbf{p}
+\end{split} \quad ,
 \end{equation}
 where 
 \begin{equation}
@@ -172,7 +198,14 @@ where
 \end{equation}
 $\mathbf{0}_{(L-1)2 \times 1}$ is an $(L-1)2 \times 1$ vector with null elements,
 $\mathbf{0}_{2 \times V}$ is a $2 \times V$ matrix with null elements and 
-$\mathbf{I}_{2}$ is the identity matrix of order $2$.
+$\mathbf{I}_{2}$ is the identity matrix of order $2$. The gradient and Hessian of function $\varphi_{3}(\mathbf{p})$ (eq. \ref{eq:phi3}) are given by:
+\begin{equation}\label{eq:phi3_grad}
+\boldsymbol{\nabla\varphi}_{3}(\mathbf{p}) = 2 \mathbf{R}^{\mathsf{T}}_{3}\mathbf{R}_{3}\mathbf{p} \quad ,
+\end{equation}
+and
+\begin{equation}\label{eq:phi3_hessian}
+\mathbf{H}_{3}(\mathbf{p}) = 2 \mathbf{R}^{\mathsf{T}}_{3}\mathbf{R}_{3} \quad .
+\end{equation}
 
 \subsubsection{Equality constraints}
 
@@ -182,14 +215,12 @@ This group if formed by two constraints that were proposed by \cite{oliveirajr-e
 The \textit{Source’s outcrop constraint} imposes that the horizontal cross-section of the shallowest prism 
 must be close to the intersection of the geologic source with the known outcropping boundary. 
 The matrix form of the this constraint is given by
-\begin{equation}\label{eq:phi4_sum}
-\varphi_{4}(\mathbf{p}) = \left[\left(x_{0}^{1} - x_{0}^{0}\right)^2 + \left(y_{0}^{1} - y_{0}^{0}\right)^2 + \sum\limits^{V}_{j=1}\left(r^{1}_{j}-r^{0}_{j}\right)^2\right] ,
-\end{equation}
-
-in matrix form:
 \begin{equation}\label{eq:phi4}
-\varphi_{4}(\mathbf{p}) = \left(\mathbf{R}_{4} \mathbf{p} - \mathbf{a} \right)^{\mathsf{T}} 
-\left(\mathbf{R}_{4} \mathbf{p} - \mathbf{a} \right) ,
+\begin{split}
+\varphi_{4}(\mathbf{p}) &= \left[\left(x_{0}^{1} - x_{0}^{0}\right)^2 + \left(y_{0}^{1} - y_{0}^{0}\right)^2 + \sum\limits^{V}_{j=1}\left(r^{1}_{j}-r^{0}_{j}\right)^2\right] \\
+&= \left(\mathbf{R}_{4} \mathbf{p} - \mathbf{a} \right)^{\mathsf{T}} 
+\left(\mathbf{R}_{4} \mathbf{p} - \mathbf{a} \right)
+\end{split} \quad ,
 \end{equation}
 where $\mathbf{a}$ is a vector containing the radii and the horizontal Cartesian coordinates of the 
 polygon defining the outcropping boundary
@@ -208,17 +239,24 @@ and
 \label{eq:R4-matrix}
 \end{equation}
 where $\mathbf{I}_{V+2}$ is the identity matrix of order $V+2$ and $\mathbf{0}_{(V+2) \times (M-V-2)}$ is a matrix 
-with null elements.
+with null elements. The gradient and Hessian of function $\varphi_{4}(\mathbf{p})$ (eq. \ref{eq:phi4}) are given by:
+\begin{equation}\label{eq:phi4_grad}
+\boldsymbol{\nabla\varphi}_{4}(\mathbf{p}) = 2 \mathbf{R}_{4} 
+\left(\mathbf{R}_{4} \mathbf{p} - \mathbf{a} \right) \quad ,
+\end{equation}
+and
+\begin{equation}\label{eq:phi4_hessian}
+\mathbf{H}_{4}(\mathbf{p}) = 2 \mathbf{R}^{\mathsf{T}}_{4}\mathbf{R}_{4} \quad .
+\end{equation}
 
 The \textit{Source's horizontal location constraint} imposes that the horizontal Cartesian coordinates of the origin within 
 the shallowest prism must be as close as possible to a known outcropping point. The matrix form of the this constraint is given by
-\begin{equation}\label{eq:phi5_sum}
-\varphi_{5}(\mathbf{p}) = \left[\left(x_{0}^{1} - x_{0}^{0}\right)^2 + \left(y_{0}^{1} - y_0^0\right)^2\right] ,
-\end{equation}
-in matrix form:
 \begin{equation}\label{eq:phi5}
-\varphi_{5}(\mathbf{p}) = \left(\mathbf{R}_{5} \mathbf{p} - \mathbf{b} \right)^{\mathsf{T}}
-\left(\mathbf{R}_{5} \mathbf{p} - \mathbf{b}\right) \quad ,
+\begin{split}
+\varphi_{5}(\mathbf{p}) &= \left[\left(x_{0}^{1} - x_{0}^{0}\right)^2 + \left(y_{0}^{1} - y_0^0\right)^2\right] \\
+&= \left(\mathbf{R}_{5} \mathbf{p} - \mathbf{b} \right)^{\mathsf{T}}
+\left(\mathbf{R}_{5} \mathbf{p} - \mathbf{b}\right)
+\end{split} \quad ,
 \end{equation}
 where $\mathbf{b}$ is a vector containing the horizontal Cartesian coordinates of the outcropping point 
 \begin{equation}
@@ -236,7 +274,15 @@ and
 \label{eq:R5-matrix}
 \end{equation}
 where $\mathbf{I}_{2}$ is the identity matrix of order $2$ and $\mathbf{0}_{2 \times (M-V-2)}$ and 
-$\mathbf{0}_{2 \times V}$ are matrices with null elements.
+$\mathbf{0}_{2 \times V}$ are matrices with null elements. The gradient and Hessian of function $\varphi_{5}(\mathbf{p})$ (eq. \ref{eq:phi5}) are given by:
+\begin{equation}\label{eq:phi5_grad}
+\boldsymbol{\nabla\varphi}_{5}(\mathbf{p}) = 2\mathbf{R}_{5}
+\left(\mathbf{R}_{5} \mathbf{p} - \mathbf{b}\right) \quad ,
+\end{equation}
+and
+\begin{equation}\label{eq:phi5_hessian}
+\mathbf{H}_{5}(\mathbf{p}) = 2 \mathbf{R}^{\mathsf{T}}_{5}\mathbf{R}_{5} \quad .
+\end{equation}
 
 \subsubsection{Minimum Euclidean norm constraints}
 
@@ -244,12 +290,11 @@ Two constraints use the zeroth-order Tikhonov regularization with the purpose of
 
 The \textit{Minimum Euclidean norm of the radii} imposes that 
 all estimated radii within each prism must be close to null values. This constraint were proposed by \cite{oliveirajr-etal2011} and \cite{oliveirajr-barbosa2013} and can be rewritten in matrix form as follows
-\begin{equation}\label{eq:phi6_sum}
-\varphi_{6}(\textbf{p}) = \sum\limits^{L}_{k=1}\sum\limits^{V}_{j=1}\left(r_{j}^{k}\right)^2 .
-\end{equation}
-in matrix form:
 \begin{equation}\label{eq:phi6}
-\varphi_{6}(\mathbf{p}) = \mathbf{p}^{\mathsf{T}} \mathbf{R}_{6}^{\mathsf{T}} \mathbf{R}_{6} \mathbf{p},
+\begin{split}
+\varphi_{6}(\mathbf{p}) &= \sum\limits^{L}_{k=1}\sum\limits^{V}_{j=1}\left(r_{j}^{k}\right)^2 \\
+&= \mathbf{p}^{\mathsf{T}} \mathbf{R}_{6}^{\mathsf{T}} \mathbf{R}_{6} \mathbf{p}
+\end{split} \quad ,
 \end{equation}
 where
 \begin{equation}
@@ -269,16 +314,21 @@ and
 \end{bmatrix}_{ (V+2)\times (V+2)} \quad .
 \label{eq:S6-matrix}
 \end{equation}
-
-The other constraint, the \textit{Minimum Euclidean norm of the thickness}, imposes that the thickness of all prisms must be close to zero. This constraint were developed here to introduce a priori information about the maximum depth of the source. Its matrix form 
-is given by
-\begin{equation}\label{eq:phi7_sum}
-\varphi_7 = dz^2 ,
+The gradient and Hessian of function $\varphi_{6}(\mathbf{p})$ (eq. \ref{eq:phi6}) are given by:
+\begin{equation}\label{eq:phi6_grad}
+\boldsymbol{\nabla\varphi}_{6}(\mathbf{p}) = 2 \mathbf{R}_{6}^{\mathsf{T}} \mathbf{R}_{6} \mathbf{p} \quad ,
 \end{equation}
-in matrix form:
-\begin{equation}
-\varphi_7 = \mathbf{p}^{\mathsf{T}} \mathbf{R}_{7}^{\mathsf{T}} \mathbf{R}_{7} \mathbf{p} \quad ,
-\label{eq:phi7}
+and
+\begin{equation}\label{eq:phi6_hessian}
+\mathbf{H}_{6}(\mathbf{p}) = 2 \mathbf{R}^{\mathsf{T}}_{6}\mathbf{R}_{6} \quad .
+\end{equation}
+
+The other constraint, the \textit{Minimum Euclidean norm of the depth extent}, imposes that the depth extent of all prisms must be close to zero. We present this constraint to introduce a priori information about the maximum depth of the source. It is given by
+\begin{equation}\label{eq:phi7}
+\begin{split}
+\varphi_{7}(\mathbf{p}) &= dz^2 \\
+&= \mathbf{p}^{\mathsf{T}} \mathbf{R}_{7}^{\mathsf{T}} \mathbf{R}_{7} \mathbf{p}
+\end{split} \quad ,
 \end{equation}
 where
 \begin{equation}
@@ -288,18 +338,26 @@ where
 \mathbf{0}_{1 \times (M-1)} & 1 \\
 \end{bmatrix}_{ M \times M } \quad .
 \end{equation}
+The gradient and Hessian of function $\varphi_{7}(\mathbf{p})$ (eq. \ref{eq:phi7}) are given by:
+\begin{equation}\label{eq:phi7_grad}
+\boldsymbol{\nabla\varphi}_{7}(\mathbf{p}) = 2 \mathbf{R}_{7}^{\mathsf{T}} \mathbf{R}_{7} \mathbf{p} \quad ,
+\end{equation}
+and
+\begin{equation}\label{eq:phi7_hessian}
+\mathbf{H}_{7}(\mathbf{p}) = 2 \mathbf{R}^{\mathsf{T}}_{7}\mathbf{R}_{7} \quad .
+\end{equation}
 
 \subsection{Computational procedures}
 
-To estimate the parameter vector $\mathbf{p}$ (eq. \ref{eq:p-vector}) that minimizes the goal function $\Gamma(\mathbf{p})$ (eq. \ref{eq:gamma}), subjected to the inequality constraint (eq. \ref{eq:inequality-constraint}), we use the Levenberg-Marquardt method \cite[ p. 240]{aster-etal2019}, and the inequality constraint (eq. \ref{eq:inequality-constraint}) is incorporated using the same strategy used by \cite{barbosa-1999b}. All derivatives of the misfit function $\phi(\mathbf{p})$ (eq. \ref{eq:misfit}) with respect to the parameters are computed using a finite-difference approximation.
+To estimate the parameter vector $\mathbf{p}$ (eq. \ref{eq:p-vector}) that minimizes the goal function $\Gamma(\mathbf{p})$ (eq. \ref{eq:gamma}), subjected to the inequality constraint (eq. \ref{eq:inequality-constraint}), we use the Levenberg-Marquardt method \cite[ p. 240]{aster-etal2019}, and the same strategy used by \cite{barbosa-1999b}, \cite{oliveirajr-etal2011} and \cite{oliveirajr-barbosa2013}  to incorporate the inequality constraint (eq. \ref{eq:inequality-constraint}). All elements forming the matrix $\mathbf{G}(\mathbf{p})$ (eqs \ref{eq:phi_gradient} and \ref{eq:phi_hessian}) are computed using a finite-difference approximation.
 
-\subsubsection{Considerations about the weights $\alpha_1$, $\alpha_2$, $\alpha_3$, $\alpha_4$, $\alpha_5$, $\alpha_6$, and $\alpha_7$}
+\subsubsection{Considerations about the weights $\alpha_{1}-\alpha_{7}$}
 
-Attributing the values to the weights $ \alpha_{\ell} $ (eq. \ref{eq:gamma}) consists in an important feature of our method. However, there is no analytical rule to define them, so their values can be dependent on the particular characteristics of the interpretation model. To overcome this problem, we normalize the $ \alpha_{\ell} $ values as follows:
+Attributing the values to the weights $ \alpha_{\ell} $ (eq. \ref{eq:gamma}) is an important feature of our method. However, there is no analytical rule to define them, and their values can be dependent on the particular characteristics of the interpretation model. To overcome this problem, we normalize the $ \alpha_{\ell} $ values as follows:
 \begin{equation}\label{eq:alphas}
 \alpha_{\ell} = \tilde{\alpha}_\ell\frac{E_\phi}{E_\ell}, \quad \ell = 1,\dots, 7,
 \end{equation}
-where $\tilde{\alpha}_\ell$ is a positive scalar and $ E_\phi/E_\ell $ is a normalizing constant. In this equation, $ E_\ell $ represents the median of the elements forming the main diagonal of the Hessian matrix of the $\ell$th constraining function $\varphi_{\ell}(\mathbf{p})$ (eqs \ref{eq:phi1_sum}, \ref{eq:phi2_sum}, \ref{eq:phi3_sum}, \ref{eq:phi4_sum}, \ref{eq:phi5_sum}, \ref{eq:phi6_sum}, and \ref{eq:phi7_sum}). The constant $E_\phi$ is defined in a similar way using the Hessian matrix of the misfit function $\phi(\mathbf{p})$ (eq. \ref{eq:misfit}) computed with the initial approximation $ \mathbf{p}_0 $ for the parameter vector $ \mathbf{p} $ (eq. \ref{eq:p-vector}) at the inversion algorithm. According to this empirical strategy, the weights $ \alpha_{\ell} $ are defined using the positive scalars $\tilde{\alpha}_\ell$ (eq. \ref{eq:alphas}), which are less dependent on the particular characteristics of the interpretation model.
+where $\tilde{\alpha}_\ell$ is a positive scalar and $ E_\phi/E_\ell $ is a normalizing factor. In this equation, $ E_\ell $ represents the trace of the Hessian matrix of the $\ell$th constraining function $\varphi_{\ell}(\mathbf{p})$ (eqs \ref{eq:phi1}, \ref{eq:phi2}, \ref{eq:phi3}, \ref{eq:phi4}, \ref{eq:phi5}, \ref{eq:phi6}, and \ref{eq:phi7}). The constant $E_\phi$ is the trace of the Hessian matrix of the misfit function $\phi(\mathbf{p})$ (eq. \ref{eq:misfit}) computed with the initial approximation $ \mathbf{p}_0 $ for the parameter vector $ \mathbf{p} $ (eq. \ref{eq:phi_hessian}) at the inversion algorithm. According to this empirical strategy, the weights $ \alpha_{\ell} $ are defined using the positive scalars $\tilde{\alpha}_\ell$ (eq. \ref{eq:alphas}), which are less dependent on the particular characteristics of the interpretation model.
 
 \subsubsection{Inversion algorithm}
 
@@ -316,11 +374,11 @@ The estimated correction $\boldsymbol{\Delta}\hat{\mathbf{p}}_k$ (where ``\^{}" 
 \begin{equation}\label{eq:linear-system}
 \mathbf{D}_k\left[\mathbf{D}_k\mathbf{H}^\dagger(\hat{\mathbf{p}}_k)\mathbf{D}_k + \lambda_k\mathbf{I}\right]\mathbf{D}_k\boldsymbol{\Delta}\hat{\mathbf{p}}^\dagger_k = -\boldsymbol{\nabla}\Gamma(\hat{\mathbf{p}}),
 \end{equation}
-$\lambda_k$ is a positive scalar to regularize the steps of the inversion ensuring the convergence of the algorithm which varies at each iteration by a scalar $d\lambda$ described in the algorithm, $\mathbf{I}$ is a identity matrix with dimension $M\times M$, and $\boldsymbol{\nabla}\Gamma(\hat{\mathbf{p}})$ is the gradient of the goal function (eq. \ref{eq:gamma}) plus the gradient of each constraint function (eqss \ref{eq:phi1_sum}, \ref{eq:phi2_sum}, \ref{eq:phi3_sum}, \ref{eq:phi4_sum}, \ref{eq:phi5_sum}, \ref{eq:phi6_sum}, and \ref{eq:phi7_sum}). In this equation, $\mathbf{H}^\dagger(\mathbf{p}^\dagger_k)$ is given by
+$\lambda_k$ is a positive scalar to regularize the steps of the inversion ensuring the convergence of the algorithm which varies at each iteration by a scalar $d\lambda$ described in the algorithm, $\mathbf{I}$ is a identity matrix with dimension $M\times M$, and $\boldsymbol{\nabla}\Gamma(\hat{\mathbf{p}})$ is the gradient of the goal function (eq. \ref{eq:gamma}) plus the gradient of each constraint function (eqss \ref{eq:phi1}, \ref{eq:phi2}, \ref{eq:phi3}, \ref{eq:phi4}, \ref{eq:phi5}, \ref{eq:phi6}, and \ref{eq:phi7}). In this equation, $\mathbf{H}^\dagger(\mathbf{p}^\dagger_k)$ is given by
 \begin{equation}\label{eq:H-dagger}
 \mathbf{H}^\dagger(\mathbf{p}_k) = \mathbf{H}(\mathbf{p}_k)\mathbf{T}(\mathbf{p}_k),
 \end{equation}
-where $\mathbf{H}(\mathbf{p}_k)$ is the Hessian matrix of $\Gamma(\mathbf{p})$ plus the Hessian matrix of each constraint function (eqss \ref{eq:phi1_sum}, \ref{eq:phi2_sum}, \ref{eq:phi3_sum}, \ref{eq:phi4_sum}, \ref{eq:phi5_sum}, \ref{eq:phi6_sum}, and \ref{eq:phi7_sum}) and $\mathbf{T}(\mathbf{p}_k)$ is a diagonal matrix that incorporates the inequality constraint on $\mathbf{H}^\dagger(\mathbf{p}_k)$ which the $l$th non-zero element given by
+where $\mathbf{H}(\mathbf{p}_k)$ is the Hessian matrix of $\Gamma(\mathbf{p})$ plus the Hessian matrix of each constraint function (eqss \ref{eq:phi1}, \ref{eq:phi2}, \ref{eq:phi3}, \ref{eq:phi4}, \ref{eq:phi5}, \ref{eq:phi6}, and \ref{eq:phi7}) and $\mathbf{T}(\mathbf{p}_k)$ is a diagonal matrix that incorporates the inequality constraint on $\mathbf{H}^\dagger(\mathbf{p}_k)$ which the $l$th non-zero element given by
 \begin{equation}\label{eq:inequality-diag}
 \mathbf{T}_{ll} = \frac{(p_l^{max} - p_l)(p_l - p_l^{min})}{p_l^{max} - p_l^{min}}, \quad l = 1, \dots, M .
 \end{equation}
