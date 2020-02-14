@@ -60,36 +60,38 @@ upper limits for the $l$th element $p_{l}$ of the parameter vector $\mathbf{p}$ 
 These limits are defined by the interpreter based on both the horizontal extent of the magnetic anomaly and the knowledge 
 about the source.
 
-To solve our nonlinear inverse problem, we use a gradient-based  method and, consequently, we need to define the gradient vector $\nabla \Gamma(\mathbf{p})$ and Hessian matrix $\mathbf{H}(\mathbf{p})$ of the goal function $\Gamma(\mathbf{p})$ (eq. \ref{eq:gamma}). They are given by:
-
+To solve our nonlinear inverse problem, we use a gradient-based  method and, consequently, we need to define the gradient vector 
+$\boldsymbol{\nabla}\Gamma(\mathbf{p})$ and Hessian matrix $\mathbf{H}(\mathbf{p})$ of the goal function 
+$\Gamma(\mathbf{p})$ (eq. \ref{eq:gamma}):
 \begin{equation}\label{eq:gamma_gradient}
-\nabla\Gamma (\mathbf{p}) = \nabla\phi (\mathbf{p}) + \sum\limits^{7}_{\ell =1} \alpha_{\ell} \, \nabla\varphi_{\ell}(\mathbf{p}) \: ,
+\boldsymbol{\nabla}\Gamma (\mathbf{p}) = \boldsymbol{\nabla}\phi (\mathbf{p}) + 
+\sum\limits^{7}_{\ell =1} \alpha_{\ell} \, \boldsymbol{\nabla}\varphi_{\ell}(\mathbf{p})
 \end{equation}
-
 and
-
 \begin{equation}\label{eq:gamma_hessian}
-\mathbf{H}\Gamma (\mathbf{p}) = \mathbf{H}_\phi (\mathbf{p}) + \sum\limits^{7}_{\ell =1} \alpha_{\ell} \, \mathbf{H}_\ell(\mathbf{p}) \: ,
+\mathbf{H} (\mathbf{p}) = \mathbf{H}_\phi (\mathbf{p}) + \sum\limits^{7}_{\ell =1} \alpha_{\ell} \, \mathbf{H}_\ell \: ,
 \end{equation}
-where $\mathbf{G}(\mathbf{p})$ is an $N \times M$ matrix whose element $ij$ is the derivative of the predicted data $d_{i}(\mathbf{p})$ (eq. \ref{eq:predicted-data-i}) with respect to the $j$ element $p_{j}$ of the parameter vector $\mathbf{p}$ (eq. \ref{eq:p-vector}). In eqs \ref{eq:gamma_gradient} and \ref{eq:gamma_hessian}, 
-
+where 
 \begin{equation}\label{eq:phi_gradient}
-\nabla \phi(\mathbf{p}) =  - \frac{2}{N}\mathbf{G}^{\mathsf{T}}(\hat{\mathbf{p}}_k)[\mathbf{d}^o - \boldsymbol{\psi}(\hat{\mathbf{p}}_k)];
+\boldsymbol{\nabla} \phi(\mathbf{p}) =  - \frac{2}{N}\mathbf{G}(\mathbf{p})^{\mathsf{T}}[\mathbf{d}^o - \mathbf{d}(\mathbf{p})]
 \end{equation} 
-
 and 
-
 \begin{equation}\label{eq:phi_hessian}
-\mathbf{H}_{\phi}(\mathbf{p}) = \frac{2}{N}\mathbf{G}^{\mathsf{T}}(\hat{\mathbf{p}}_k)\mathbf{G}(\hat{\mathbf{p}}_k);
+\mathbf{H}_{\phi}(\mathbf{p}) = \frac{2}{N}\mathbf{G}(\mathbf{p})^{\mathsf{T}}\mathbf{G}(\mathbf{p})
 \end{equation}
-are the gradient vector of the Hessian matrix of the misfit function $\phi(\mathbf{p})$ (eq. 5), respectively, and the terms $\nabla \varphi_{\ell}(\mathbf{p})$ and $\mathbf{H}_{\ell}$, $\ell = 1, \dots, 7$, are the gradient vectors and Hessian matrices of the constraint functions. Details about the regularizing functions $\varphi_\ell(\mathbf{p})$, $\ell = 1, \dots, 7$, as well as the numerical procedure to solve this nonlinear inverse problem are given in the following sections.
+are the gradient vector of the Hessian matrix of the misfit function $\phi(\mathbf{p})$ (eq. 5), respectively, the terms 
+$\boldsymbol{\nabla} \varphi_{\ell}(\mathbf{p})$ and $\mathbf{H}_{\ell}$, $\ell = 1, \dots, 7$, are the gradient vectors and Hessian 
+matrices of the constraint functions, respectively, and $\mathbf{G}(\mathbf{p})$ is an $N \times M$ matrix whose element $ij$ is 
+the derivative of the predicted data $d_{i}(\mathbf{p})$ (eq. \ref{eq:predicted-data-i}) with respect to the $j$ element $p_{j}$ of 
+the parameter vector $\mathbf{p}$ (eq. \ref{eq:p-vector}).
+Details about the constraint functions $\varphi_\ell(\mathbf{p})$, $\ell = 1, \dots, 7$, as well as the numerical procedure to solve 
+this nonlinear inverse problem are given in the following sections.
+
 
 \subsection{Constraint functions}\label{sec:constraints}
 
 We have divided the constraint functions $\varphi_{\ell}(\mathbf{p})$ (eq. \ref{eq:gamma}), $\ell = 1, \dots, 7$, used here to 
 obtain stable solutions and introduce a priori information about the magnetic source into three groups.
-
-
 
 \subsubsection{Smoothness constraints}
 
@@ -102,9 +104,9 @@ role in introducing a prior information about the shape of the source.
 The first constraint of this group is the \textit{Smoothness constraint on the adjacent radii defining the horizontal 
 section of each vertical prism}. This constraint imposes that adjacent radii $r_{j}^{k}$ and $r_{j+1}^{k}$ within each 
 prism must be close to each other. It forces the estimated prism to be approximately cylindrical. Mathematically, the constraint is given by
-\begin{equation}\label{eq:ph1}
+\begin{equation}\label{eq:phi1}
 \begin{split}
-\varphi_{2}(\mathbf{p}) &= \sum\limits^{L}_{k=1}\left[\left(r^{k}_{V}-r^{k}_{1}\right)^2 + \sum\limits^{V-1}_{j=1}\left(r^{k}_{j}-r^{k}_{j+1}\right)^2\right]\\
+\varphi_{1}(\mathbf{p}) &= \sum\limits^{L}_{k=1}\left[\left(r^{k}_{V}-r^{k}_{1}\right)^2 + \sum\limits^{V-1}_{j=1}\left(r^{k}_{j}-r^{k}_{j+1}\right)^2\right]\\
  &= \mathbf{p}^{\mathsf{T}} \mathbf{R}^{\mathsf{T}}_{1}\mathbf{R}_{1} \mathbf{p} \quad ,
 \end{split}
 \end{equation}
@@ -123,7 +125,7 @@ $\mathbf{I}_{L}$ is the identity matrix of order $L$, ``$\otimes$" denotes the K
 $\mathbf{I}_{V}$ is the identity matrix of order $V$ and $\mathbf{D}_{V}^\mathsf{T}$ is the upshift permutation 
 matrix of order $V$ \citep[][ p. 20]{golub-vanloan2013}. The gradient and Hessian of function $\varphi_{1}(\mathbf{p})$ (eq. \ref{eq:phi1}) are given by:
 \begin{equation}\label{eq:phi1_grad}
-\boldsymbol{\nabla\varphi}_{1}(\mathbf{p}) = 2 \mathbf{R}^\mathsf{T}_{1}\mathbf{R}_{1}\mathbf{p} \quad ,
+\boldsymbol{\nabla}\varphi_{1}(\mathbf{p}) = 2 \mathbf{R}^\mathsf{T}_{1}\mathbf{R}_{1}\mathbf{p} \quad ,
 \end{equation}
 and
 \begin{equation}\label{eq:phi1_hessian}
@@ -161,7 +163,7 @@ $\mathbf{0}_{(L-1)V \times 1}$ is an $(L-1)V \times 1$ vector with null elements
 $\mathbf{0}_{(L-1) \times 1}$ is an $(L-1) \times 1$ vector with null elements and 
 $\mathbf{I}_{L-1}$ is the identity matrix of order $L-1$. The gradient and Hessian of function $\varphi_{2}(\mathbf{p})$ (eq. \ref{eq:phi2}) are given by:
 \begin{equation}\label{eq:phi2_grad}
-\boldsymbol{\nabla\varphi}_{2}(\mathbf{p}) = 2\mathbf{R}^\mathsf{T}_{2}\mathbf{R}_{2}\mathbf{p} \quad ,
+\boldsymbol{\nabla}\varphi_{2}(\mathbf{p}) = 2\mathbf{R}^\mathsf{T}_{2}\mathbf{R}_{2}\mathbf{p} \quad ,
 \end{equation}
 and
 \begin{equation}\label{eq:phi2_hessian}
@@ -200,7 +202,7 @@ $\mathbf{0}_{(L-1)2 \times 1}$ is an $(L-1)2 \times 1$ vector with null elements
 $\mathbf{0}_{2 \times V}$ is a $2 \times V$ matrix with null elements and 
 $\mathbf{I}_{2}$ is the identity matrix of order $2$. The gradient and Hessian of function $\varphi_{3}(\mathbf{p})$ (eq. \ref{eq:phi3}) are given by:
 \begin{equation}\label{eq:phi3_grad}
-\boldsymbol{\nabla\varphi}_{3}(\mathbf{p}) = 2 \mathbf{R}^{\mathsf{T}}_{3}\mathbf{R}_{3}\mathbf{p} \quad ,
+\boldsymbol{\nabla}\varphi_{3}(\mathbf{p}) = 2 \mathbf{R}^{\mathsf{T}}_{3}\mathbf{R}_{3}\mathbf{p} \quad ,
 \end{equation}
 and
 \begin{equation}\label{eq:phi3_hessian}
@@ -241,7 +243,7 @@ and
 where $\mathbf{I}_{V+2}$ is the identity matrix of order $V+2$ and $\mathbf{0}_{(V+2) \times (M-V-2)}$ is a matrix 
 with null elements. The gradient and Hessian of function $\varphi_{4}(\mathbf{p})$ (eq. \ref{eq:phi4}) are given by:
 \begin{equation}\label{eq:phi4_grad}
-\boldsymbol{\nabla\varphi}_{4}(\mathbf{p}) = 2 \mathbf{R}_{4} 
+\boldsymbol{\nabla}\varphi_{4}(\mathbf{p}) = 2 \mathbf{R}_{4}^{\mathsf{T}} 
 \left(\mathbf{R}_{4} \mathbf{p} - \mathbf{a} \right) \quad ,
 \end{equation}
 and
@@ -276,7 +278,7 @@ and
 where $\mathbf{I}_{2}$ is the identity matrix of order $2$ and $\mathbf{0}_{2 \times (M-V-2)}$ and 
 $\mathbf{0}_{2 \times V}$ are matrices with null elements. The gradient and Hessian of function $\varphi_{5}(\mathbf{p})$ (eq. \ref{eq:phi5}) are given by:
 \begin{equation}\label{eq:phi5_grad}
-\boldsymbol{\nabla\varphi}_{5}(\mathbf{p}) = 2\mathbf{R}_{5}
+\boldsymbol{\nabla}\varphi_{5}(\mathbf{p}) = 2\mathbf{R}_{5}^{\mathsf{T}}
 \left(\mathbf{R}_{5} \mathbf{p} - \mathbf{b}\right) \quad ,
 \end{equation}
 and
@@ -316,7 +318,7 @@ and
 \end{equation}
 The gradient and Hessian of function $\varphi_{6}(\mathbf{p})$ (eq. \ref{eq:phi6}) are given by:
 \begin{equation}\label{eq:phi6_grad}
-\boldsymbol{\nabla\varphi}_{6}(\mathbf{p}) = 2 \mathbf{R}_{6}^{\mathsf{T}} \mathbf{R}_{6} \mathbf{p} \quad ,
+\boldsymbol{\nabla}\varphi_{6}(\mathbf{p}) = 2 \mathbf{R}_{6}^{\mathsf{T}} \mathbf{R}_{6} \mathbf{p} \quad ,
 \end{equation}
 and
 \begin{equation}\label{eq:phi6_hessian}
@@ -340,7 +342,7 @@ where
 \end{equation}
 The gradient and Hessian of function $\varphi_{7}(\mathbf{p})$ (eq. \ref{eq:phi7}) are given by:
 \begin{equation}\label{eq:phi7_grad}
-\boldsymbol{\nabla\varphi}_{7}(\mathbf{p}) = 2 \mathbf{R}_{7}^{\mathsf{T}} \mathbf{R}_{7} \mathbf{p} \quad ,
+\boldsymbol{\nabla}\varphi_{7}(\mathbf{p}) = 2 \mathbf{R}_{7}^{\mathsf{T}} \mathbf{R}_{7} \mathbf{p} \quad ,
 \end{equation}
 and
 \begin{equation}\label{eq:phi7_hessian}
@@ -349,59 +351,85 @@ and
 
 \subsection{Computational procedures}
 
-To estimate the parameter vector $\mathbf{p}$ (eq. \ref{eq:p-vector}) that minimizes the goal function $\Gamma(\mathbf{p})$ (eq. \ref{eq:gamma}), subjected to the inequality constraint (eq. \ref{eq:inequality-constraint}), we use the Levenberg-Marquardt method \cite[ p. 240]{aster-etal2019}, and the same strategy used by \cite{barbosa-1999b}, \cite{oliveirajr-etal2011} and \cite{oliveirajr-barbosa2013}  to incorporate the inequality constraint (eq. \ref{eq:inequality-constraint}). All elements forming the matrix $\mathbf{G}(\mathbf{p})$ (eqs \ref{eq:phi_gradient} and \ref{eq:phi_hessian}) are computed using a finite-difference approximation.
+To estimate the parameter vector $\mathbf{p}$ (eq. \ref{eq:p-vector}) that minimizes the goal function 
+$\Gamma(\mathbf{p})$ (eq. \ref{eq:gamma}), subjected to the inequality constraint (eq. \ref{eq:inequality-constraint}), 
+we use the Levenberg-Marquardt method \cite[e.g., ][ p. 240]{aster-etal2019}. 
+This is an iterative gradient-based method that, at each iteration $k$, updates the estimated 
+parameter vector $\hat{\mathbf{p}}_{(k)}$ (where the superscript hat ``~$\hat{}$~" denotes estimated) 
+to obtain new a estimated parameter vector $\hat{\mathbf{p}}_{(k+1)}$.
+We compute this update by following the same strategy 
+of \cite{barbosa-1999b}, \cite{oliveirajr-etal2011} and \cite{oliveirajr-barbosa2013} to
+incorporate the inequality constraint (eq. \ref{eq:inequality-constraint}). 
+This strategy consists in transforming each element $p_{l}$ of the estimated parameter vector 
+$\hat{\mathbf{p}}_{(k)}$ into the element $p^{\dagger}_{l}$ of a new vector $\hat{\mathbf{p}}^{\dagger}_{(k)}$
+as follows:
+\begin{equation}\label{eq:inequality-function}
+p^{\dagger}_{l} = -\ln\left(\frac{p_{l}^{max} - p_{l}}{p_{l} - p_{l}^{min}}\right) \: ,
+\end{equation}
+where $p_{l}^{min}$ and $p_{l}^{max}$ are defined in the inequality constraint 
+(eq. \ref{eq:inequality-constraint}).
+Then, we compute a correction $\boldsymbol{\Delta}\hat{\mathbf{p}}^{\dagger}_{(k)}$ and a new vector 
+$\hat{\mathbf{p}}^{\dagger}_{(k+1)} = \hat{\mathbf{p}}^{\dagger}_{(k)} + \boldsymbol{\Delta}\hat{\mathbf{p}}^{\dagger}_{(k)}$.
+Finally, we transform each element $p^{\dagger}_{l}$ of $\hat{\mathbf{p}}^{\dagger}_{(k+1)}$ into the element 
+$p_{l}$ of the new estimated parameter vector $\hat{\mathbf{p}}_{(k+1)}$ as follows:
+\begin{equation}\label{eq:inv-inequality-function}
+p_{l} = p_{l}^{min} + \left(\frac{p_{l}^{max} - p_{l}^{min}}{ 1 + e^{-p^{\dagger}_{l}} }\right) \: .
+\end{equation}
+What follows presents details about how we compute the correction 
+$\boldsymbol{\Delta}\hat{\mathbf{p}}^{\dagger}_{(k)}$ and a fully description of our algorithm.
 
 \subsubsection{Considerations about the weights $\alpha_{1}-\alpha_{7}$}
 
-Attributing the values to the weights $ \alpha_{\ell} $ (eq. \ref{eq:gamma}) is an important feature of our method. However, there is no analytical rule to define them, and their values can be dependent on the particular characteristics of the interpretation model. To overcome this problem, we normalize the $ \alpha_{\ell} $ values as follows:
+Attributing values to the weights $ \alpha_{\ell} $ (eq. \ref{eq:gamma}) is an important feature of our method. 
+However, there is no analytical rule to define them and their values can be dependent on the particular 
+characteristics of the interpretation model. To overcome this problem, we normalize the $ \alpha_{\ell} $ 
+values as follows:
 \begin{equation}\label{eq:alphas}
 \alpha_{\ell} = \tilde{\alpha}_\ell\frac{E_\phi}{E_\ell}, \quad \ell = 1,\dots, 7,
 \end{equation}
-where $\tilde{\alpha}_\ell$ is a positive scalar and $ E_\phi/E_\ell $ is a normalizing factor. In this equation, $ E_\ell $ represents the trace of the Hessian matrix of the $\ell$th constraining function $\varphi_{\ell}(\mathbf{p})$ (eqs \ref{eq:phi1}, \ref{eq:phi2}, \ref{eq:phi3}, \ref{eq:phi4}, \ref{eq:phi5}, \ref{eq:phi6}, and \ref{eq:phi7}). The constant $E_\phi$ is the trace of the Hessian matrix of the misfit function $\phi(\mathbf{p})$ (eq. \ref{eq:misfit}) computed with the initial approximation $ \mathbf{p}_0 $ for the parameter vector $ \mathbf{p} $ (eq. \ref{eq:phi_hessian}) at the inversion algorithm. According to this empirical strategy, the weights $ \alpha_{\ell} $ are defined using the positive scalars $\tilde{\alpha}_\ell$ (eq. \ref{eq:alphas}), which are less dependent on the particular characteristics of the interpretation model.
+where $\tilde{\alpha}_\ell$ is a positive scalar and $ E_\phi/E_\ell $ is a normalizing factor. 
+In this equation, $ E_\ell $ represents the 
+trace of the Hessian matrix $\mathbf{H}_{\ell}$ 
+(eqs \ref{eq:phi1_hessian}, \ref{eq:phi2_hessian}, \ref{eq:phi3_hessian}, \ref{eq:phi4_hessian}, \ref{eq:phi5_hessian}, 
+\ref{eq:phi6_hessian}, and \ref{eq:phi7_hessian})
+of the $\ell$th constraining function $\varphi_{\ell}(\mathbf{p})$ 
+(eqs \ref{eq:phi1}, \ref{eq:phi2}, \ref{eq:phi3}, \ref{eq:phi4}, \ref{eq:phi5}, \ref{eq:phi6}, and \ref{eq:phi7}). 
+The constant $E_\phi$ is the trace of the Hessian matrix $\mathbf{H}_{\phi}(\mathbf{p}_{0})$ (eq. \ref{eq:phi_hessian}) of 
+the misfit function $\phi(\mathbf{p})$ (eq. \ref{eq:misfit}) computed with the initial approximation $\hat{\mathbf{p}}_{(0)}$ 
+for the parameter vector $ \mathbf{p} $ (eq. \ref{eq:p-vector}) at the beginning of the inversion algorithm. 
+According to this empirical strategy, the weights $ \alpha_{\ell} $ 
+are defined using the positive scalars $\tilde{\alpha}_\ell$ (eq. \ref{eq:alphas}), which are less dependent on the 
+particular characteristics of the interpretation model.
 
 \subsubsection{Inversion algorithm}
 
-At first, the inequality constraint (eq. \ref{eq:inequality-constraint}) is incorporated on the parameter vector $\mathbf{p}$ element by element obtaining the transformed parameter vector $\mathbf{p}^\dagger = f(\mathbf{p})$ as follows
-\begin{equation}\label{eq:inequality-function}
-p^\dagger_l = f(p_l) = -\ln\left(\frac{p_l^{max} - p_l}{p_l - p_l^{min}}\right),
-\end{equation}
-where $pl$, $p_l^{max}$, and $p_l^{min}$ are the $l$th elements of $\mathbf{p}$, $\mathbf{p}^{max}$ and $\mathbf{p}^{min}$, respectively. This equation is a homeomorphic transformation that has the inverse transformation given by
-\begin{equation}\label{eq:inv-inequality-function}
-p_l = p_l^{min} + \left(\frac{p_l^{max} - p_l^{min}}{ 1 + e^{-p^\dagger_l} }\right).
-\end{equation}
-
-The estimated correction $\boldsymbol{\Delta}\hat{\mathbf{p}}_k$ (where ``\^{}" denotes estimated) for the parameter vector $\mathbf{p}_k$ for the nonlinear inverse problem at the $k$th iteration is obtained by solving the linear system given by
+At each iteration $k$ of our algorithm, the correction $\boldsymbol{\Delta}\hat{\mathbf{p}}^{\dagger}_{(k)}$
+is computed by solving the following linear system:
 \begin{equation}\label{eq:linear-system}
-\mathbf{D}_k\left[\mathbf{D}_k\mathbf{H}^\dagger(\hat{\mathbf{p}}_k)\mathbf{D}_k + \lambda_k\mathbf{I}\right]\mathbf{D}_k\boldsymbol{\Delta}\hat{\mathbf{p}}^\dagger_k = -\boldsymbol{\nabla}\Gamma(\hat{\mathbf{p}}),
+\mathbf{D}_{(k)} \left[\mathbf{D}_{(k)} \mathbf{H}^{\dagger}(\hat{\mathbf{p}}_{(k)}) \mathbf{D}_{(k)} + \lambda_{(k)} \mathbf{I}\right] \mathbf{D}_{(k)} \boldsymbol{\Delta} \hat{\mathbf{p}}^{\dagger}_{(k)} = -\boldsymbol{\nabla}\Gamma(\hat{\mathbf{p}}_{(k)}) \: ,
 \end{equation}
-$\lambda_k$ is a positive scalar to regularize the steps of the inversion ensuring the convergence of the algorithm which varies at each iteration by a scalar $d\lambda$ described in the algorithm, $\mathbf{I}$ is a identity matrix with dimension $M\times M$, and $\boldsymbol{\nabla}\Gamma(\hat{\mathbf{p}})$ is the gradient of the goal function (eq. \ref{eq:gamma}) plus the gradient of each constraint function (eqss \ref{eq:phi1}, \ref{eq:phi2}, \ref{eq:phi3}, \ref{eq:phi4}, \ref{eq:phi5}, \ref{eq:phi6}, and \ref{eq:phi7}). In this equation, $\mathbf{H}^\dagger(\mathbf{p}^\dagger_k)$ is given by
+where $\lambda_{(k)}$ is the a positive scalar adjusted at each iteration \cite[e.g., ][ p. 240]{aster-etal2019}, 
+$\mathbf{I}$ is the identity matrix with order $M$, $\boldsymbol{\nabla}\Gamma(\hat{\mathbf{p}})$ is the gradient of the 
+goal function (eq. \ref{eq:gamma_gradient}) and $\mathbf{H}^{\dagger}(\hat{\mathbf{p}}_{(k)})$ is a matrix given by
 \begin{equation}\label{eq:H-dagger}
-\mathbf{H}^\dagger(\mathbf{p}_k) = \mathbf{H}(\mathbf{p}_k)\mathbf{T}(\mathbf{p}_k),
+\mathbf{H}^{\dagger}(\hat{\mathbf{p}}_{(k)}) = \mathbf{H}(\hat{\mathbf{p}}_{(k)})\mathbf{T}(\hat{\mathbf{p}}_{(k)}),
 \end{equation}
-where $\mathbf{H}(\mathbf{p}_k)$ is the Hessian matrix of $\Gamma(\mathbf{p})$ plus the Hessian matrix of each constraint function (eqss \ref{eq:phi1}, \ref{eq:phi2}, \ref{eq:phi3}, \ref{eq:phi4}, \ref{eq:phi5}, \ref{eq:phi6}, and \ref{eq:phi7}) and $\mathbf{T}(\mathbf{p}_k)$ is a diagonal matrix that incorporates the inequality constraint on $\mathbf{H}^\dagger(\mathbf{p}_k)$ which the $l$th non-zero element given by
+where $\mathbf{H}(\hat{\mathbf{p}}_{(k)})$ is the Hessian matrix of the goal function (eq. \ref{eq:gamma_hessian}) 
+and $\mathbf{T}(\hat{\mathbf{p}}_{(k)})$ is a diagonal matrix whose element $ll$ is given by
 \begin{equation}\label{eq:inequality-diag}
-\mathbf{T}_{ll} = \frac{(p_l^{max} - p_l)(p_l - p_l^{min})}{p_l^{max} - p_l^{min}}, \quad l = 1, \dots, M .
+t(p_{l}) = \frac{(p_{l}^{max} - p_{l})(p_{l} - p_{l}^{min})}{p_{l}^{max} - p_{l}^{min}}, \quad l = 1, \dots, M \: ,
 \end{equation}
-
-\cite{marquardt_algorithm_1963} suggests a normalization on $\mathbf{H}^\dagger(\mathbf{p}_k)$ to balance the magnitude of $\lambda_k$ and the diagonal of $\mathbf{H}^\dagger(\mathbf{p}_k)$. To introduce this normalization, we use the diagonal matrix $\mathbf{D}_k$ whose $l$th non-zero element $d_{ll}$ given by
-
+with $p_{l}$ being the $l$th element of the estimated parameter vector $\hat{\mathbf{p}}_{(k)}$. 
+In eq. \ref{eq:linear-system}, $\mathbf{D}_{(k)}$ is a diagonal matrix proposed by 
+\cite{marquardt_algorithm_1963} for scaling the parameter $\lambda_{(k)}$ at each iteration and 
+improving the convergence of the algorithm. The element $ll$ of this diagonal matrix is given by
 \begin{equation}\label{eq:D-matrix}
-d_{ll} = \frac{1}{\sqrt{h^\dagger_{ll}}},
+d_{ll} = \frac{1}{\sqrt{h^{\dagger}_{ll}}} \: ,
 \end{equation}
-where $h^\dagger_{ll}$ is the $l$th element of the diagonal of $\mathbf{H}^\dagger(\mathbf{p}_k)$. The effect of this normalization is introduced and removed in the equation \ref{eq:linear-system}. 
+where $h^{\dagger}_{ll}$ is the element $ll$ of the matrix $\mathbf{H}^{\dagger}(\hat{\mathbf{p}}_{(k)})$ 
+(eq. \ref{eq:H-dagger}). Figure \ref{fig:flowchart} shows a flowchart of our algorithm.
 
-The proposed methodology was implemented using the following algorithm:
-
-\begin{enumerate}
-	\item Iteration $k = 0$: input $z_0$, $m_0$, $\mathbf{d}^o$, $\mathbf{p}^{min}$, $\mathbf{p}^{max}$, $\tilde{\alpha}_1$, $\tilde{\alpha}_2$, $\tilde{\alpha}_3$, $\tilde{\alpha}_4$, $\tilde{\alpha}_5$, $\tilde{\alpha}_6$, $\tilde{\alpha}_7$, and an initial approximation $\mathbf{p}_0$ satisfying the inequality constraints (eq. \ref{eq:inequality-constraint});
-	\item obtain $\mathbf{H}_0$ and $\alpha_1$, $\alpha_2$, $\alpha_3$, $\alpha_4$, $\alpha_5$, $\alpha_6$, and $\alpha_7$ (eq. \ref{eq:alphas});
-	\item obtain $\mathbf{p}^\dagger_k$ and $\mathbf{H}^\dagger(\mathbf{p}_k)$ using equations \ref{eq:inequality-function} and \ref{eq:H-dagger}, respectively;
-	\item obtain $\Delta\hat{\mathbf{p}}^{\dagger}_k$ at the $k$th iteration by solving equation \ref{eq:linear-system};
-	\item compute: $\hat{\mathbf{p}}_{k+1}^{\dagger} = \hat{\mathbf{p}}^{\dagger}_k + \Delta\hat{\mathbf{p}}^{\dagger}$;
-	\item obtain $\hat{\mathbf{p}}_{k+1}$ using the inverse inequality function (eq. \ref{eq:inv-inequality-function});
-	\item Test for algorithm convergence. Evaluate $\left|\Gamma(\hat{\mathbf{p}}_{k+1}) - \Gamma(\hat{\mathbf{p}}_k)\right|$.
-\end{enumerate}
-where  $ \Gamma(\mathbf{p}^{k+1}) $ and $\Gamma(\mathbf{p}^{k})$ are the goal function (eq. \ref{eq:gamma}) evaluated at the iteration $k+1$ and $k$, respectively.
+PAREI AQUI
 
 \subsubsection{Practical considerations}
 
