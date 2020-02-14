@@ -31,7 +31,7 @@
 \begin{figure}
 	\centering
 	\includegraphics[scale=.5]{figures/wedding_cake_results.png}
-	\caption{Application to simple model data. (a) residual data given by the difference between the noise-corrupted data (Fig. \ref{fig:kimb_model}(a)) and the predicted data (not shown) produced by the inverse model (red prisms) in (c) and (d). These inversions were computed using the same cylinder as a initial approximation. The red prisms in (b) represent the input model of the inversion.
+	\caption{Application to simple model data. (a) residual data given by the difference between the noise-corrupted data (Fig. \ref{fig:kimb_model}a) and the predicted data (not shown) produced by the estimated model (red prisms) in (c) and (d). These inversions were computed using the same cylinder as a initial approximation. The red prisms in (b) represent the initial approximate of the inversion.
 	}
 	\label{fig:kimb_results}
 \end{figure}
@@ -39,7 +39,7 @@
 \begin{figure}
     \centering
     \includegraphics[scale=.5]{figures/complex_model_data.png}
-    \caption{Complex model simulation. (a) noise-corrupted total-field anomaly produced by the complex model (blue prisms) in (c) and (d). The black dots represent the observation points that simulate an airborne survey.
+    \caption{Complex model simulation. (a) noise-corrupted total-field anomaly, the black dots represent the observation points. (b) elevation of the observations simulating an airborne survey produced by the complex model (blue prisms) in (c) and (d).
 }
     \label{fig:complex_model}
 \end{figure}
@@ -55,23 +55,31 @@
 \begin{figure}
     \centering
     \includegraphics[scale=.5]{figures/complex_results.png}
-    \caption{Application to complex model data. (a) residual data given by the difference between the noise-corrupted data (Fig. \ref{fig:complex_model}(a)) and the predicted data (not shown) produced by the inverse model (red prisms) in (c) and (d). The red prisms in (b) represent the input model of the inversion.
+    \caption{Application to complex model data. (a) residual data given by the difference between the noise-corrupted data (Fig. \ref{fig:complex_model}a) and the predicted data (not shown) produced by the estimated model (red prisms) in (c) and (d). The red prisms in (b) represent the initial approximate of the inversion.
 }
     \label{fig:complex_result}
 \end{figure}
 
 \begin{figure}
     \centering
-    \includegraphics[scale=.5]{figures/diorama_real_data.png}
-    \caption{Total-field anomaly of Diorama in GAP. The black dots are the observation points used in this work.
+    \includegraphics[scale=.5]{figures/anitapolis_data_alt.png}
+    \caption{Field data application. (a) total-field anomaly of Anitapolis, the black dots are the observation points. (b) elevation of the observations.
 }
     \label{fig:real_data}
 \end{figure}
 
 \begin{figure}
+	\centering
+	\includegraphics[scale=.75]{figures/anitapolis_goal_func_grid.png}
+	\caption{Map of the objective function values due to the inverse solutions for the complex model. The range of the total-magnetization intensity varies from $m_0 = 3.5$ to $m_0=6$ A/m in a step of $0.6$ A/m and the range of the depth to the top  varies from $z_0=-900$ to $-750$ m in a step of $30$ m. Each square is a value of the goal function (eq. \ref{eq:gamma}) of a solution of the inverse problem for a pair of the total-magnetization intensity and the depth to the top of the source. These inversions were computed using the same cylinder as a initial approximation. The red triangle represents the lowest value of $ \Gamma(\mathbf{p}) $ for a pair of $m_0$ and $z_0$.
+	}
+	\label{fig:real_map}
+\end{figure}
+
+\begin{figure}
     \centering
-    \includegraphics[scale=.75]{figures/real_data_estimates.png}
-    \caption{Perspective views of the initial guess (blue cylinder) and the estimated source (red prisms) in (a), (b) and (c). (d) Residuals defined as the difference between the noisy and the predicted (not shown) total-field anomalies and the histogram of the residuals (inset in d) with mean $\mu=2.42$ nT and standard deviation $\sigma=20.89$ nT. The dashed line on the inset is the Gaussian curve for the residuals.
+    \includegraphics[scale=.5]{figures/anitapolis_results.png}
+    \caption{Application to field data. (a) residual data given by the difference between the observed data (Fig. \ref{fig:real_data}a) and the predicted data (not shown). The blue prisms in (b) represent the initial approximate of the inversion. The red prisms in (c) and (d) represent the estimated model. 
 }
     \label{fig:real_result}
 \end{figure}
