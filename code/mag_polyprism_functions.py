@@ -36,22 +36,18 @@ def area_polygon(x, y):
     area = (x * (y.take(shift_up) - y.take(shift_down))).sum() / 2.0
     return area
 
-def volume_polygon(x, y, model):
+def volume_polygon(model):
     '''
     Returns the volume of a list of polygonal prisms.
 
     input
 
-    x: 1D array - Cartesian coordinates
-    y: 1D array - Cartesian coordinates
     model: list - list of fatiando.mesher.PolygonalPrism
 
     output
 
     volume: float - volume of the model
     '''
-    assert x.size == y.size, 'x and y must have the same size'
-    assert x.shape == y.shape, 'x, y and z must have the same shape'
 
     volume = 0
     for m in model:
