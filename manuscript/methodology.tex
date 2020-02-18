@@ -37,9 +37,7 @@ which implements the formulas proposed by \cite{plouff1976}.
 
 \subsection{Inverse problem formulation}
 
-Given a set of tentative values for depth to the top of the shallowest prism $z_{0}$ and for the intensity of the 
-total-magnetization of the source $m_{0}$, we solve a constrained non-linear problem to estimate the parameter 
-vector $\mathbf{p}$ (eq. \ref{eq:p-vector}) by minimizing the goal function
+The total-magnetization of the source $m_{0}$ and depth to the top of the shallowest prism $z_{0}$ are hyperparameters of the inversion, i. e., they are not estimated during the inversion, but their value influences the final solution. Given a set of tentative values for  $m_{0}$ and $z_{0}$, we solve a constrained non-linear problem to estimate the parameter vector $\mathbf{p}$ (eq. \ref{eq:p-vector}) by minimizing the goal function
 \begin{equation}
 \Gamma (\mathbf{p}) = \phi (\mathbf{p}) + \sum\limits^{7}_{\ell =1} \alpha_{\ell} \, \varphi_{\ell}(\mathbf{p}) \: ,
 \label{eq:gamma}
