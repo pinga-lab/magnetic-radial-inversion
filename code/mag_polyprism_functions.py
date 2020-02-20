@@ -1865,9 +1865,26 @@ def levmarq_amf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, 
     phi_list = [phi0]
     model_list = [model0]
     res_list = [res0]
-    G0 = Jacobian_tf(xp, yp, zp, model0, M, L, delta[0], delta[1], delta[2], delta[3], inc, dec)
-    th = np.trace(2.*np.dot(G0.T, G0)/N)/P
-    alpha *= th
+    G0 = Jacobian_amf(xp, yp, zp, model0, M, L, delta[0], delta[1], delta[2], delta[3])
+
+    # Scale factor of misfit function
+    th = np.trace(2.*np.dot(G0.T, G0)/N)
+
+    # Scale factors of the constraint functions
+    th_constraints = []
+    d0, d1, dM = diags_phi_1(M, L)
+    th_constraints.append(np.sum(d0)) # phi1
+    d0, d1 = diags_phi_2(M, L)
+    th_constraints.append(np.sum(d0)) # phi2
+    th_constraints.append(2.*(M+2)) # phi3
+    th_constraints.append(2.*2) # phi4
+    d0, d1 = diags_phi_5(M, L)
+    th_constraints.append(np.sum(d0)) # phi5
+    d0 = diags_phi_6(M, L)
+    th_constraints.append(np.sum(d0)) # phi6
+    th_constraints.append(2.) # phi7
+
+    alpha *= th/th_constraints
 
     for it in range(maxit):
         mt = log_barrier(m0, M, L, mmax, mmin)
@@ -1876,7 +1893,7 @@ def levmarq_amf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, 
         G = Jacobian_amf(xp, yp, zp, model0, M, L, delta[0], delta[1], delta[2], delta[3])
 
         # Hessian matrix
-        H = 2.*np.dot(G.T, G)/(th*N)
+        H = 2.*np.dot(G.T, G)/N
 
         # weighting the regularization parameters
         H = Hessian_phi_1(M, L, H, alpha[0])
@@ -1888,8 +1905,8 @@ def levmarq_amf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, 
         H = Hessian_phi_7(M, L, H, alpha[6])
 
         # gradient vector
-        grad = -2.*np.dot(Gnp.dot(o,Q).T, res0)/(th*N)
-
+        grad = -2.*np.dot(G.T, res0)/N
+        
         grad = gradient_phi_1(M, L, grad, alpha[0])
         grad = gradient_phi_2(M, L, grad, alpha[1])
         grad = gradient_phi_3(M, L, grad, m_out, alpha[2])
