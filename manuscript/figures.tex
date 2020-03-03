@@ -86,7 +86,7 @@
 \begin{figure}
 	\centering
 	\includegraphics[scale=.75]{figures/real_gamma.png}
-	\caption{Validation to estimate the depth to the top ($ z_0 $) and the total-magnetization intensity ($ m_0 $) for the field application. The ranges in the axes are $m_0 = 1$ A/m to $m_0=5.5$ A/m with $0.5$ A/m intervals and $z_0=-1200$ m to $-750$ m with $30$ m intervals. This range of $m_0$ corresponds to an interval of magnetic susceptibility $\chi$ from $0.05$ to $0.30$ (upper axis). Each square is the goal function $ \Gamma(\mathbf{p}) $ (eq. \ref{eq:gamma}) produced by an estimated model inverted using a pair of $m_0$ and $z_0$. These 100 inversions were computed using the same cylinder as a initial approximation. The cyan diamond represents the lowest value of $ \Gamma(\mathbf{p}) $ (eq. \ref{eq:gamma}).
+	\caption{Validation to estimate the depth to the top ($ z_0 $) and the total-magnetization intensity ($ m_0 $) for the field application. The ranges in the axes are $m_0 = 1$ A/m to $m_0=5.5$ A/m with $0.5$ A/m intervals and $z_0=-1200$ m to $-750$ m with $30$ m intervals. This range of $m_0$ corresponds to an interval of magnetic susceptibility $\chi$ from $0.05$ to $0.30$ (upper axis). Each square is the goal function $ \Gamma(\mathbf{p}) $ (eq. \ref{eq:gamma}) produced by an estimated model inverted using a pair of $m_0$ and $z_0$. These 100 inversions were computed using the same cylinder as a initial approximation. The cyan diamond represents the estimated model whose magnetic susceptibility is compatible to the main field intensity. The magenta diamond represents the estimate model that produces the lowest value of $ \Gamma(\mathbf{p}) $ (eq. \ref{eq:gamma}).
 	}
 	\label{fig:real_map}
 \end{figure}
@@ -94,7 +94,15 @@
 \begin{figure}
     \centering
     \includegraphics[scale=.5]{figures/real_results.png}
-    \caption{Application to field data. (a) residual data given by the difference between the observed data (Fig. \ref{fig:real_data}a) and the predicted data (not shown). The inset in (a) shows the histogram of the residuals and the Gaussian curve (dashed line) whose mean and standard deviation are, respectively, $\mu = 0.91$ nT and $\sigma=6.95$ nT. (b) perspective view of the initial approximate (red prisms). (c) and (d) perspective views of the estimated model (red prisms). 
+    \caption{Application to field data represented by the cyan diamond in Fig. \ref{fig:real_map}. (a) residual data given by the difference between the observed data (Fig. \ref{fig:real_data}a) and the predicted data (not shown). The inset in (a) shows the histogram of the residuals and the Gaussian curve (dashed line) whose mean and standard deviation are, respectively, $\mu = 0.91$ nT and $\sigma=6.95$ nT. (b) perspective view of the initial approximate (red prisms). (c) and (d) perspective views of the estimated model (red prisms). 
 }
     \label{fig:real_result}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[scale=.5]{figures/real_results2.png}
+	\caption{Application to field data represented by the magenta diamond in Fig. \ref{fig:real_map}. (a) residual data given by the difference between the observed data (Fig. \ref{fig:real_data}a) and the predicted data (not shown). The inset in (a) shows the histogram of the residuals and the Gaussian curve (dashed line) whose mean and standard deviation are, respectively, $\mu = -0.59$ nT and $\sigma=5.80$ nT. (b) perspective view of the initial approximate (red prisms). (c) and (d) perspective views of the estimated model (red prisms). 
+	}
+	\label{fig:real_result2}
 \end{figure}
