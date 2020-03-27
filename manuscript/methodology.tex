@@ -73,7 +73,7 @@ The first constraint of this group is the \textit{Smoothness constraint on the a
 \end{equation}
 where
 \begin{equation}
-\mathbf{S}_{1} = 
+\mathbf{R}_{1} = 
 \mathbf{I}_{L} \otimes 
 \begin{bmatrix}
 \left( \mathbf{I}_{V} - \mathbf{D}_{V}^\mathsf{T} \right) & \mathbf{0}_{V \times 2} \\
@@ -169,7 +169,7 @@ and
 \subsubsection{Equality constraints}
 
 This group if formed by two constraints that were proposed by \cite{oliveirajr-etal2011} and \cite{oliveirajr-barbosa2013} by following the same approach proposed \cite{barbosa-etal1997} and 
-\cite{barbosa-etal1999}. They introduce a priori information about the shallowest prism and are  suitable for outcropping sources.
+\cite{barbosa-1999a}. They introduce a priori information about the shallowest prism and are  suitable for outcropping sources.
 
 The \textit{Source’s outcrop constraint} imposes that the horizontal cross-section of the shallowest prism 
 must be close to the intersection of the geologic source with the known outcropping boundary. 
@@ -248,7 +248,7 @@ and
 Two constraints use the zeroth-order Tikhonov regularization with the purpose of obtaining stable solutions without necessarily introducing significant a priori information about the source. 
 
 The \textit{Minimum Euclidean norm of the radii} imposes that 
-all estimated radii within each prism must be close to null values. This constraint were proposed by \cite{oliveirajr-etal2011} and \cite{oliveirajr-barbosa2013} and can be rewritten in matrix form as follows
+all estimated radii within each prism must be close to null values. This constraint was proposed by \cite{oliveirajr-etal2011} and \cite{oliveirajr-barbosa2013} and can be rewritten in matrix form as follows
 \begin{equation}\label{eq:phi6}
 \begin{split}
 \varphi_{6}(\mathbf{p}) &= \sum\limits^{L}_{k=1}\sum\limits^{V}_{j=1}\left(r_{j}^{k}\right)^2 \\
@@ -347,7 +347,10 @@ At each iteration $k$ of our algorithm, the correction $\boldsymbol{\Delta}\hat{
 \begin{equation}\label{eq:linear-system}
 \mathbf{D}_{(k)} \left[\mathbf{D}_{(k)} \mathbf{H}^{\dagger}(\hat{\mathbf{p}}_{(k)}) \mathbf{D}_{(k)} + \lambda_{(k)} \mathbf{I}\right] \mathbf{D}_{(k)} \boldsymbol{\Delta} \hat{\mathbf{p}}^{\dagger}_{(k)} = -\boldsymbol{\nabla}\Gamma(\hat{\mathbf{p}}_{(k)}) \: ,
 \end{equation}
-where $\lambda_{(k)}$ is the a positive scalar adjusted at each iteration \cite[e.g., ][ p. 240]{aster-etal2019}, $\mathbf{I}$ is the identity matrix with order $M$, $\boldsymbol{\nabla}\Gamma(\hat{\mathbf{p}})$ is the gradient of the 
+where $\lambda_{(k)}$ is a positive scalar which is adjusted at each iteration and 
+is associated with the Levenberg-Marquardt method \cite[e.g., ][ p. 240]{aster-etal2019},
+$\mathbf{I}$ is the identity matrix with order $M$, $\boldsymbol{\nabla}\Gamma(\hat{\mathbf{p}})$
+is the gradient of the 
 goal function (eq. \ref{eq:gamma_gradient}) and $\mathbf{H}^{\dagger}(\hat{\mathbf{p}}_{(k)})$ is a matrix given by
 \begin{equation}\label{eq:H-dagger}
 \mathbf{H}^{\dagger}(\hat{\mathbf{p}}_{(k)}) = \mathbf{H}(\hat{\mathbf{p}}_{(k)})\mathbf{T}(\hat{\mathbf{p}}_{(k)}),
@@ -360,20 +363,44 @@ with $p_{l}$ being the $l$th element of the estimated parameter vector $\hat{\ma
 \begin{equation}\label{eq:D-matrix}
 d_{ll} = \frac{1}{\sqrt{h^{\dagger}_{ll}}} \: ,
 \end{equation}
-where $h^{\dagger}_{ll}$ is the element $ll$ of the matrix $\mathbf{H}^{\dagger}(\hat{\mathbf{p}}_{(k)})$ (eq. \ref{eq:H-dagger}). Figure \ref{fig:flowchart} shows a flowchart of our algorithm.
+where $h^{\dagger}_{ll}$ is the element $ll$ of the matrix $\mathbf{H}^{\dagger}(\hat{\mathbf{p}}_{(k)})$ (eq. \ref{eq:H-dagger}). 
 
-PAREI AQUI
 
 \subsubsection{Practical considerations}
 
-Our algorithm depends on several parameters that significantly impact the estimated models and cannot be automatically set without the interpreter’s judgment. They are the parameters $\tilde{\alpha}_1$, $\tilde{\alpha}_2$, $\tilde{\alpha}_3$, $\tilde{\alpha}_4$, $\tilde{\alpha}_5$, $\tilde{\alpha}_6$, and $\tilde{\alpha}_7$. Based on our practical experience, we suggest some empirical procedures for setting these parameters.
+Our algorithm depends on several parameters that significantly impact the estimated models 
+and cannot be automatically set without the interpreter’s judgment. They are the parameters
+$\tilde{\alpha}_1 - \tilde{\alpha}_7$ (eq. \ref{eq:alphas}). 
+Based on our practical experience, we suggest some 
+empirical procedures for setting these parameters.
 
-The parameters $\tilde{\alpha}_1$ and $\tilde{\alpha}_2$ impose priori information on the shape of the horizontal cross-section of the prisms. Generally, they have values close to each other varying from $10^{-5}$ to $10^{-4}$. If $\tilde{\alpha}_1 > \tilde{\alpha}_2$ the prisms will have a very smooth horizontal cross-section, close to a circular shape. On the other hand, if $\tilde{\alpha}_1 < \tilde{\alpha}_2$, than the difference on the shape of the horizontal cross-sections of the estimated model between vertically adjacent prisms will be smooth.
+The parameters $\tilde{\alpha}_1$ and $\tilde{\alpha}_2$ impose priori information on the 
+shape of the horizontal cross-section of the prisms. 
+The first one forces all prisms to have a circular horizontal cross-section, while 
+the second forces all prisms to have a similar horizontal cross-section.
+Generally, their values vary from $10^{-5}$ to $10^{-3}$ and differs from
+each other by one order of magnitude, at most.
+The parameter $\tilde{\alpha}_3$ also varies from $10^{-5}$ to $10^{-3}$ and 
+controls the relative position of adjacent prisms forming the model.
+A high value privileges a vertical estimated body, whereas a small value 
+tends to generate an inclined estimated body.
 
-To control the alignment of the estimated model, the parameter $\tilde{\alpha}_3$ should be in a range from $10^{-5}$ to $10^{-3}$. This parameter allows or forbids the estimated model to dip. Empirically, the value for this parameter follows the value for $\tilde{\alpha}_1$ and $\tilde{\alpha}_2$, they are usually close.
+In comparison to $\tilde{\alpha}_1$, $\tilde{\alpha}_2$ and $\tilde{\alpha}_3$,
+the other parameters usually have smaller values varying from $10^{-7}$ to $10^{-5}$.
+The parameters $\tilde{\alpha}_4$ and $\tilde{\alpha}_5$ are used when a priori
+information about the source is available at the study area.
+The parameter $\tilde{\alpha}_6$ has a purely mathematical meaning and it is 
+used only to obtain stable solutions for the inverse problem.
+Its value is set to as small as possible.
+The parameter $\tilde{\alpha}_7$ controls the total-vertical extension of the 
+the estimated body. 
+The greater its value, the smaller the estimated total-vertical extension 
+and vice versa.
+A general rule is starting with values 
+$\tilde{\alpha}_1 = 10^{-4}$, $\tilde{\alpha}_2 = 10^{-4}$, $\tilde{\alpha}_3 = 10^{-4}$,
+$\tilde{\alpha}_4 = 0$, $\tilde{\alpha}_5 = 0$, $\tilde{\alpha}_6 = 10^{-7}$, 
+$\tilde{\alpha}_7 = 10^{-5}$ and change them to refine the results.
 
-The parameter $\tilde{\alpha}_6$ imposes mathematical priori information on the inverse problem to control the convergence of the algorithm. We suggest that the value for this parameter should be two or three orders of magnitude greater than $\tilde{\alpha}_1$ and $\tilde{\alpha}_2$.
-
-To control the depth extent of the estimated model, the parameter $\tilde{\alpha}_7$ should be in a range from $10^{-6}$ to $10^{-4}$. This parameter depends on the depth extent of the initial approximate, it can decrease the depth extent or keep it close to the initial one. Normally, we suggest $\tilde{\alpha}_7=10^{-5}$ for a initial value.
+PAREI AQUI
 
 An important aspect of our method is the choice of the initial approximation. For simplicity, we use a cylinder shape as an initial approximation located the initial cylinder on the center of the anomaly. We suggest that the cylinder radius should involves a great part, both positive and negative, of the horizontal size of the anomaly. Also, the depth extent $dz$ of the cylinder should be greater than the true source. We suggest that the data produced by the initial approximation fit qualitatively the observations.
