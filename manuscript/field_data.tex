@@ -1,9 +1,90 @@
 \section{Application to field data}
 
-We applied our method to interpret the total-field anomaly data provided by CPRM and acquired by Lasa Prospecções S.A. over the Anitápolis complex in the state of Santa Catarina, Brazil (colocar mapa). The total-field anomaly data were corrected from daytime variation and subtracted from the main field of the Earth using the IGRF. Anitápolis is an intrusive complex in southern Brazil formed by alkaline-carbonatitic rocks \cite[]{GOMES2018}. The flight was at an elevation of 100 m above the terrain, the N–S and E–W lines were spaced 500 m and 10,000 m, respectively. Fig \ref{fig:real_data}b shows GPS height of the acquisition and the horizontal coordinates referred to the WGS84 datum. We processed the data by applying a regional separation using a second-order polynomial fit. To attenuate the non-dipolar effects present in the data, we applied the equivalent layer \cite[]{dampney1969,emilia1973} to continue the anomaly upward to a constant height $z=-2000$ m (Fig. \ref{fig:real_data}a). The upward continued data were calculated in a regular grid of $50\times50$ points equally spaced from 6916 km to 6926 km in $x$ axis and 683 km to 693. in $y$ axis. The main field direction in the area at that time has an inclination and declination $(-37.05^\circ, -18.17^\circ)$.
+We have applied our method to interpret airborne magnetic data provided by 
+Geological Survey of Brazil (CPRM) over the Anitápolis complex, in the Santa Catarina
+state, Brazil. The total-field anomaly data were corrected from daytime variation and 
+subtracted from the main magnetic field using the IGRF. 
+The inclination, declination and intensity of the main field at the study area, 
+for the period of the survey, are $-37.05^{\circ}$, $-18.17^{\circ}$ and 
+$\approx 22 \, 768 $ nT, respectively.
+Anitápolis is an intrusive complex in southern Brazil formed by alkaline-carbonatitic 
+rocks \cite[]{GOMES2018}. The flight was at an elevation of 100 m above the terrain, 
+with N-S and E-W lines spaced by $500$ m and $10,000$ m from each other, respectively. 
+Fig. \ref{fig:real_data}b shows the geometric height (referred to the WGS84 ellipsoid) 
+and UTM horizontal coordinates of the data.
 
-To define the total-magnetization of the interpretation model, we used the reduction to the pole technique (RTP) with the main field direction in the area. The RTP result (not shown) indicates that the magnetic source has purely induced magnetization. \cite{valdivia-2009} measured the magnetic susceptibility $\chi$ of carbonatitic samples of Jacupiranga alkaline complex, another southern Brazil complex in São Paulo state. They have found that the magnetic susceptibility for those samples varies from $\chi = 1.06\times 10^{-3}$ SI to $\chi=161.05\times 10^{-3}$ SI \cite[][ tb. 1]{valdivia-2009}. There are carbonatites with similar ages in both Jacupiranga and Anitápolis complexes \cite[]{gibson-1999}. So, we based the values for $m_0$ using this reference and the main magnetic field intensity of the Earth in the area $ \approx 22768 $ nT. The magnetic susceptibility ($ \chi $) range used in this application is the upper axis in Fig. (\ref{fig:real_map}) which is equivalent to the $ m_0 $ axis.
+To isolate the target total-field anomaly, we have applied 
+a regional separation using a second-order polynomial fit. We have also continued 
+the anomaly upward to a constant height $z=-2000$ m (Fig. \ref{fig:real_data}a) by 
+using the equivalent-layer technique \cite[]{dampney1969,emilia1973,oliveirajr-barbosa2013}. 
+The upward-continued data were calculated on a regular grid of $50 \times 50$ points 
+equally spaced from $6916$ to $6926$ km along the $x$ axis and from 
+$683$ to $693$ km along the $y$ axis. 
+To define the total-magnetization direction of the interpretation model, 
+we applied the method proposed by \citet{oliveirajr-etal2015} and verified the 
+result using the reduction to the pole technique (RTP). The results (not shown) 
+indicate that the total magnetization of the source has the same direction of the 
+main field in the study area, suggesting a purely induced magnetization.
 
-The interpretation model is formed by an ensemble of $L = 8$ prisms, each one with number of polygon vertices $V = 30$ ($k = 1, \dots , 10$) describing the horizontal cross-sections of the polygons. We set the origin of the initial approximation $(x_0^k, y_0^k) = (6921, 688)$ km and the radii $r_j^k = 1500$ m so it involves the center and great part of the positive and negative pols of the anomaly. The depth extent of the prisms is $dz = 700$ m that returns an total-field anomaly in the same range of the observed data. Following the approach for the synthetic applications (sec. \ref{sec:synthetic}), we have inverted the real total-field anomaly (Fig. \ref{fig:real_data}a) obtaining 100 different models. Each model was obtained by using a different pair of depth to the top $z_0$ and total-magnetization intensity $m_0$ (Fig. \ref{fig:real_map}). The range of $m_0$ and $z_0$ in Fig. \ref{fig:real_map} were defined empirically, however, the $m_0$ range was based on the typical values of magnetic susceptibility for alkaline-carbonatitic rocks and the main field intensity for the study area. For all the 100 models, the initial approximate has the same cylindrical shape and the regularization weights $\tilde{\alpha}_1 = 10^{-3}$, $\tilde{\alpha}_2 = 10^{-4}$, $\tilde{\alpha}_3 = 10^{-3}$, $\tilde{\alpha}_4 = 0$, $\tilde{\alpha}_5 = 0$, $\tilde{\alpha}_6 = 10^{-6}$, and $\tilde{\alpha}_7 = 10^{-5}$. Figs \ref{fig:simple_map} and \ref{fig:complex_map} show that lowest values for $\Gamma(\mathbf{p})$ (eq. \ref{eq:gamma}) indicate the pair of $m_0$ and $z_0$ is close to the true one.
+Previous works \citep[e.g., ][]{gibson-1999} found carbonatites with similar ages in the 
+Anitápolis and Jacupiranga complexes, where the last one is another alkaline complex 
+located at southern Brazil, in the São Paulo state.
+Measurements of the magnetic susceptibility $\chi$ made at the Jacupiranga complex 
+show values varying from $\chi = 1.06 \times 10^{-3}$ SI to 
+$\chi = 161.05 \times 10^{-3}$ SI \citep[][ tb. 1]{valdivia-2009}.
+Hence, we used these values and the main magnetic field intensity in the study area 
+($\approx 22 \, 768 $ nT) to constraint the total-magnetization intensity $m_{0}$ 
+values used by our method.
+The magnetic susceptibility ($ \chi $) and the corresponding total-magnetization 
+intensity $m_{0}$ ranges used in our application are shown in Fig. \ref{fig:real_map}.
 
-Therefore, we can interpret that the estimated model that has the pair $z_0 = -1200$ m and $m_0 = 2.5$ A/m (cyan diamond in Fig. \ref{fig:real_map}) is more compatible with the possible values of magnetic susceptibility $ \chi $ (upper axis in Fig. \ref{fig:real_map}). We do not have evidences of an outcropping source for this anomaly, but there are evidences of outcropping intrusions in the area of the Anitápolis complex \cite[]{gibson-1999}. The depth to the top $z_0 = -1200$ indicates a very shallow source or a possible outcropping source. This estimated model produces a very low value for $ \Gamma(\mathbf{p}) $ (\ref{eq:gamma}) whose data fit is shown in Fig. \ref{fig:real_result}a. The acceptable data fit is confirmed by the histogram of residuals in the inset of the \ref{fig:real_result}a with $ \mu $ close to zero and a low standard deviation similar to the synthetic applications. Fig. \ref{fig:real_result}b shows the cylinder used as the initial approximate for the inversion. Figs \ref{fig:real_result}c and d show the estimated model (red prisms) for this application. Our method estimated a body northwest-southeast elongated with volume $ 52.89 $ km$ ^3 $ and total depth extent $ 5434.35 $ m ($ dz=679.29 $). In addition, the magenta diamond in Fig. \ref{fig:real_map} is the estimated model that produces the lowest value for $ \Gamma(\mathbf{p}) $ (\ref{eq:gamma}). Nevertheless, both data fit and the estimated model (Figs \ref{fig:real_result2}a, c, and d) are very close to the cyan diamond solution (Fig. \ref{fig:real_result}) in Fig. (\ref{fig:real_map}). The volume and total depth extent for this solution (Figs \ref{fig:real_result2}c and d) are, respectively, $ 48.37 $ km$ ^3 $ and $ 5709.20 $ m ($ dz=713.65 $). Both estimated models are very similar to each other, but the first one thicker and shallower than the second one. This difference is given by the inversion in order to compensate the estimated magnetic momentum for different values of $ z_0 $ and $ m_0 $. So, considering the data fit and its histogram both solutions can be a possible geometry of this magnetic source in the Anitápolis complex. To confirm this estimated model, more prior geological information about this geological anomalous source must be included.
+We used an interpretation model formed by $L = 8$ prisms, each one with 
+$V = 30$ ($k = 1, \dots , 10$) vertices defining their horizontal cross-sections.
+We inverted the observed total-field anomaly (Fig. \ref{fig:real_data}a) for each 
+pair of $m_0$ and $z_0$ shown in Fig. \ref{fig:real_map}, resulting in $100$ estimated 
+models. 
+For all models, we set an initial approximation $\hat{\mathbf{p}}_{(0)}$ with origin 
+at $(x_0^k, y_0^k) = (6921, 688)$ km, constant radii $r_j^k = 1500$ m for 
+all vertices forming all prisms and the same constant depth extent $dz = 700$ m.
+We also used the same weights $\tilde{\alpha}_1 = 10^{-3}$, $\tilde{\alpha}_2 = 10^{-4}$, 
+$\tilde{\alpha}_3 = 10^{-3}$, $\tilde{\alpha}_4 = 0$, $\tilde{\alpha}_5 = 0$, 
+$\tilde{\alpha}_6 = 10^{-6}$, and $\tilde{\alpha}_7 = 10^{-5}$ (eq. \ref{eq:alphas}). 
+
+Fig. \ref{fig:real_map} shows that, similarly to the results obtained with the 
+complex model (Fig. \ref{fig:complex_map}), there is an elongated region containing 
+candidate solutions producing small values for the goal function 
+$\Gamma(\mathbf{p})$ (eq. \ref{eq:gamma}), with different values of $m_0$ and $z_0$.
+The magenta diamond in Fig. \ref{fig:real_map} represents the estimated model 
+shown in Fig. \ref{fig:real_result2}. 
+This model produces the lowest value for $ \Gamma(\mathbf{p}) $ (\ref{eq:gamma}),
+it has a volume $ 48.37 $ km$ ^3 $, total depth extent of $ 5709.20 $ m 
+($ dz = 713.65 $), depth-to-the-top $z_0 = -1150$ m and total-magnetization intensity 
+$m_0 = 3.0$ A/m. This value corresponds to a magnetic susceptibility 
+$chi = 0.16$ SI.
+Fig. \ref{fig:real_map}a shows that this model produces a very good data fit.
+This estimated depth-to-the-top $z_0$ indicates a non-outcropping source, 
+which is compatible with a priori information a the study area. 
+We do not have evidences of an outcropping source for this anomaly, 
+although there are outcropping intrusions in the area of the Anitápolis 
+complex \cite[]{gibson-1999}.
+The estimated magnetic susceptibility $ \chi $ is also compatible with the 
+available a priori information. It is close to the upper limit found by 
+\citet{valdivia-2009} in the Jacupiranga complex.
+
+The cyan diamond in Fig. \ref{fig:real_map} represents the alternative model 
+show in Fig. \ref{fig:real_result}. This model is similar to that shown in 
+Fig. \ref{fig:real_result2}. It has a volume $ 52.89 $ km$ ^3 $, total depth extent 
+$ 5434.35 $ m ($ dz = 679.29 $), depth-to-the-top $z_0 = -1200$ m and 
+total-magnetization intensity $m_0 = 2.5$ A/m, which corresponds to a magnetic 
+susceptibility $chi = 0.13$ SI. 
+In comparison to the model shown in Fig. \ref{fig:real_result2}, the alternative model 
+shown in Fig. \ref{fig:real_result} has a shallower (but still non-outcropping) top
+and a smaller estimated magnetic susceptibility. As a consequence, the alternative 
+model has a greater volume in order to produce an equally good data fit 
+(Fig. \ref{fig:real_result}a).
+
+Both estimated models (Figs \ref{fig:real_result2} and \ref{fig:real_result}) show 
+a northwest-southeast elongated body with variable dip along depth.
+They have estimated magnetic susceptibility and depth-to-the-top compatible with 
+available a priori information and produce very good data fits.
+Hence, both models represent the possible geometry of the Anitápolis complex. 

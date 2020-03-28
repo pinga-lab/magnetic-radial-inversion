@@ -27,16 +27,18 @@
 \begin{figure}
 	\centering
 	\includegraphics[scale=.75]{figures/simple_gamma.png}
-	\caption{Validation to estimate the depth to the top ($ z_0 $) and the total-magnetization intensity ($ m_0 $) for the simple model application. The ranges in the axes are $m_0 = 6$ A/m to $m_0=11$ A/m with $1$ A/m intervals and $z_0=-50$ m to $200$ m with $50$ m intervals. Each square is the $\Gamma (\mathbf{p})$ (eq. \ref{eq:gamma}) in nT produced by an estimated model inverted using a pair of $m_0$ and $z_0$. These 36 inversions were computed using the same cylinder as a initial approximation. The red triangle represents the true $m_0$ and $z_0$.
-	}
+	\caption{Application to the simple model data. 
+	Goal function $\Gamma(\mathbf{p})$ (eq. \ref{eq:gamma}), in nT,  
+	produced by estimated models with different depths-to-the-top ($ z_0 $) and 
+	total-magnetization intensities ($ m_0 $). 
+	The red triangle represents the $m_0$ and $z_0$ of the true source.}
 	\label{fig:simple_map}
 \end{figure}
 
 \begin{figure}
 	\centering
 	\includegraphics[scale=.5]{figures/simple_results.png}
-	\caption{Application to simple model data. (a) residual data given by the difference between the noise-corrupted data (Fig. \ref{fig:simple_model}a) and the predicted data (not shown) produced by the estimated model. The inset in (a) shows the histogram of the residuals and the Gaussian curve (dashed line) (dashed line) whose mean and standard deviation are, respectively, $\mu = 0.04$ nT and $\sigma=7.20$ nT. (b) perspective view of the initial approximate (red prisms) and the true model (blue prisms). (c) and (d) comparison between the estimated source (red prisms) and the true model (blue prisms) in perspective views.
-	}
+	\caption{Application to the simple model data. (a) residual data given by the difference between the noise-corrupted data (Fig. \ref{fig:simple_model}a) and the predicted data (not shown) produced by the estimated model. The inset in (a) shows the histogram of the residuals and the Gaussian curve (dashed line) (dashed line) whose mean and standard deviation are, respectively, $\mu = 0.04$ nT and $\sigma=7.20$ nT. (b) perspective view of the initial approximate (red prisms) and the true model (blue prisms). (c) and (d) comparison between the estimated source (red prisms) and the true model (blue prisms) in perspective views.}
 	\label{fig:simple_results}
 \end{figure}
 
@@ -53,8 +55,12 @@
 \begin{figure}
 	\centering
 	\includegraphics[scale=.75]{figures/complex_gamma.png}
-	\caption{Validation to estimate the depth to the top ($ z_0 $) and the total-magnetization intensity ($ m_0 $) for the complex model application. The ranges in the axes are $m_0 = 9$ A/m to $m_0=15$ A/m with $1.2$ A/m intervals and $z_0=-400$ m to $-200$ m with $40$ m intervals. Each square is the $\Gamma (\mathbf{p})$ (eq. \ref{eq:gamma}) in nT produced by an estimated model inverted using a pair of $m_0$ and $z_0$. These 36 inversions were computed using the same cylinder as a initial approximation. The red triangle represents the true $m_0$ and $z_0$. The cyan diamond represents the estimated model that produces the lowest value for $\Gamma (\mathbf{p})$ (eq. \ref{eq:gamma}).
-	}
+	\caption{Application to the complex model data. 
+	Goal function $\Gamma(\mathbf{p})$ (eq. \ref{eq:gamma}), in nT,  
+	produced by estimated models with different depths-to-the-top ($ z_0 $) and 
+	total-magnetization intensities ($ m_0 $). 
+	The red triangle represents the $m_0$ and $z_0$ of the true source. 
+	The cyan diamond represents the estimated model that produces the lowest value for $\Gamma (\mathbf{p})$.}
 	\label{fig:complex_map}
 \end{figure}
 
@@ -71,31 +77,62 @@
 \begin{figure}
     \centering
     \includegraphics[scale=.5]{figures/real_updata.png}
-    \caption{(a) Total-field anomaly of the alkaline-carbonatitic complex of Anitapolis processed and calculated at $z=-2000$ m using upward continuation. The magnetic data are in nT and the coordinates are in UTM on the WGS84 datum, with central meridian $ 51^\circ $ W. (b) GPS elevation of the observation points in m. The black dots are the measures of the original data. The connected red dots in both maps are the vertices of the initial approximate horizontally projected at the data map.
-}
+    \caption{(a) Residual total-field anomaly (in nT) over the alkaline-carbonatitic 
+    complex of Anitápolis, upward-continued to $z = -2000$ m. The horizontal UTM 
+    coordinates are referred to the central meridian $ 51^\circ $ W. (b) Geometric 
+    height (referred to the WGS84 ellipsoid) of the observation points in m. 
+    The black dots are the observation points. The connected red dots in both maps 
+    are the projected vertices of the initial approximation $\hat{\mathbf{p}}_{(0)}$ 
+    used in the inversion.}
     \label{fig:real_data}
 \end{figure}
 
 \begin{figure}
 	\centering
 	\includegraphics[scale=.75]{figures/real_gamma.png}
-	\caption{Validation to estimate the depth to the top ($ z_0 $) and the total-magnetization intensity ($ m_0 $) for the field application. The ranges in the axes are $m_0 = 1$ A/m to $m_0=5.5$ A/m with $0.5$ A/m intervals and $z_0=-1200$ m to $-750$ m with $30$ m intervals. This range of $m_0$ corresponds to an interval of magnetic susceptibility $\chi$ from $0.05$ to $0.30$ (upper axis). Each square is the goal function $ \Gamma(\mathbf{p}) $ (eq. \ref{eq:gamma}) produced by an estimated model inverted using a pair of $m_0$ and $z_0$. These 100 inversions were computed using the same cylinder as a initial approximation. The cyan diamond represents the estimated model whose magnetic susceptibility is compatible to the main field intensity. The magenta diamond represents the estimate model that produces the lowest value of $ \Gamma(\mathbf{p}) $ (eq. \ref{eq:gamma}).
-	}
+	\caption{Application to the field data over the Anitápolis complex, Brazil. 
+	Goal function $\Gamma(\mathbf{p})$ (eq. \ref{eq:gamma}), in nT,  
+	produced by estimated models with different depths-to-the-top ($ z_0 $) and 
+	total-magnetization intensities ($ m_0 $).
+	The corresponding range of magnetic susceptibility $\chi$ is represented in the 
+	upper axis by considering a purely induced magnetization with inducing field 
+	$\approx 22 \, 768 $ nT.
+	The magenta diamond represents the estimated model that produces the lowest value of $ \Gamma(\mathbf{p})$.
+	The cyan diamond represents an alternative model whose magnetic susceptibility 
+	is also compatible with values found at the Jacupiranga complex in a previous work 
+	\citep[][ tb. 1]{valdivia-2009}.}
 	\label{fig:real_map}
-\end{figure}
-
-\begin{figure}
-    \centering
-    \includegraphics[scale=.5]{figures/real_results.png}
-    \caption{Application to field data represented by the cyan diamond in Fig. \ref{fig:real_map}. (a) residual data given by the difference between the observed data (Fig. \ref{fig:real_data}a) and the predicted data (not shown). The inset in (a) shows the histogram of the residuals and the Gaussian curve (dashed line) whose mean and standard deviation are, respectively, $\mu = 0.91$ nT and $\sigma=6.95$ nT. (b) perspective view of the initial approximate (red prisms). (c) and (d) perspective views of the estimated model (red prisms). 
-}
-    \label{fig:real_result}
 \end{figure}
 
 \begin{figure}
 	\centering
 	\includegraphics[scale=.5]{figures/real_results2.png}
-	\caption{Application to field data represented by the magenta diamond in Fig. \ref{fig:real_map}. (a) residual data given by the difference between the observed data (Fig. \ref{fig:real_data}a) and the predicted data (not shown). The inset in (a) shows the histogram of the residuals and the Gaussian curve (dashed line) whose mean and standard deviation are, respectively, $\mu = -0.59$ nT and $\sigma=5.80$ nT. (b) perspective view of the initial approximate (red prisms). (c) and (d) perspective views of the estimated model (red prisms). 
-	}
+	\caption{Application to the field data over the Anitápolis complex, Brazil.
+	Estimated model producing the lowest goal function value, 
+	represented by the magenta diamond in Fig. \ref{fig:real_map}.
+	(a) Residual between the observed data (Fig. \ref{fig:real_data}a) and the 
+	predicted data (not shown) produced by the estimated model. 
+	The inset in (a) shows the histogram of the residuals and a normal 
+	Gaussian curve (dashed line) with mean and standard deviation 
+	$\mu = -0.59$ nT and $\sigma = 5.80$ nT, respectively. 
+	(b) Perspective view of the initial approximate (red prisms). 
+	(c) and (d) Perspective views of the estimated model (red prisms).}
 	\label{fig:real_result2}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[scale=.5]{figures/real_results.png}
+    \caption{Application to the field data over the Anitápolis complex, Brazil.
+    Estimated model with magnetic susceptibility value compatible with 
+    a priori information close to the study area, 
+    represented by the cyan diamond in Fig. \ref{fig:real_map}. 
+    (a) Residual between the observed data (Fig. \ref{fig:real_data}a) and the 
+    predicted data (not shown) produced by the estimated model. 
+    The inset in (a) shows the histogram of the residuals and a normal 
+    Gaussian curve (dashed line) with mean and standard deviation 
+    $\mu = 0.91$ nT and $\sigma = 6.95$ nT, respectively. 
+    (b) Perspective view of the initial approximate (red prisms). 
+    (c) and (d) Perspective views of the estimated model (red prisms).}
+    \label{fig:real_result}
 \end{figure}
