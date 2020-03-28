@@ -326,8 +326,7 @@ $p_{l}$ of the new estimated parameter vector $\hat{\mathbf{p}}_{(k+1)}$ as foll
 \begin{equation}\label{eq:inv-inequality-function}
 p_{l} = p_{l}^{min} + \left(\frac{p_{l}^{max} - p_{l}^{min}}{ 1 + e^{-p^{\dagger}_{l}} }\right) \: .
 \end{equation}
-What follows presents details about how we compute the correction 
-$\boldsymbol{\Delta}\hat{\mathbf{p}}^{\dagger}_{(k)}$ and a fully description of our algorithm.
+
 
 \subsubsection{Considerations about the weights $\alpha_{1}-\alpha_{7}$}
 
@@ -337,8 +336,16 @@ values as follows:
 \begin{equation}\label{eq:alphas}
 \alpha_{\ell} = \tilde{\alpha}_\ell\frac{E_\phi}{E_\ell}, \quad \ell = 1,\dots, 7,
 \end{equation}
-where $\tilde{\alpha}_\ell$ is a positive scalar and $ E_\phi/E_\ell $ is a normalizing factor. In this equation, $ E_\ell $ represents the 
-trace of the Hessian matrix $\mathbf{H}_{\ell}$ (eqs \ref{eq:phi1_hessian}, \ref{eq:phi2_hessian}, \ref{eq:phi3_hessian}, \ref{eq:phi4_hessian}, \ref{eq:phi5_hessian}, \ref{eq:phi6_hessian}, and \ref{eq:phi7_hessian}) of the $\ell$th constraining function $\varphi_{\ell}(\mathbf{p})$ (eqs \ref{eq:phi1}, \ref{eq:phi2}, \ref{eq:phi3}, \ref{eq:phi4}, \ref{eq:phi5}, \ref{eq:phi6}, and \ref{eq:phi7}). The constant $E_\phi$ is the trace of the Hessian matrix $\mathbf{H}_{\phi}(\mathbf{p}_{0})$ (eq. \ref{eq:phi_hessian}) of the misfit function $\phi(\mathbf{p})$ (eq. \ref{eq:misfit}) computed with the initial approximation $\hat{\mathbf{p}}_{(0)}$ 
+where $\tilde{\alpha}_\ell$ is a positive scalar and $ E_\phi/E_\ell $ is a normalizing
+factor. In this equation, $ E_\ell $ represents the 
+trace of the Hessian matrix $\mathbf{H}_{\ell}$ (eqs \ref{eq:phi1_hessian}, 
+\ref{eq:phi2_hessian}, \ref{eq:phi3_hessian}, \ref{eq:phi4_hessian}, \ref{eq:phi5_hessian}, 
+\ref{eq:phi6_hessian}, and \ref{eq:phi7_hessian}) of the $\ell$th constraining function 
+$\varphi_{\ell}(\mathbf{p})$ (eqs \ref{eq:phi1}, \ref{eq:phi2}, \ref{eq:phi3}, 
+\ref{eq:phi4}, \ref{eq:phi5}, \ref{eq:phi6}, and \ref{eq:phi7}). 
+The constant $E_\phi$ is the trace of the Hessian matrix 
+$\mathbf{H}_{\phi}(\mathbf{p}_{0})$ (eq. \ref{eq:phi_hessian}) of the misfit function 
+$\phi(\mathbf{p})$ (eq. \ref{eq:misfit}) computed with the initial approximation $\hat{\mathbf{p}}_{(0)}$ 
 for the parameter vector $ \mathbf{p} $ (eq. \ref{eq:p-vector}) at the beginning of the inversion algorithm. According to this empirical strategy, the weights $ \alpha_{\ell} $ are defined using the positive scalars $\tilde{\alpha}_\ell$ (eq. \ref{eq:alphas}), which are less dependent on the particular characteristics of the interpretation model.
 
 \subsubsection{Inversion algorithm}
@@ -391,7 +398,7 @@ The parameters $\tilde{\alpha}_4$ and $\tilde{\alpha}_5$ are used when a priori
 information about the source is available at the study area.
 The parameter $\tilde{\alpha}_6$ has a purely mathematical meaning and it is 
 used only to obtain stable solutions for the inverse problem.
-Its value is set to as small as possible.
+Its value is set to be as small as possible.
 The parameter $\tilde{\alpha}_7$ controls the total-vertical extension of the 
 the estimated body. 
 The greater its value, the smaller the estimated total-vertical extension 
@@ -401,6 +408,10 @@ $\tilde{\alpha}_1 = 10^{-4}$, $\tilde{\alpha}_2 = 10^{-4}$, $\tilde{\alpha}_3 = 
 $\tilde{\alpha}_4 = 0$, $\tilde{\alpha}_5 = 0$, $\tilde{\alpha}_6 = 10^{-7}$, 
 $\tilde{\alpha}_7 = 10^{-5}$ and change them to refine the results.
 
-PAREI AQUI
-
-An important aspect of our method is the choice of the initial approximation. For simplicity, we use a cylinder shape as an initial approximation located the initial cylinder on the center of the anomaly. We suggest that the cylinder radius should involves a great part, both positive and negative, of the horizontal size of the anomaly. Also, the depth extent $dz$ of the cylinder should be greater than the true source. We suggest that the data produced by the initial approximation fit qualitatively the observations.
+Another important aspect of our method is the initial approximation $\hat{\mathbf{p}}_{(0)}$. 
+We set the same constant radii for all prisms, so that they approximate a cylinder and 
+enclose both positive and negative parts of the observed anomaly.
+Also, we set the same constant depth extent $dz$ for all prisms with the purpose 
+of generating a bottom depth greater than that we expect for the true source.
+Finally, we adjust the parameters of the initial approximation $\hat{\mathbf{p}}_{(0)}$ 
+in order to obtain a preliminary fit of the observed data.
