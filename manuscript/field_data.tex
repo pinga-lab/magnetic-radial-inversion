@@ -1,40 +1,52 @@
 \section{Application to field data}
 
 We have applied our method to interpret airborne magnetic data provided by 
-Geological Survey of Brazil (CPRM) over the Anitápolis complex, in the Santa Catarina
-state, Brazil. The total-field anomaly data were corrected from daytime variation and 
+Geological Survey of Brazil (CPRM) over the Anit{\'a}polis complex, 
+in the Santa Catarina state, Brazil. 
+The survey was at an elevation of $100$ m above the terrain, 
+with N-S and E-W lines spaced by $500$ m and $10,000$ m from each other, respectively. 
+The total-field anomaly data were corrected from daytime variation and 
 subtracted from the main magnetic field using the IGRF. 
 The inclination, declination and intensity of the main field at the study area, 
 for the period of the survey, are $-37.05^{\circ}$, $-18.17^{\circ}$ and 
 $\approx 22 \, 768 $ nT, respectively.
-Anitápolis is an intrusive complex in southern Brazil formed by alkaline-carbonatitic 
-rocks \cite[]{GOMES2018}. The flight was at an elevation of 100 m above the terrain, 
-with N-S and E-W lines spaced by $500$ m and $10,000$ m from each other, respectively. 
-Fig. \ref{fig:real_data}b shows the geometric height (referred to the WGS84 ellipsoid) 
-and UTM horizontal coordinates of the data.
-
 To isolate the target total-field anomaly, we have applied 
 a regional separation using a second-order polynomial fit. We have also continued 
 the anomaly upward to a constant height $z=-2000$ m (Fig. \ref{fig:real_data}a) by 
-using the equivalent-layer technique \cite[]{dampney1969,emilia1973,oliveirajr-barbosa2013}. 
+using the equivalent-layer technique \citep{dampney1969,emilia1973,oliveirajr-barbosa2013}. 
 The upward-continued data were calculated on a regular grid of $50 \times 50$ points 
 equally spaced from $6916$ to $6926$ km along the $x$ axis and from 
 $683$ to $693$ km along the $y$ axis. 
+Fig. \ref{fig:real_data}b shows the geometric height (referred to the WGS84 ellipsoid) 
+and UTM horizontal coordinates of the data.
+
+The Anit{\'a}polis alkaline-carbonatite complex forms a circular concentric body 
+($\approx 6$ km$^{2}$ in area) containing magnetite as part of its mineralogical 
+composition. It intruded the Late Proterozoic leucogranites of the Dom Feliciano 
+mobile belt in the Early Cretaceous ($132$ Ma), apparently concomitant with the 
+voluminous flood tholeiitic basalts of the Serra Geral Formation ($133$-$130$ Ma) 
+at the southern side of the Paran{\'a} Basin \citep{gibson-1999, scheibe-etal2005}.
+As pointed out by \citet{GOMES2018}, there is still some debate about the emplacement 
+of the Anit{\'a}polis alkaline-carbonatite complex. 
+\citet{melcher-coutinho1966} pointed out the influence of N-S-trending faults. 
+\citet{scheibe-etal2005} considered that it is roughly emplaced along the E-W Rio 
+Uruguay Lineament. According to \citet{riccomini-etal2005}, the Anit{\'a}polis 
+complex does not show a clear structural control. 
+
 To define the total-magnetization direction of the interpretation model, 
 we applied the method proposed by \citet{oliveirajr-etal2015} and verified the 
 result using the reduction to the pole technique (RTP). The results (not shown) 
 indicate that the total magnetization of the source has the same direction of the 
 main field in the study area, suggesting a purely induced magnetization.
-
-Previous works \citep[e.g., ][]{gibson-1999} found carbonatites with similar ages in the 
-Anitápolis and Jacupiranga complexes, where the last one is another alkaline complex 
-located at southern Brazil, in the São Paulo state.
-Measurements of the magnetic susceptibility $\chi$ made at the Jacupiranga complex 
+Measurements of the magnetic susceptibility $\chi$ made at the Jacupiranga complex,
+another alkaline complex located at southern Brazil, São Paulo state, 
+with the same age as the Anit{\'a}polis complex, 
 show values varying from $\chi = 1.06 \times 10^{-3}$ SI to 
 $\chi = 161.05 \times 10^{-3}$ SI \citep[][ tb. 1]{valdivia-2009}.
 Hence, we used these values and the main magnetic field intensity in the study area 
-($\approx 22 \, 768 $ nT) to constraint the total-magnetization intensity $m_{0}$ 
-values used by our method.
+($\approx 22 \, 768 $ nT) as a priori information to constraint the 
+total-magnetization intensity $m_{0}$ values used to interpret the magnetic data 
+at the Anit{\'a}polis complex.
 The magnetic susceptibility ($ \chi $) and the corresponding total-magnetization 
 intensity $m_{0}$ ranges used in our application are shown in Fig. \ref{fig:real_map}.
 
@@ -46,7 +58,8 @@ models.
 For all models, we set an initial approximation $\hat{\mathbf{p}}_{(0)}$ with origin 
 at $(x_0^k, y_0^k) = (6921, 688)$ km, constant radii $r_j^k = 1500$ m for 
 all vertices forming all prisms and the same constant depth extent $dz = 700$ m.
-We also used the same weights $\tilde{\alpha}_1 = 10^{-3}$, $\tilde{\alpha}_2 = 10^{-4}$, 
+We also used the same weights $\tilde{\alpha}_1 = 10^{-3}$, 
+$\tilde{\alpha}_2 = 10^{-4}$, 
 $\tilde{\alpha}_3 = 10^{-3}$, $\tilde{\alpha}_4 = 0$, $\tilde{\alpha}_5 = 0$, 
 $\tilde{\alpha}_6 = 10^{-6}$, and $\tilde{\alpha}_7 = 10^{-5}$ (eq. \ref{eq:alphas}). 
 
@@ -60,12 +73,12 @@ This model produces the lowest value for $ \Gamma(\mathbf{p}) $ (\ref{eq:gamma})
 it has a volume $ 48.37 $ km$ ^3 $, total depth extent of $ 5709.20 $ m 
 ($ dz = 713.65 $), depth-to-the-top $z_0 = -1150$ m and total-magnetization intensity 
 $m_0 = 3.0$ A/m. This value corresponds to a magnetic susceptibility 
-$chi = 0.16$ SI.
+$\chi = 0.16$ SI.
 Fig. \ref{fig:real_map}a shows that this model produces a very good data fit.
 This estimated depth-to-the-top $z_0$ indicates a non-outcropping source, 
 which is compatible with a priori information a the study area. 
 We do not have evidences of an outcropping source for this anomaly, 
-although there are outcropping intrusions in the area of the Anitápolis 
+although there are outcropping intrusions in the area of the Anit{\'a}polis 
 complex \cite[]{gibson-1999}.
 The estimated magnetic susceptibility $ \chi $ is also compatible with the 
 available a priori information. It is close to the upper limit found by 
@@ -76,7 +89,7 @@ show in Fig. \ref{fig:real_result}. This model is similar to that shown in
 Fig. \ref{fig:real_result2}. It has a volume $ 52.89 $ km$ ^3 $, total depth extent 
 $ 5434.35 $ m ($ dz = 679.29 $), depth-to-the-top $z_0 = -1200$ m and 
 total-magnetization intensity $m_0 = 2.5$ A/m, which corresponds to a magnetic 
-susceptibility $chi = 0.13$ SI. 
+susceptibility $\chi = 0.13$ SI. 
 In comparison to the model shown in Fig. \ref{fig:real_result2}, the alternative model 
 shown in Fig. \ref{fig:real_result} has a shallower (but still non-outcropping) top
 and a smaller estimated magnetic susceptibility. As a consequence, the alternative 
@@ -84,7 +97,11 @@ model has a greater volume in order to produce an equally good data fit
 (Fig. \ref{fig:real_result}a).
 
 Both estimated models (Figs \ref{fig:real_result2} and \ref{fig:real_result}) show 
-a northwest-southeast elongated body with variable dip along depth.
-They have estimated magnetic susceptibility and depth-to-the-top compatible with 
-available a priori information and produce very good data fits.
-Hence, both models represent the possible geometry of the Anitápolis complex. 
+a NW-SE elongated body with variable dip along depth.
+This is the same direction associated, for example, with the Lages complex (another 
+complex close to the study area), the Ponta Grossa Arch and the Guapiara Lineament,
+which controls the Jacupiranga complex at the S{\~a}o Paulo State 
+\citep{GOMES2018}.
+The estimated magnetic susceptibilities and depths-to-the-top are compatible with 
+the available a priori information and produce very good data fits.
+Hence, both models represent the possible geometry of the Anit{\'a}polis complex. 
