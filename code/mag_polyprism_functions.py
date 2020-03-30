@@ -36,6 +36,25 @@ def area_polygon(x, y):
     area = (x * (y.take(shift_up) - y.take(shift_down))).sum() / 2.0
     return area
 
+def volume_polygon(model):
+    '''
+    Returns the volume of a list of polygonal prisms.
+
+    input
+
+    model: list - list of fatiando.mesher.PolygonalPrism
+
+    output
+
+    volume: float - volume of the model
+    '''
+
+    volume = 0
+    for m in model:
+        volume += area_polygon(m.x,m.y)*(m.z2 - m.z1)
+
+    return volume
+
 def pol2cart(l, M, L):
     '''
     This function transforms polar coordinates of the prisms
@@ -1663,9 +1682,9 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
     dz: float - thickness of the prisms
     output
 
-    d0: array - fitted data
-    m0: array - estimated parameters
-    model0: list - objects of fatiando.mesher.polyprisms
+    d_fit: array - fitted data
+    m_est: array - estimated parameters
+    model_est: list - objects of fatiando.mesher.polyprisms
     phi_list: list - solutions of objective funtion
     model_list: list - estimated models at each iteration
     res_list: list - calculated residual at each iteration
@@ -1747,7 +1766,8 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
 
         for it_marq in range(maxsteps):
 
-            delta_mt = (D*(np.linalg.solve((D*(H*D).T).T + lamb*np.identity(mt.size), -D*grad)).T).T
+            delta_mt = D*(np.linalg.solve((D*(H.T*D).T) + lamb*np.identity(mt.size), -D*grad)).T
+            #delta_mt = np.linalg.solve(H + lamb*np.identity(mt.size), -grad).T
             m_est = inv_log_barrier(mt + delta_mt, M, L, mmax, mmin)
             model_est = param2polyprism(m_est, M, L, z0, props)
             d_fit = polyprism.tf(xp, yp, zp, model_est, inc, dec)
@@ -1763,7 +1783,7 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
 
             dphi = phi - phi0
 
-            print 'it: %2d   it_marq: %2d   lambda: %.e   misfit: %.5e' % (it, it_marq, lamb, phi)
+            print 'it: %2d   it_marq: %2d   lambda: %.e   init obj.: %.5e  fin obj.: %.5e' % (it, it_marq, lamb, phi0, phi)
 
             if (dphi > 0.):
                 lamb *= dlamb
@@ -1845,9 +1865,26 @@ def levmarq_amf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, 
     phi_list = [phi0]
     model_list = [model0]
     res_list = [res0]
-    G0 = Jacobian_tf(xp, yp, zp, model0, M, L, delta[0], delta[1], delta[2], delta[3], inc, dec)
-    th = np.trace(2.*np.dot(G0.T, G0)/N)/P
-    alpha *= th
+    G0 = Jacobian_amf(xp, yp, zp, model0, M, L, delta[0], delta[1], delta[2], delta[3])
+
+    # Scale factor of misfit function
+    th = np.trace(2.*np.dot(G0.T, G0)/N)
+
+    # Scale factors of the constraint functions
+    th_constraints = []
+    d0, d1, dM = diags_phi_1(M, L)
+    th_constraints.append(np.sum(d0)) # phi1
+    d0, d1 = diags_phi_2(M, L)
+    th_constraints.append(np.sum(d0)) # phi2
+    th_constraints.append(2.*(M+2)) # phi3
+    th_constraints.append(2.*2) # phi4
+    d0, d1 = diags_phi_5(M, L)
+    th_constraints.append(np.sum(d0)) # phi5
+    d0 = diags_phi_6(M, L)
+    th_constraints.append(np.sum(d0)) # phi6
+    th_constraints.append(2.) # phi7
+
+    alpha *= th/th_constraints
 
     for it in range(maxit):
         mt = log_barrier(m0, M, L, mmax, mmin)
@@ -1856,7 +1893,7 @@ def levmarq_amf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, 
         G = Jacobian_amf(xp, yp, zp, model0, M, L, delta[0], delta[1], delta[2], delta[3])
 
         # Hessian matrix
-        H = 2.*np.dot(G.T, G)/(th*N)
+        H = 2.*np.dot(G.T, G)/N
 
         # weighting the regularization parameters
         H = Hessian_phi_1(M, L, H, alpha[0])
@@ -1868,8 +1905,8 @@ def levmarq_amf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, 
         H = Hessian_phi_7(M, L, H, alpha[6])
 
         # gradient vector
-        grad = -2.*np.dot(G.T, res0)/(th*N)
-
+        grad = -2.*np.dot(G.T, res0)/N
+        
         grad = gradient_phi_1(M, L, grad, alpha[0])
         grad = gradient_phi_2(M, L, grad, alpha[1])
         grad = gradient_phi_3(M, L, grad, m_out, alpha[2])
@@ -1886,7 +1923,7 @@ def levmarq_amf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, 
 
         for it_marq in range(maxsteps):
 
-            delta_mt = (D*(np.linalg.solve((D*(H*D).T).T + lamb*np.identity(mt.size), -D*grad)).T).T
+            delta_mt = D*(np.linalg.solve((D*(H.T*D).T) + lamb*np.identity(mt.size), -D*grad)).T
             m_est = inv_log_barrier(mt + delta_mt, M, L, mmax, mmin)
             model_est = param2polyprism(m_est, M, L, z0, props)
             d_fit = np.sqrt(polyprism.bx(xp, yp, zp, model_est)**2. + \
@@ -1904,7 +1941,7 @@ def levmarq_amf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, 
 
             dphi = phi - phi0
 
-            print 'it: %2d   it_marq: %2d   lambda: %.e   misfit: %.4e' % (it, it_marq, lamb, phi)
+            print 'it: %2d   it_marq: %2d   lambda: %.e   init obj.: %.5e  fin obj.: %.5e' % (it, it_marq, lamb, phi0, phi)
 
             if (dphi > 0.):
                 lamb *= dlamb
@@ -1949,22 +1986,22 @@ def plot_prisms(prisms):
         top = []
         bottom = []
         for x, y in zip(o.x, o.y):
-            top.append(np.array([x,y,o.z1]))
-            bottom.append(np.array([x,y,o.z2]))
+            top.append(np.array([y,x,o.z1]))
+            bottom.append(np.array([y,x,o.z2]))
         verts.append(top)
         verts.append(bottom)
         for i in range(o.x.size-1):
             sides = []
-            sides.append(np.array([o.x[i], o.y[i], o.z1]))
-            sides.append(np.array([o.x[i+1], o.y[i+1], o.z1]))
-            sides.append(np.array([o.x[i+1], o.y[i+1], o.z2]))
-            sides.append(np.array([o.x[i], o.y[i], o.z2]))
+            sides.append(np.array([o.y[i], o.x[i], o.z1]))
+            sides.append(np.array([o.y[i+1], o.x[i+1], o.z1]))
+            sides.append(np.array([o.y[i+1], o.x[i+1], o.z2]))
+            sides.append(np.array([o.y[i], o.x[i], o.z2]))
             verts.append(sides)
         sides = []
-        sides.append(np.array([o.x[-1], o.y[-1], o.z1]))
-        sides.append(np.array([o.x[0], o.y[0], o.z1]))
-        sides.append(np.array([o.x[0], o.y[0], o.z2]))
-        sides.append(np.array([o.x[-1], o.y[-1], o.z2]))
+        sides.append(np.array([o.y[-1], o.x[-1], o.z1]))
+        sides.append(np.array([o.y[0], o.x[0], o.z1]))
+        sides.append(np.array([o.y[0], o.x[0], o.z2]))
+        sides.append(np.array([o.y[-1], o.x[-1], o.z2]))
         verts.append(sides)
 
     return verts
