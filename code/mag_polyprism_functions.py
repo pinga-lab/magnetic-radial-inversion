@@ -1906,7 +1906,7 @@ def levmarq_amf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, 
 
         # gradient vector
         grad = -2.*np.dot(G.T, res0)/N
-        
+
         grad = gradient_phi_1(M, L, grad, alpha[0])
         grad = gradient_phi_2(M, L, grad, alpha[1])
         grad = gradient_phi_3(M, L, grad, m_out, alpha[2])
@@ -1968,7 +1968,7 @@ def levmarq_amf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, 
 
     return d_fit, m_est, model_est, phi_list, model_list, res_list
 
-def plot_prisms(prisms):
+def plot_prisms(prisms, scale=1.):
     '''
     Returns a list of ordered vertices to build the model
     on matplotlib 3D
@@ -1976,32 +1976,37 @@ def plot_prisms(prisms):
     input
 
     prisms: list - objects of fatiando.mesher.polyprisms
+    scale: float - factor used to scale the coordinate values
 
     output
 
     verts: list - ordered vertices
     '''
+
+    assert np.isscalar(scale), 'scale must be a scalar'
+    assert scale > 0., 'scale must be positive'
+
     verts = []
     for o in prisms:
         top = []
         bottom = []
         for x, y in zip(o.x, o.y):
-            top.append(np.array([y,x,o.z1]))
-            bottom.append(np.array([y,x,o.z2]))
+            top.append(scale*np.array([y,x,o.z1]))
+            bottom.append(scale*np.array([y,x,o.z2]))
         verts.append(top)
         verts.append(bottom)
         for i in range(o.x.size-1):
             sides = []
-            sides.append(np.array([o.y[i], o.x[i], o.z1]))
-            sides.append(np.array([o.y[i+1], o.x[i+1], o.z1]))
-            sides.append(np.array([o.y[i+1], o.x[i+1], o.z2]))
-            sides.append(np.array([o.y[i], o.x[i], o.z2]))
+            sides.append(scale*np.array([o.y[i], o.x[i], o.z1]))
+            sides.append(scale*np.array([o.y[i+1], o.x[i+1], o.z1]))
+            sides.append(scale*np.array([o.y[i+1], o.x[i+1], o.z2]))
+            sides.append(scale*np.array([o.y[i], o.x[i], o.z2]))
             verts.append(sides)
         sides = []
-        sides.append(np.array([o.y[-1], o.x[-1], o.z1]))
-        sides.append(np.array([o.y[0], o.x[0], o.z1]))
-        sides.append(np.array([o.y[0], o.x[0], o.z2]))
-        sides.append(np.array([o.y[-1], o.x[-1], o.z2]))
+        sides.append(scale*np.array([o.y[-1], o.x[-1], o.z1]))
+        sides.append(scale*np.array([o.y[0], o.x[0], o.z1]))
+        sides.append(scale*np.array([o.y[0], o.x[0], o.z2]))
+        sides.append(scale*np.array([o.y[-1], o.x[-1], o.z2]))
         verts.append(sides)
 
     return verts
