@@ -1,13 +1,79 @@
 \section{Introduction}
 
-The interpretation of a 3D magnetic survey measured above the surface of the earth is an important challenge in exploration geophysics. Many authors developed different strategies to interpret magnetic data quantitatively. The nonuniqueness of the magnetic inversion is well-known so that several subsurface sources can reproduce the same magnetic dataset with the same accuracy. Necessarily, a priori information is required in the inversion process to overcome this difficulty. By introducing it, the family of mathematically acceptable models should decrease and be more coherent to the local geology.
+The interpretation of total-field anomalies on the surface of the Earth is an 
+important challenge in exploration geophysics due to the nonuniqueness of 3-D magnetic 
+inversion. It is well-known that several magnetization distribution in subsurface 
+can reproduce the same magnetic data with the same accuracy. 
+To overcome this inherent ambiguity, a priori information need to be introduced 
+for reducing the number of possible solutions coherent with the local geology.
+There are basically two groups of 3-D magnetic inversion methods. The available 
+a priori information determines the suitable approach for each case.
 
-There are groups of approaches that deal differently with such nonuniqueness of the magnetic inverse problem. The prior information available can determine a suitable approach depending on the desired outcome of inversion. The first group approximates the magnetic source by a geometrically simple causative body with a small number of parameters that define the geometry and the physical property. Commonly, this approach consists of a nonlinear optimization problem with a small family of possible solutions due to the very restrictive parametrization \cite[]{ballantyne-1980,bhattacharyya-1980,silva-1983}.
+The first group is formed methods approximating the source by a geometrically 
+simple causative body having its geometry defined by a small number of parameters 
+\citep[e.g., ][]{ballantyne-1980,bhattacharyya-1980,silva-1983}. These methods 
+estimate both the geometry and the physical property of the source by solving 
+a nonlinear inverse problem. Due to the very restrictive parametrization, 
+such methods usually do not have severe problems with ambiguity.
 
-The second group composes the vast majority of magnetic inversion methods. These methods divide the subsurface in a grid of rectangular prisms that have magnetization direction aligned with the local main field of the earth \cite[]{cribb-1976,li_3-d_1996,pilkington_3-d_1997} . In these methods, the magnetic susceptibility is a parameter in the inversion, considered isotropic within each prism. Additionally, some of these methods allow a magnetization direction different from the local main field direction \cite[]{pignatelli-2006}. In this case, instead of estimating susceptibility, these methods estimate the total-magnetization intensity within each prism. The magnetic sources in the subsurface are imagined by the estimated susceptibility distribution or magnetization intensity supporting the geological interpretation. Theoretically, these methods are capable of recovering the geometry of complex sources. However, they are characterized by a high computational cost due to the solution of large linear systems. Another disadvantage of these methods is the necessity to impose prior information to overcome problems of nonuniqueness and instability due to a large number of parameters in the inversion.
+The second group is formed by the vast majority of methods. 
+They approximate the subsurface by a grid of juxtaposed rectangular prisms having 
+a constant total-magnetization direction. Some methods presume that a purely induced 
+magnetization \citep[e.g., ][]{cribb-1976,li_3-d_1996,pilkington_3-d_1997} and the 
+isotropic magnetic susceptibility of the prisms is the quantity estimated by solving 
+a linear inverse problem. Some of these methods allow a magnetization direction 
+different from that of the local main field \cite[e.g., ][]{pignatelli-2006}. 
+In this case, the parameters to be estimated are the total-magnetization intensities 
+of the prisms. 
+In all these methods, the geometry of the magnetic sources is estimated indirectly, 
+by interpreting the estimated susceptibility or total-magnetization intensity 
+distribution. 
+Theoretically, these methods are capable of recovering the geometry of complex 
+sources. However, they require a lot of a priori information to overcome 
+their nonuniqueness and instability due to the large number of parameters 
+to be estimated by inversion. Additionally, they are characterized by a high 
+computational cost associated with the solution of large linear systems.
 
-The third group of total-field anomaly inversion estimates the geometries or boundaries of a magnetic source by assuming some knowledge about the physical property. The method proposed by \cite{wang_inversion_1990} estimates, in the frequency domain, the spacial position of vertices defining a polyhedron body.  Among the few studies in this group, \cite{wenbin-2017} have developed a multiple level-set method to estimate the shape of a 3D magnetic source. This method represents the geological structure by a set of causative bodies with uniform magnetic susceptibility. According to the authors, this method is only applicable to magnetic data produced by sources with weak induced magnetization and known magnetic susceptibility. However, these methods have a small number of parameters for inversion than the second group. In addition, the inherent nonuniqueness of the magnetic inversion for these methods is not severe in comparison to the other groups due to the flexibility of the parametrization. As noticeable, the lack of works on 3D magnetic inversion presents a great challenge in the area of the potential fields.
+The third group of 3-D magnetic inversion methods presume some knowledge about the 
+physical property distribution and estimate the geometry of the sources. 
+They are usually formulated as nonlinear inverse problems. 
+\citet{wang_inversion_1990} approximate the source by a polyhedron and estimate 
+the position of its vertices in the Fourier domain. 
+\citet{wenbin-2017} have developed a multiple level-set method to estimate geometry 
+of a set of causative bodies with uniform magnetic susceptibility. 
+These methods have a small number of parameters to be estimated by inversion and 
+much less ambiguity problems if compared to those methods the second group. 
 
-The main difficulty in magnetic inversion to estimate the shape of a 3D magnetic source is that prior information about the physical property and position of the body is necessary as input. If available, prior information can help the algorithm to deal with fewer parameters in the inversion process. In other words, the whole process would be faster and more suitable for the geological configuration. Moreover, the choice of the best solution would be easier due to the smaller subset of possible solutions. Consequently, the inverted boundaries of the body can delineate more realistically the magnetic source. We thus are challenged to develop an algorithm that requires the total-magnetization direction only and retrieves complex geometries for an isolated source.
+We present a magnetic inversion method to estimate the geometry of an isolated 
+and uniformly 3-D magnetic source having known total-magnetization direction.
+Our method is an extension for total-field anomaly data of those methods presented 
+by \cite{oliveirajr-etal2011} and \cite{oliveirajr-barbosa2013} for inverting 
+gravity and gravity-gradient data, respectively. 
+We approximate the source by an interpretation model formed vertically juxtaposed 
+right prisms having horizontal cross-sections defined by polygons, all
+of them with the same number of vertices.
+For convenience, all prisms have the same depth extension and total-magnetization 
+intensity.
+Differently from \cite{oliveirajr-etal2011} and \cite{oliveirajr-barbosa2013}, 
+our method estimates not only the position of the vertices defining the horizontal 
+cross-sections and the horizontal position, but also the depth extension of all 
+prisms forming the interpretation model. Additionally, we run the inversion for 
+different values of total-magnetization intensities and depths to the top 
+of the shallowest prism. Among the estimated models, those producing the 
+lowest values of goal function form the set of candidate models.
+To obtain a stable solutions, use the same set of regularizing functions proposed by 
+\cite{oliveirajr-etal2011} and also propose a new one for constraining the 
+depth extent of the prisms. 
 
-We present an algorithm to estimate the geometry of an isolated magnetic 3D source by inverting total-field anomaly data with known total-magnetization direction. The prisms have the same depth extent and total-magnetization intensity that are a parameter and a constant in the inversion process, respectively. The method estimates the radii connecting an arbitrary origin and the vertices of the regular polygon that describes the horizontal cross-section of the prisms. Also, the algorithm estimates the Cartesian coordinates of the arbitrary origin of the prisms polygons. The magnetic source is approximated by a set of vertically juxtaposed polygonal prisms to estimate the shape of the source. The method is an extension for magnetic data of those presented by \cite{oliveirajr-etal2011} and \cite{oliveirajr-barbosa2013} for inversion of gravity and gravity-gradient data, respectively. However, differently from those authors, we estimate the thickness of all prisms defining the interpretation model. Additionally, we introduced a validation test using successive inversions for ranges of depth to the top and the total-magnetization intensity of the source and choosing them based on the lower values of the objective function. To obtain a stable solutions, we introduced a set of six smoothness constraints following the strategy of \cite{oliveirajr-etal2011} and a new minimum Euclidean constraint on the depth extent of the prisms. Ultimately, tests on synthetic total-field anomaly data and a field application on the Anitápolis alkaline complex, Santa Catarina, Brazil, support the efficiency of our method.
+A test with synthetic data produced by a simple symmetric model shows the performance 
+of our method in an ideal case. We also applied our method to interpret the synthetic 
+data produced by a complex sources having variable shape and dip along depth. The 
+results show that our method can be a very useful tool for interpreting magnetic data 
+in real situations. Based on these results with synthetic data, we applied our method 
+to interpret airborne data located over the alkaline-carbonatitic complex of 
+Anit{\'a}polis, in the Santa Catarina state, Brazil. Our results bring some light 
+on the debate about the structural control of the Anit{\'a}polis complex. 
+Our results suggest that the complex follows a NW-SE direction at depth, in agreement 
+with known geological structures not only located at, but also northward and southward 
+the study area. These results attest that our method is a promising tool for interpreting 
+total-field anomaly data.
