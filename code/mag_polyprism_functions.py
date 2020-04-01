@@ -2,12 +2,17 @@
 
 import numpy as np
 import numpy.testing as npt
+import matplotlib.pyplot as plt
+import scipy.stats as sp
 from fatiando import mesher, gridder, utils
 from fatiando.gravmag import polyprism
 from fatiando.mesher import PolygonalPrism
 from fatiando.constants import CM, T2NT
 from copy import deepcopy
 from math import factorial
+from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+from fatiando.vis import mpl
 
 ### Functions for the foward problem using fatiando
 
@@ -2095,3 +2100,267 @@ def initial_cylinder(M, L, x0, y0, z0, dz, r, inc, dec, incs, decs, intensity):
     model0 = param2polyprism(m0, M, L, z0, props)
 
     return model0, m0
+
+def goal_matrix(n, m, results):
+    '''
+    Returns the goal function values for each inversion
+    organized in a matrix
+    
+    input
+    n, m: integer - number of values of depth to the top (z0)
+                    and magnetic intensity (m0)
+    results: list - inversion results from the pickle file
+                    made by multiple inversion notebook
+    output
+    gamma_matrix: 2D array - goal function values    
+    '''
+    gamma_matrix = np.zeros((n,m))
+    for i in range(n):
+        for j in range(m):
+            gamma_matrix[i, j] = results[i*n+j][1][-1]
+    return gamma_matrix
+
+def misfit_matrix(n, m, results):
+    '''
+    Returns the misfit function values for each inversion
+    organized in a matrix
+    
+    input
+    n, m: integer - number of values of depth to the top (z0)
+                    and magnetic intensity (m0)
+    results: list - inversion results from the pickle file
+                    made by multiple inversion notebook
+    output
+    gamma_matrix: 2D array - misfit function values  
+    '''
+    misfit_matrix = np.zeros((n,m))
+    for i in range(n):
+        for j in range(m):
+            misfit_matrix[i, j] = np.linalg.norm(results[i*n+j][3])**2./results[i*n+j][3].size
+    return misfit_matrix
+
+def plot_matrix(z0, intensity, sus, matrix, filename):
+    '''
+    Returns a plot of the goal function values for each inversion
+    organized in a matrix
+    
+    input
+    z0: 1D array - range of depth to the top values
+    intensity: 1D array - range of total-magnetization
+                        intensity values
+    sus: 1D array - range of susceptibility values
+                    equivalent to z0
+    matrix: 2D array - values for the goal or misfit function
+                    produced by the solutions of the multiple
+                    inversions
+    filename: string - directory and filename of the figure
+
+    output
+    fig: figure - plot of the result
+    '''
+
+    n = z0.size
+    m = intensity.size
+    fig, ax = plt.subplots(1,1)
+    fig.set_size_inches(6,6)
+    w = 3.
+    img = ax.imshow(matrix, vmin=40, vmax=100, origin='lower',extent=[0,w,0,w])
+    img.axes.tick_params(labelbottom='on',labeltop='off', labelleft="on", labelright='off',
+        bottom='off', left='off', right='off',labelsize=14)
+    plt.ylabel('$z_0$ (m)', fontsize=14)
+    plt.xlabel('$m_0$ (A/m)', fontsize=14)
+    plt.plot(7*w/(2*n), w/(2*m), 'cD', markersize=12)
+    plt.plot(9*w/(2*n), 3*w/(2*m), 'mD', markersize=12)
+    x_label_list = []
+    y_label_list = []
+    sus_label_list = []
+    for xl, yl, sl in zip(intensity,z0,sus):
+        x_label_list.append(str(xl))
+        y_label_list.append(str(yl)[:-2])
+        sus_label_list.append(str(sl)[:4])
+    ax.set_xticks(np.linspace(w/(2.*n), w - w/(2.*n), n))
+    ax.set_yticks(np.linspace(w/(2.*m), w - w/(2.*m), m))
+    ax.set_xticklabels(x_label_list)
+    ax.set_yticklabels(y_label_list)
+    ax.set_xticks(np.linspace(0, w, n+1), minor=True)
+    ax.set_yticks(np.linspace(0, w, m+1), minor=True)
+    clb = plt.colorbar(img, pad=0.01, aspect=30, shrink=0.865)
+    clb.ax.set_title('nT', pad=-295)
+    clb.ax.tick_params(labelsize=14)
+    ax2 = fig.add_axes(ax.get_position(), frameon=False)
+    ax2.set_xlim(ax.get_xlim())
+    ax2.set_xticks(np.linspace(w/(2.*n), w - w/(2.*n), n))
+    ax2.set_xticklabels(sus_label_list)
+    ax2.tick_params(labelbottom='off',labeltop='on', labelleft="off", labelright='off',
+        bottom='off', left='off', right='off', labelsize=12)
+    ax2.set_title('$\chi$ (S.I.)', fontsize=14, pad=30)
+    ax.grid(which='minor', color='k', linewidth=2)
+    plt.draw()
+    ax2.set_position(ax.get_position())
+    plt.savefig(filename, dpi=300, bbox_inches='tight')
+    return plt.show()
+
+def plot_solution_4figures(xp, yp, zp, residuals, solution, initial, filename):
+    '''
+    Returns a plot of the resdiuals, initial approximate
+    and two perspective views of the solution
+    
+    input
+    x, y, z: 1D array - Cartesian coordinates of the residuals
+    residuals: 1D array - residuals between observed and predicted data
+    solution: list - list of a fatiando.mesher.PolygonalPrism
+                    of the estimated model
+    initial: list - list of a fatiando.mesher.PolygonalPrism
+                    of the initial approximate
+    filename: string - directory and filename of the figure
+
+    output
+    fig: figure - plot of the result
+    '''
+
+    verts = plot_prisms(prisms=solution, scale=0.001)
+    verts_initial = plot_prisms(prisms=initial, scale=0.001)
+
+    plt.figure(figsize=(10,9))
+
+    # residual data and histogram
+    ax=plt.subplot(2,2,1)
+    plt.tricontourf(yp, xp, residuals, 20,
+                    cmap='RdBu_r', vmin=-50.,
+                    vmax=50.).ax.tick_params(labelsize=12)
+    # horizontal projections of the estimated prisms
+    for prism_i in solution:
+        mpl.polygon(prism_i.topolygon(), linewidth=0, fill='k',
+                    alpha=0.05, xy2ne=True)
+    plt.xlim(683000, 693000)
+    plt.xlabel('$y$(m)', fontsize=12)
+    plt.ylabel('$x$(m)', fontsize=12)
+    clb = plt.colorbar(pad=0.01, aspect=20, shrink=1)
+    clb.ax.set_title('nT', pad=-285)
+    mpl.m2km()
+    clb.ax.tick_params(labelsize=13)
+    # histogram in the inset
+    inset = inset_axes(ax, width="40%", height="30%", loc=1, borderpad=0.7)
+    mean = np.mean(residuals)
+    std = np.std(residuals)
+    nbins=30
+    n, bins, patches = plt.hist(residuals,bins=nbins,
+                                normed=True, facecolor='blue')
+    props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+    inset.text(0.6, 0.95,
+               "$\mu$ = {:.2f}\n$\sigma$ = {:.2f}".format(mean,std),
+                transform=inset.transAxes, fontsize=8,
+                va='top', ha='left', bbox=props)
+    gauss = sp.norm.pdf(bins, mean, std)
+    plt.plot(bins, gauss, 'k--', linewidth=1., label='Gaussian')
+    ax.text(681000, 6925000, '(a)', fontsize= 15)
+
+    # converting coordinates
+    x=xp/1000.
+    y=yp/1000.
+    z=zp/1000.
+
+    # initial approximate
+    ax = plt.subplot(2,2,2, projection='3d')
+
+    # plot sides
+    ax.add_collection3d(Poly3DCollection(verts_initial, alpha=0.3, 
+     facecolor='r', linewidths=0.5, edgecolors='k'))
+
+    ax.set_ylim(np.min(x), np.max(x), 100)
+    ax.set_xlim(np.min(y), np.max(y), 100)
+    ax.set_zlim(7, -2, 100)
+    ax.tick_params(labelsize= 10)
+    ax.set_ylabel('x (km)', fontsize= 14)
+    ax.set_xlabel('y (km)', fontsize= 14)
+    ax.set_zlabel('z (km)', fontsize= 14)
+    ax.view_init(30, 45)
+    ax.text2D(-0.1, 0.07, '(b)', fontsize= 15)
+
+    # inverse model view 1
+    ax = plt.subplot(2,2,3, projection='3d')
+
+    # plot sides
+    ax.add_collection3d(Poly3DCollection(verts, alpha=0.3, 
+     facecolor='r', linewidths=0.5, edgecolors='k'))
+
+    ax.set_ylim(np.min(x), np.max(x), 100)
+    ax.set_xlim(np.min(y), np.max(y), 100)
+    ax.set_zlim(7, -2, 100)
+    ax.tick_params(labelsize= 10)
+    ax.set_ylabel('x (km)', fontsize= 14)
+    ax.set_xlabel('y (km)', fontsize= 14)
+    ax.set_zlabel('z (km)', fontsize= 14)
+    ax.view_init(15, 45)
+    ax.text2D(-0.11, 0.07, '(c)', fontsize= 15)
+
+    # inverse model view 2
+    ax = plt.subplot(2,2,4, projection='3d')
+
+    # plot sides
+    ax.add_collection3d(Poly3DCollection(verts, alpha=0.3, 
+     facecolor='r', linewidths=0.5, edgecolors='k'))
+
+    ax.set_ylim(np.min(x), np.max(x), 100)
+    ax.set_xlim(np.min(y), np.max(y), 100)
+    ax.set_zlim(7, -2, 100)
+    ax.tick_params(labelsize= 10)
+    ax.set_ylabel('x (km)', fontsize= 14)
+    ax.set_xlabel('y (km)', fontsize= 14)
+    ax.set_zlabel('z (km)', fontsize= 14)
+    ax.view_init(-3, -140)
+    ax.text2D(-0.1, 0.07, '(d)', fontsize= 15)
+
+    plt.tight_layout()
+    plt.savefig(filename, dpi=300, bbox_inches='tight')
+    return plt.show()
+
+def plot_obs_alt(x, y, xa, ya, obs, alt, prism, filename):
+    '''
+    Returns a plot of upward continued total-field anomaly
+    data and the elevation of the observations
+    
+    input
+    x, y: 1D array - Cartesian coordinates of the upward
+                    continued total-field anomaly data
+    x, y: 1D array - Cartesian coordinates of the observations
+    obs: 1D array - upward continued total-field anomaly data
+    alt: 1D array - geometric heigt of the observations
+    prism: list - fatiando.mesher.PolygonalPrism
+                    of the initial approximate
+    filename: string - directory and filename of the figure
+
+    output
+    fig: figure - plot
+    '''
+
+    plt.figure(figsize=(13,5))
+
+    ax=plt.subplot(1,2,1)
+    plt.tricontour(yp, xp, obs, 20, linewidths=1, cmap='RdBu_r')
+    plt.tricontourf(yp, xp, obs, 20, cmap='RdBu_r',
+                   vmin=-np.max(obs),
+                   vmax=np.max(obs)).ax.tick_params(labelsize=12)
+    estimate = mpl.polygon(prism, '.-r', xy2ne=True)
+    plt.xlabel('$y$(km)', fontsize=14)
+    plt.ylabel('$x$(km)', fontsize=14)
+    clb = plt.colorbar(pad=0.01, aspect=40, shrink=1)
+    clb.ax.tick_params(labelsize=13)
+    clb.ax.set_title('nT', pad=-285)
+    ax.text(681000, 6925000, '(a)', fontsize= 15)
+    mpl.m2km()
+
+    ax=plt.subplot(1,2,2)
+    plt.tricontourf(yt, xt, alt, 10, cmap='viridis').ax.tick_params(labelsize=12)
+    plt.plot(yt, xt, 'ko', markersize=1.)
+    plt.xlabel('$y$(km)', fontsize=14)
+    plt.ylabel('$x$(km)', fontsize=14)
+    estimate = mpl.polygon(prism, '.-r', xy2ne=True)
+    clb = plt.colorbar(pad=0.01, aspect=40, shrink=1)
+    clb.ax.set_title('m', pad=-285)
+    clb.ax.tick_params(labelsize=13)
+    ax.text(681000, 6925000, '(b)', fontsize= 15)
+    mpl.m2km()
+
+    plt.savefig(filename, dpi=300, bbox_inches='tight')
+    return plt.show()
