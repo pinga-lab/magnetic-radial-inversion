@@ -1,3 +1,24 @@
 \begin{summary}
-We present a method for inverting total-field anomaly data to estimate the geometry of a 3D complex geological source in subsurface. The method assumes total-magnetization direction is known. We use an ensemble of vertically juxtaposed 3D right prisms to approximate the shape of the geological source. Each prism has a known homogeneous magnetization and an unknown regular polygon as its horizontal cross-sections. The vertices of the polygons approximately describe the edges of horizontal depth slices of the source. All prisms’ polygons have the same fixed number of vertices, which are equally spaced with central angles from $0^{\circ}$ to $360^{\circ}$ and horizontally described by polar coordinates associated to an arbitrary origin within each prism. We used a validation test to define the total-magnetization intensity and the depth to the top of the magnetic source. This test uses successive inversions for a range of both parameters, where we set a pair of them for each inverted solution. These parameters are defined based on the minimization of the goal function. The lower the goal function, the better the data fit. The method estimates the radii of all vertices, the horizontal Cartesian coordinates of all arbitrary origins, and the depth extent of the prisms defining the shape of the interpretation model. We impose zeroth- and first-order Tikhonov regularizations as constraints on the shape of the estimated model to stabilize the inverse problem. The method allows estimating both vertical and inclined sources by a suitable use of first-order Tikhonov regularization. This regularization can be applied on either all or few parameters excluding the depth extent of the prisms. The tests on synthetic and field data show the efficiency of the method on retrieving the shape of a complex geologic source.
+We present a method for inverting total-field anomaly data to estimate the geometry of 
+a uniformly magnetized 3-D geological source in subsurface. The method assumes 
+the total-magnetization direction is known. We approximate the source by an 
+ensemble of vertically juxtaposed right prisms, all of them with the same 
+total-magnetization vector and depth extent. The horizontal cross-section 
+of each prism is defined by a polygon having the same number of vertices 
+equally spaced from $0^{\circ}$ to $360^{\circ}$. The position of these 
+vertices, the horizontal location of each prism and the depth extent of all prisms 
+are the parameters to be estimated by solving a constrained nonlinear inverse problem 
+for minimizing a goal function. 
+We run successive inversions for a range of tentative total-magnetization intensities 
+and depths to the top of the shallowest prism. The estimated models producing 
+the lowest values of the goal function form the set of candidate solutions.
+To obtain stable solutions, we impose the zeroth- and first-order Tikhonov 
+regularizations on the shape of the prisms. The method allows estimating the geometry 
+of both vertical and inclined sources by the suitable use of first-order Tikhonov 
+regularization. Tests with synthetic data produced by simple and complex simulated 
+bodies show the efficiency of our method in retrieving the shape of the magnetic 
+source. Results obtained by inverting airborne total-field anomaly data over the 
+Anit{\'a}polis alkaline-carbonatitic complex, in the Santa Catarina state, Brazil, 
+suggest that the emplacement of the magnetic sources was controlled by NW-SE-trending 
+faults at depth, in accordance with known structural features at the study area.
 \end{summary}
