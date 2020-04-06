@@ -2,7 +2,7 @@
 
 \subsection{Forward problem}
 
-Let $\mathbf{d}^{o}$ be the observed data vector, whose $i$th element $d^{o}_{i}$, $i = 1, \dots, N$, is the total-field anomaly produced by a 3-D source (Fig. \ref{fig:obs}a) at the point $(x_{i}, y_{i}, z_{i})$ of a Cartesian coordinate  system with $x$, $y$ and $z$ axes pointing to north, east and down, respectively. We assume that the direction of the total magnetization vector of the source is constant and known. We approximate the volume of the source by a set of $L$ vertically juxtaposed 3-D prisms (Fig. \ref{fig:obs}b) by following the same approach of \cite{oliveirajr-etal2011} and \cite{oliveirajr-barbosa2013}. The depth to the top of the shallowest prism is defined by $z_{0}$ and $m_{0}$ is the constant total-magnetization  intensity of all prisms. The horizontal cross-section of each prism is described by a polygon with a fixed number $V$ of vertices equally spaced from $0^{\circ}$ to $360^{\circ}$, which are described in polar coordinates referred to an internal origin $O^{k}$. The radii of the vertices ($r^{k}_{j}$, $j=1,\dots , V$, $k=1,\dots ,L$), the horizontal coordinates ($x_{0}^{k}$ and $y_{0}^{k}$, $k=1,\dots ,L$) of the origins $O^{k}$, $k=1,\dots ,L$, and the depth extent $dz$ of the $L$ vertically stacked prisms (Fig. \ref{fig:obs}b) are arranged in a $M \times 1$ parameter vector $\mathbf{p}$, $M = L (V + 2) + 1$, given by
+Let $\mathbf{d}^{o}$ be the observed data vector, whose $i$th element $d^{o}_{i}$, $i = 1, \dots, N$, is the total-field anomaly produced by a 3-D source (Fig. \ref{fig:obs}a) at the point $(x_{i}, y_{i}, z_{i})$ of a Cartesian coordinate  system with $x$, $y$ and $z$ axes pointing to north, east and down, respectively. We assume that the direction of the total magnetization vector of the source is constant and known. We approximate the volume of the source by a set of $L$ vertically juxtaposed 3-D prisms (Fig. \ref{fig:obs}b) by following the same approach of \cite{oliveirajr-etal2011} and \cite{oliveirajr-barbosa2013}. The depth to the top of the shallowest prism is defined by $z_{0}$ and $m_{0}$ is the constant total-magnetization  intensity of all prisms. The horizontal cross-section of each prism is described by a polygon with a fixed number $V$ of vertices equally spaced from $0^{\circ}$ to $360^{\circ}$, which are described in polar coordinates referred to an internal origin $O^{k}$. The radii of the vertices ($r^{k}_{j}$, $j=1,\dots , V$, $k=1,\dots ,L$), the horizontal coordinates ($x_{0}^{k}$ and $y_{0}^{k}$, $k=1,\dots ,L$) of the origins $O^{k}$, $k=1,\dots ,L$, and the thickness $dz$ of the $L$ vertically stacked prisms (Fig. \ref{fig:obs}b) are arranged in a $M \times 1$ parameter vector $\mathbf{p}$, $M = L (V + 2) + 1$, given by
 \begin{equation}
 \mathbf{p} = \left[ \begin{array}{@{}*{12}{c}@{}}
 {\mathbf{r}^{1}}^{\mathsf{T}} & x_{0}^{1} & y_{0}^{1} & \dots & {\mathbf{r}^{L}}^{\mathsf{T}} & x_{0}^{L} & y_{0}^{L} & dz \\
@@ -282,7 +282,7 @@ and
 \mathbf{H}_{6}(\mathbf{p}) = 2 \mathbf{R}^{\mathsf{T}}_{6}\mathbf{R}_{6} \quad .
 \end{equation}
 
-The other constraint, the \textit{Minimum Euclidean norm of the depth extent}, imposes that the depth extent of all prisms must be close to zero. We present this constraint to introduce a priori information about the maximum depth of the source. It is given by
+The other constraint, the \textit{Minimum Euclidean norm of the thickness}, imposes that the thickness of all prisms must be close to zero. We present this constraint to introduce a priori information about the maximum depth of the source. It is given by
 \begin{equation}\label{eq:phi7}
 \begin{split}
 \varphi_{7}(\mathbf{p}) &= dz^2 \\
@@ -411,7 +411,7 @@ $\tilde{\alpha}_7 = 10^{-5}$ and change them to refine the results.
 Another important aspect of our method is the initial approximation $\hat{\mathbf{p}}_{(0)}$. 
 We set the same constant radii for all prisms, so that they approximate a cylinder and 
 enclose both positive and negative parts of the observed anomaly.
-Also, we set the same constant depth extent $dz$ for all prisms with the purpose 
+Also, we set the same constant thickness $dz$ for all prisms with the purpose 
 of generating a bottom depth greater than that we expect for the true source.
 Finally, we adjust the parameters of the initial approximation $\hat{\mathbf{p}}_{(0)}$ 
 in order to obtain a preliminary fit of the observed data.
