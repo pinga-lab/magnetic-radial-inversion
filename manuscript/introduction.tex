@@ -5,11 +5,11 @@ important challenge in exploration geophysics due to the nonuniqueness of 3-D ma
 inversion. It is well-known that several magnetization distribution in subsurface 
 can reproduce the same magnetic data with the same accuracy. 
 To overcome this inherent ambiguity, a priori information need to be introduced 
-for reducing the number of possible solutions coherent with the local geology.
-There are basically two groups of 3-D magnetic inversion methods. The available 
+for reducing the number of possible possible solutions that are coherent with the local geology.
+There are basically three groups of 3-D magnetic inversion methods. The available 
 a priori information determines the suitable approach for each case.
 
-The first group is formed methods approximating the source by a geometrically 
+The first group of methods approximates the source by a geometrically 
 simple causative body having its geometry defined by a small number of parameters 
 \citep[e.g., ][]{ballantyne-1980,bhattacharyya-1980,silva-1983}. These methods 
 estimate both the geometry and the physical property of the source by solving 
@@ -21,18 +21,16 @@ They approximate the subsurface by a grid of juxtaposed rectangular prisms havin
 a constant total-magnetization direction. Some methods presume that a purely induced 
 magnetization \citep[e.g., ][]{cribb-1976,li_3-d_1996,pilkington_3-d_1997} and the 
 isotropic magnetic susceptibility of the prisms is the quantity estimated by solving 
-a linear inverse problem. Different approaches have improved this inversion method. To obtain focused images of the subsurface, \cite{portniaguine_focusing_1999} and \cite{portniaguine_3d_2002} introduced the minimum gradient support to minimize the effect of strong variations and discontinuity on the parameters by inverting magnetic anomaly and any component of the total anomalous field. Other studies introduced strategies to constraint the nonuniqueness and delineate the source \cite[]{tontini,pilkington_3d_2009,shamsipour_3d_2011,cella_inversion_2012,abedi-2015}. Exceptionally, some of these methods allow a magnetization direction 
-different from that of the local main field \cite[e.g., ][]{pignatelli-2006}. 
+a linear inverse problem. Different approaches have improved this inversion method to obtain focused images of the subsurface. For example, \cite{portniaguine_focusing_1999} and \cite{portniaguine_3d_2002} introduced the minimum gradient support to minimize the effect of strong variations and discontinuity on the parameters by inverting magnetic anomaly and any component of the total anomalous field. \cite{barbosa_interactive_2006} presented a method for inverting interfering magnetic anomalies by combining  features of the forward modeling (the interactivity) and traditional inversion (the automatic data fitting). Other studies introduced strategies to constraint the nonuniqueness and delineate the source \cite[]{tontini,pilkington_3d_2009,shamsipour_3d_2011,cella_inversion_2012,abedi-2015}. Exceptionally, some of these methods allowed different magnetization direction from the local main field one \cite[e.g., ][]{pignatelli-2006}. 
 In this case, the parameters to be estimated are the total-magnetization intensities 
 of the prisms. 
-In all these methods, the geometry of the magnetic sources is estimated indirectly, 
-by interpreting the estimated susceptibility or total-magnetization intensity 
+In all these methods, and thus, the geometries of the magnetic sources are indirectly retrivied by interpreting the estimated total-magnetization intensity 
 distribution. 
-Theoretically, these methods are capable of recovering the geometry of complex 
-sources. However, they require a lot of a priori information to overcome 
+Theoretically, these inversion methods are capable of recovering the geometry of complex 
+sources. However, they require a plethora of a priori information to overcome 
 their nonuniqueness and instability due to the large number of parameters 
-to be estimated by inversion. Additionally, they are characterized by a high 
-computational cost associated with the solution of large linear systems.
+to be estimated. Additionally, they are characterized by a high 
+computational cost associated due to the solution of large linear systems.
 
 The third group of 3-D magnetic inversion methods presume some knowledge about the 
 physical property distribution and estimate the geometry of the sources. 
@@ -40,40 +38,37 @@ They are usually formulated as nonlinear inverse problems.
 \citet{wang_inversion_1990} approximate the source by a polyhedron and estimate 
 the position of its vertices in the Fourier domain. 
 \citet{wenbin-2017} have developed a multiple level-set method to estimate geometry 
-of a set of causative bodies with uniform magnetic susceptibility. 
-These methods have a small number of parameters to be estimated by inversion and 
-much less ambiguity problems if compared to those methods the second group. 
+of a set of causative bodies with uniform magnetic susceptibility. \cite{hidalgo-2019} inverted the total-field anomaly for estimating the geometry of a basement relief of a sedimentary basin with known magnetization intensity but unknown magnetization direction. 
+This method has a small number of parameters to be estimated by inversion and 
+much less ambiguity in comparison to the second group. 
 
-We present a magnetic inversion method to estimate the geometry of an isolated 
+We present a magnetic inversion to estimate the geometry of an isolated 
 and uniformly 3-D magnetic source having known total-magnetization direction.
 Our method is an extension for total-field anomaly data of those methods presented 
 by \cite{oliveirajr-etal2011} and \cite{oliveirajr-barbosa2013} for inverting 
 gravity and gravity-gradient data, respectively. 
-We approximate the source by an interpretation model formed vertically juxtaposed 
+We approximate the source by an interpretation model formed by vertically juxtaposed 
 right prisms having horizontal cross-sections defined by polygons, all
 of them with the same number of vertices.
-For convenience, all prisms have the same depth extension and total-magnetization 
+For convenience, all prisms have the same thickness and total-magnetization 
 intensity.
 Differently from \cite{oliveirajr-etal2011} and \cite{oliveirajr-barbosa2013}, 
-our method estimates not only the position of the vertices defining the horizontal 
-cross-sections and the horizontal position, but also the depth extension of all 
-prisms forming the interpretation model. Additionally, we run the inversion for 
-different values of total-magnetization intensities and depths to the top 
+our method estimates not only the horizontal Cartesian coordinates of the origins and the radii of the vertices describing the horizontal cross-sections of all prisms, but also the thickness of all 
+prisms forming the interpretation model. Additionally, we perform a numerical analysis to investigate the sensitivity of our method to the use of different values of total-magnetization intensities and depths to the top 
 of the shallowest prism. Among the estimated models, those producing the 
 lowest values of goal function form the set of candidate models.
-To obtain a stable solutions, use the same set of regularizing functions proposed by 
+To obtain a stable solutions, we use the same set of regularizing functions proposed by 
 \cite{oliveirajr-etal2011} and also propose a new one for constraining the 
-depth extent of the prisms. 
+thickness of the prisms. 
 
 A test with synthetic data produced by a simple symmetric model shows the performance 
 of our method in an ideal case. We also applied our method to interpret the synthetic 
 data produced by a complex sources having variable shape and dip along depth. The 
 results show that our method can be a very useful tool for interpreting magnetic data 
-in real situations. Based on these results with synthetic data, we applied our method 
-to interpret airborne data located over the alkaline-carbonatitic complex of 
-Anit{\'a}polis, in the Santa Catarina state, Brazil. Our results bring some light 
+in real situations. Based on these synthetic tests, we applied our method 
+to interpret airborne data over the alkaline-carbonatitic complex of 
+Anit{\'a}polis, in the Santa Catarina state, in southern Brazil. Our results bring some light 
 on the debate about the structural control of the Anit{\'a}polis complex. 
-Our results suggest that the complex follows a NW-SE direction at depth, in agreement 
+Our results suggest that the complex is an intrusion source dipping to northwest and maximum bottom depth of about 4 km, in agreement 
 with known geological structures not only located at, but also northward and southward 
-the study area. These results attest that our method is a promising tool for interpreting 
-total-field anomaly data.
+the study area.
