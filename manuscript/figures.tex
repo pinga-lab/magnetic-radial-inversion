@@ -3,14 +3,14 @@
 \begin{figure}
     \centering
     \includegraphics[scale=1]{figures/observed_data.png}
-    \caption{Schematic representation (modified from  \cite{oliveirajr-barbosa2013}) of (a) total-filed anomaly (gray surface) produced by (b) a 3-D anomalous source (dark gray volume). The interpretation model in (b) consists of a set of L vertical, juxtaposed 3-D prisms $P^k$ , $k = 1,\dots, L$, (light gray prisms) in the vertical direction of a right-handed coordinate system.}
+    \caption{Schematic representation (modified from \cite{oliveirajr-barbosa2013}) of (a) total-filed anomaly (gray surface) produced by (b) a 3-D anomalous source (dark gray volume). The interpretation model in (b) consists of a set of L vertical, juxtaposed 3-D prisms $P^k$ , $k = 1,\dots, L$, (light gray prisms) in the vertical direction of a right-handed coordinate system.}
     \label{fig:obs}
 \end{figure}
 
 \begin{figure}
     \centering
     \includegraphics[scale=0.3]{figures/prism_parameters_mod.png}
-    \caption{Polygonal cross-section (modified from  \cite{oliveirajr-barbosa2013}) of the $k$th vertical prism $P^k$ described by $V$ vertices (white dots) with polar coordinates ($r^k_j$ , $\theta ^k_j$), $j = 1, \dots, V$, $k = 1, \dots, L$ , referred to an arbitrary origin $O^k$ (grey dot) with horizontal Cartesian coordinates ($x_0^k$ , $y_0^k$), $k = 1, \dots, L$ , (black dot).}
+    \caption{Polygonal cross-section (modified from \cite{oliveirajr-barbosa2013}) of the $k$th vertical prism $P^k$ described by $V$ vertices (white dots) with polar coordinates ($r^k_j$ , $\theta ^k_j$), $j = 1, \dots, V$, $k = 1, \dots, L$ , referred to an arbitrary origin $O^k$ (grey dot) with horizontal Cartesian coordinates ($x_0^k$ , $y_0^k$), $k = 1, \dots, L$ , (black dot).}
     \label{fig:prism_parameters}
 \end{figure}
 
@@ -19,7 +19,7 @@
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{figures/simple_model_data.png}
-    \caption{Simple model simulation. (a) Noise-corrupted total-field anomaly produced by the simple model (blue prisms) in (b) with a pseudoramdom Gaussian distribution having mean $\mu_0 = 0$ nT and standard deviation $\sigma_0 = 5$ nT, the black dots represent the observation points. The connected red dots are the vertices of the initial approximate horizontally projected at the data map. (b) Perspective view of the simple model represented by the blue prisms.
+    \caption{Simple model simulation. (a) Noise-corrupted total-field anomaly produced by the lopolithic-like body (blue prisms) shown in the panel (b) with a pseudoramdom Gaussian distribution having mean $\mu_0 = 0$ nT and standard deviation $\sigma_0 = 5$ nT, the black dots represent the observation points. The connected red dots are the vertices of the initial approximation horizontally projected onto the data map. (b) Perspective view of the simple model (lopolithic intrusion) represented by the blue prisms.
 }
     \label{fig:simple_model}
 \end{figure}
@@ -28,7 +28,7 @@
 	\centering
 	\includegraphics[scale=.75]{figures/simple_gamma.png}
 	\caption{Application to the simple model data. 
-	Goal function $\Gamma(\mathbf{p})$ (eq. \ref{eq:gamma}), in nT,  
+	Discrete mappng of the goal function $\Gamma(\mathbf{p})$ (eq. \ref{eq:gamma}) on the plane $ m_0 \times z_0 $,  
 	produced by estimated models with different depths-to-the-top ($ z_0 $) and 
 	total-magnetization intensities ($ m_0 $). 
 	The red triangle represents the $m_0$ and $z_0$ of the true source.}
@@ -38,7 +38,7 @@
 \begin{figure}
 	\centering
 	\includegraphics[width=\linewidth]{figures/simple_results.png}
-	\caption{Application to the simple model data. (a) Residuals between the  noise-corrupted data (Fig. \ref{fig:simple_model}a) and the predicted data (not shown) produced by the estimated model. The inset in (a) shows the histogram of the residuals and the Gaussian curve (dashed line) (dashed line) whose mean and standard deviation are, respectively, $\mu = 0.04$ nT and $\sigma=7.20$ nT. (b) Perspective view of the initial approximate (red prisms) and the true model (blue prisms). (c) and (d) Comparison between the estimated source (red prisms) and the true model (blue prisms) in perspective views.}
+	\caption{Application to the simple model data. (a) Residuals between the  noise-corrupted data (Fig. \ref{fig:simple_model}a) and the predicted data (not shown) produced by the estimated model (red prisms shown in the panels c and d). The inset in (a) shows the histogram of the residuals and the Gaussian curve (dashed line) whose mean and standard deviation are, respectively, $\mu = -0.04$ nT and $\sigma=7.21$ nT. (b) Perspective view of the initial approximation (red prisms) and the true model (blue prisms). (c) and (d) Comparison between the estimated source (red prisms) and the true model (blue prisms) in perspective views.}
 	\label{fig:simple_results}
 \end{figure}
 
@@ -47,7 +47,7 @@
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{figures/complex_model_data.png}
-    \caption{Complex model simulation. (a) Noise-corrupted total-field anomaly with a pseudorandom Gaussian distribution having mean $\mu_0 = 0$ nT and standard deviation $\sigma_0 = 5$ nT produced by the complex model, the black dots represent the observation points. The connected red dots are the vertices of the initial approximate horizontally projected at the data map. (b) Vertical coordinates of the observations  simulating an airborne survey. (c) and (d) Perspective views of the complex model represented by the blue prisms.
+    \caption{Complex model simulation. (a) Noise-corrupted total-field anomaly with a pseudorandom Gaussian distribution having mean $\mu_0 = 0$ nT and standard deviation $\sigma_0 = 5$ nT produced by the complex model (blue prisms shown in the panels c and d). The black dots represent the observation points. The connected red dots are the vertices of the initial approximation horizontally projected onto the data map. (b) Vertical coordinates of the observations simulating an airborne survey. (c) and (d) Perspective views of the complex model represented by the blue prisms.
 }
     \label{fig:complex_model}
 \end{figure}
@@ -56,18 +56,17 @@
 	\centering
 	\includegraphics[scale=.75]{figures/complex_gamma.png}
 	\caption{Application to the complex model data. 
-	Goal function $\Gamma(\mathbf{p})$ (eq. \ref{eq:gamma}), in nT,  
-	produced by estimated models with different depths-to-the-top ($ z_0 $) and 
+	Discrete mappng of the goal function $\Gamma(\mathbf{p})$ (eq. \ref{eq:gamma}) on the plane $ m_0 \times z_0 $ produced by estimated models with different depths-to-the-top ($ z_0 $) and 
 	total-magnetization intensities ($ m_0 $). 
 	The red triangle represents the $m_0$ and $z_0$ of the true source. 
-	The cyan diamond represents the estimated model that produces the lowest value for $\Gamma (\mathbf{p})$.}
+	The cyan diamond indicates the estimated pair ($ m_0, z_0 $) that produces the smallest value of $\Gamma (\mathbf{p})$.}
 	\label{fig:complex_map}
 \end{figure}
 
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{figures/complex_results.png}
-    \caption{Application to complex model data. (a) Residuals between the noise-corrupted data (Fig. \ref{fig:complex_model}a) and the predicted data (not shown) produced by the estimated model. The inset in (a) shows the histogram of the residuals and the Gaussian curve (dashed line) whose mean and standard deviation are, respectively, $\mu = 0.09$ nT and $\sigma=6.66$ nT. (b) Perspective view of the initial approximate (red prisms) and the true model (blue prisms). (c) and (d) Comparison between the estimated source (red prisms) and the true model (blue prisms) in perspective views. 
+    \caption{Application to complex model data. (a) Residuals between the noise-corrupted data (Fig. \ref{fig:complex_model}a) and the predicted data (not shown) produced by the estimated model (red prisms in the c and d panels). The inset in (a) shows the histogram of the residuals and the Gaussian curve (dashed line) whose mean and standard deviation are, respectively, $\mu = 0.07$ nT and $\sigma=6.75$ nT. (b) Perspective view of the initial approximate (red prisms) and the true model (blue prisms). (c) and (d) Comparison between the estimated source (red prisms) and the true model (blue prisms) in perspective views. 
 }
     \label{fig:complex_result}
 \end{figure}

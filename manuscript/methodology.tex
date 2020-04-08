@@ -350,7 +350,7 @@ for the parameter vector $ \mathbf{p} $ (eq. \ref{eq:p-vector}) at the beginning
 
 At each iteration $k$ of our algorithm, the correction $\boldsymbol{\Delta}\hat{\mathbf{p}}^{\dagger}_{(k)}$ is computed by solving the following linear system:
 \begin{equation}\label{eq:linear-system}
-\mathbf{D}_{(k)} \left[\mathbf{D}_{(k)} \mathbf{H}^{\dagger}(\hat{\mathbf{p}}_{(k)}) \mathbf{D}_{(k)} + \lambda_{(k)} \mathbf{I}\right] \mathbf{D}_{(k)} \boldsymbol{\Delta} \hat{\mathbf{p}}^{\dagger}_{(k)} = -\boldsymbol{\nabla}\Gamma(\hat{\mathbf{p}}_{(k)}) \: ,
+\mathbf{Q}_{(k)} \left[\mathbf{Q}_{(k)} \mathbf{H}^{\dagger}(\hat{\mathbf{p}}_{(k)}) \mathbf{Q}_{(k)} + \lambda_{(k)} \mathbf{I}\right] \mathbf{Q}_{(k)} \boldsymbol{\Delta} \hat{\mathbf{p}}^{\dagger}_{(k)} = -\boldsymbol{\nabla}\Gamma(\hat{\mathbf{p}}_{(k)}) \: ,
 \end{equation}
 where $\lambda_{(k)}$ is a positive scalar (known as Marquardt parameter) which is adjusted at each iteration and 
 is associated with the Levenberg-Marquardt method \cite[e.g., ][ p. 240]{silva-2001,aster-etal2019},
@@ -365,8 +365,8 @@ where $\mathbf{H}(\hat{\mathbf{p}}_{(k)})$ is the Hessian matrix of the goal fun
 t(\hat{p}_{l}) = \frac{(p_{l}^{max} - \hat{p}_{l})(\hat{p}_{l} - p_{l}^{min})}{p_{l}^{max} - p_{l}^{min}}, \quad l = 1, \dots, M \: ,
 \end{equation}
 with $p_{l}$ being the $l$th element of the estimated parameter vector $\hat{\mathbf{p}}_{(k)}$. In eq. \ref{eq:linear-system}, $\mathbf{D}_{(k)}$ is a diagonal matrix proposed by  \cite{marquardt_algorithm_1963} for scaling the parameter $\lambda_{(k)}$ at each iteration and improving the convergence of the algorithm. The element $ll$ of this diagonal matrix is given by
-\begin{equation}\label{eq:D-matrix}
-d_{ll} = \frac{1}{\sqrt{h^{\dagger}_{ll}}} \: ,
+\begin{equation}\label{eq:Q-matrix}
+q_{ll} = \frac{1}{\sqrt{h^{\dagger}_{ll}}} \: ,
 \end{equation}
 where $h^{\dagger}_{ll}$ is the element $ll$ of the matrix $\mathbf{H}^{\dagger}(\hat{\mathbf{p}}_{(k)})$ (eq. \ref{eq:H-dagger}). 
 
