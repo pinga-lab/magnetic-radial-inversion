@@ -2,18 +2,18 @@
 
 We have applied our method to interpret airborne magnetic data provided by 
 Geological Survey of Brazil (CPRM) over the Anit{\'a}polis complex, 
-in the Santa Catarina state, Brazil. 
-The survey was at an elevation of $100$ m above the terrain, 
-with N-S and E-W lines spaced by $500$ m and $10,000$ m from each other, respectively. 
+in southern Brazil. 
+The airborne survey was flown at a constant flight height of $100$ m, 
+with north-south and east-west lines spaced by $500$ m and $10,000$ m from each other, respectively. 
 The total-field anomaly data were corrected from daytime variation and 
-subtracted from the main magnetic field using the IGRF. 
-The inclination, declination and intensity of the main field at the study area, 
+subtracted from the main geomagnetic field using the IGRF. 
+The inclination, declination and intensity of the main geomanetic field at the study area, 
 for the period of the survey, are $-37.05^{\circ}$, $-18.17^{\circ}$ and 
 $\approx 22 \, 768 $ nT, respectively.
 To isolate the target total-field anomaly, we have applied 
 a regional separation using a second-order polynomial fit. We have also continued 
-the anomaly upward to a constant height $z=-2000$ m (Fig. \ref{fig:real_data}a) by 
-using the equivalent-layer technique \citep{dampney1969,emilia1973,oliveirajr-barbosa2013}. 
+the anomaly upward to a constant height $2000$ m (Fig. \ref{fig:real_data}a) by 
+using the equivalent-layer technique \citep{dampney1969,emilia1973,oliveira-2012}. 
 The upward-continued data were calculated on a regular grid of $50 \times 50$ points 
 equally spaced from $6916$ to $6926$ km along the $x$ axis and from 
 $683$ to $693$ km along the $y$ axis. 
@@ -22,7 +22,7 @@ and UTM horizontal coordinates of the data.
 
 The Anit{\'a}polis alkaline-carbonatitic complex forms a circular concentric body 
 ($\approx 6$ km$^{2}$ in area) containing magnetite as part of its mineralogical 
-composition. It intruded the Late Proterozoic leucogranites of the Dom Feliciano 
+composition. It intruded into the Late Proterozoic leucogranites of the Dom Feliciano 
 mobile belt in the Early Cretaceous ($132$ Ma), apparently concomitant with the 
 voluminous flood tholeiitic basalts of the Serra Geral Formation ($133$-$130$ Ma) 
 at the southern side of the Paran{\'a} Basin \citep{gibson-1999, scheibe-etal2005}.
@@ -45,10 +45,9 @@ show values varying from $\chi = 1.06 \times 10^{-3}$ SI to
 $\chi = 161.05 \times 10^{-3}$ SI \citep[][ tb. 1]{valdivia-2009}.
 Hence, we used these values and the main magnetic field intensity in the study area 
 ($\approx 22 \, 768 $ nT) as a priori information to constraint the 
-total-magnetization intensity $m_{0}$ values used to interpret the magnetic data 
-at the Anit{\'a}polis complex.
-The magnetic susceptibility ($ \chi $) and the corresponding total-magnetization 
-intensity $m_{0}$ ranges used in our application are shown in Fig. \ref{fig:real_map}.
+total-magnetization intensity $m_{0}$ used to interpret Anit{\'a}polis anomaly.
+Fig. \ref{fig:real_map} shows the ranges of the magnetic susceptibility ($ \chi $) in upper horizontal axis of the corresponding total-magnetization 
+intensity $m_{0}$ (in lower horizontal axis) used in our application.
 
 We used an interpretation model formed by $L = 8$ prisms, each one with 
 $V = 30$ ($k = 1, \dots , 10$) vertices defining their horizontal cross-sections.
@@ -58,23 +57,23 @@ models.
 For all models, we set an initial approximation $\hat{\mathbf{p}}_{(0)}$ with origin 
 at $(x_0^k, y_0^k) = (6921, 688)$ km, constant radii $r_j^k = 1500$ m for 
 all vertices forming all prisms and the same constant thickness $dz = 700$ m.
-We also used the same weights $\tilde{\alpha}_1 = 10^{-3}$, 
+We also set the same weights which were used in the synthetic tests, i.e., $\tilde{\alpha}_1 = 10^{-3}$, 
 $\tilde{\alpha}_2 = 10^{-4}$, 
 $\tilde{\alpha}_3 = 10^{-3}$, $\tilde{\alpha}_4 = 0$, $\tilde{\alpha}_5 = 0$, 
 $\tilde{\alpha}_6 = 10^{-6}$, and $\tilde{\alpha}_7 = 10^{-5}$ (eq. \ref{eq:alphas}). 
 
-Fig. \ref{fig:real_map} shows that, similarly to the results obtained with the 
+Fig. \ref{fig:real_map} shows that, similarly to the previous synthetic test with the 
 complex model (Fig. \ref{fig:complex_map}), there is an elongated region containing 
 candidate solutions producing small values for the goal function 
 $\Gamma(\mathbf{p})$ (eq. \ref{eq:gamma}), with different values of $m_0$ and $z_0$.
 The magenta diamond in Fig. \ref{fig:real_map} represents the estimated model 
 shown in Fig. \ref{fig:real_result2}. 
-This model produces the lowest value for $ \Gamma(\mathbf{p}) $ (\ref{eq:gamma}),
-it has a volume $ 48.37 $ km$ ^3 $, maximum depth of $ 5709.20 $ m 
+This model produces the smallest value for $ \Gamma(\mathbf{p}) $ (\ref{eq:gamma}),
+it has a volume $ 48.37 $ km$ ^3 $, total thickness of $ 5709.20 $ m 
 ($ dz = 713.65 $), depth-to-the-top $z_0 = -1150$ m and total-magnetization intensity 
 $m_0 = 3.0$ A/m. This value corresponds to a magnetic susceptibility 
 $\chi = 0.16$ SI.
-Fig. \ref{fig:real_map}a shows that this model produces a very good data fit.
+Fig. \ref{fig:real_result}a shows that this estimated model produces a reasonable data fit.
 This estimated depth-to-the-top $z_0$ indicates a non-outcropping source, 
 which is compatible with a priori information a the study area. 
 We do not have evidences of an outcropping source for this anomaly, 
@@ -86,11 +85,11 @@ available a priori information. It is close to the upper limit found by
 
 The cyan diamond in Fig. \ref{fig:real_map} represents the alternative model 
 show in Fig. \ref{fig:real_result}. This model is similar to that shown in 
-Fig. \ref{fig:real_result2}. It has a volume $ 52.89 $ km$ ^3 $, maximum depth 
+Fig. \ref{fig:real_result2}. It has a volume $ 52.89 $ km$ ^3 $, total thickness 
 $ 5434.35 $ m ($ dz = 679.29 $), depth-to-the-top $z_0 = -1200$ m and 
 total-magnetization intensity $m_0 = 2.5$ A/m, which corresponds to a magnetic 
 susceptibility $\chi = 0.13$ SI. 
-In comparison to the model shown in Fig. \ref{fig:real_result2}, the alternative model 
+In comparison with the estimated model shown in Fig. \ref{fig:real_result2}, the alternative model 
 shown in Fig. \ref{fig:real_result} has a shallower (but still non-outcropping) top
 and a smaller estimated magnetic susceptibility. As a consequence, the alternative 
 model has a greater volume in order to produce an equally good data fit 
@@ -102,6 +101,6 @@ This is the same direction associated with the Serra Geral Lineament,
 crossing the study area, the Ponta Grossa Arch and the Torres syncline,
 which are prominent structural features located, respectively, 
 northward and southward of the study area \citep[e.g., ][ p. 535]{scheibe-etal2005}.
-The estimated magnetic susceptibilities and depths-to-the-top are compatible with 
-the available a priori information and produce very good data fits.
+The magnetic susceptibilities and depths-to-the-top estimates are compatible with 
+the available a priori information and produce reasonable data fits.
 Hence, both models represent the possible geometry of the Anit{\'a}polis complex. 
