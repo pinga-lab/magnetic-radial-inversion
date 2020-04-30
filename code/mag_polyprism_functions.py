@@ -2224,15 +2224,15 @@ def plot_real_matrix(z0, intensity, matrix, vmin, vmax, sus, filename=''):
         bottom='off', left='off', right='off',labelsize=14)
     plt.ylabel('$z_0$ (m)', fontsize=14)
     plt.xlabel('$m_0$ (A/m)', fontsize=14)
-    plt.plot(7*w/(2*n), w/(2*m), 'cD', markersize=12)
-    plt.plot(9*w/(2*n), 3*w/(2*m), 'mD', markersize=12)
+    plt.plot(7*w/(2*n), w/(2*m), 'wD', markersize=12)
+    plt.plot(7*w/(2*n), 3*w/(2*m), 'mD', markersize=12)
+    #plt.plot(15*w/(2*n), 9*w/(2*m), 'gD', markersize=12)
     x_label_list = []
     y_label_list = []
     sus_label_list = []
-    for xl, yl, sl in zip(intensity,z0,sus):
-        x_label_list.append(str(xl))
+    for xl, yl in zip(intensity,z0):
+        x_label_list.append(str(xl)[:-2])
         y_label_list.append(str(yl)[:-2])
-        sus_label_list.append(str(sl)[:4])
     ax.set_xticks(np.linspace(w/(2.*n), w - w/(2.*n), n))
     ax.set_yticks(np.linspace(w/(2.*m), w - w/(2.*m), m))
     ax.set_xticklabels(x_label_list)
@@ -2240,18 +2240,8 @@ def plot_real_matrix(z0, intensity, matrix, vmin, vmax, sus, filename=''):
     ax.set_xticks(np.linspace(0, w, n+1), minor=True)
     ax.set_yticks(np.linspace(0, w, m+1), minor=True)
     clb = plt.colorbar(img, pad=0.01, aspect=30, shrink=0.865)
-    clb.ax.set_title('nT', pad=-295)
+    clb.ax.set_title('$\Gamma$', pad=-295)
     clb.ax.tick_params(labelsize=14)
-    # calculating the magnetic susceptibily
-    ax2 = fig.add_axes(ax.get_position(), frameon=False)
-    ax2.set_xlim(ax.get_xlim())
-    ax2.set_xticks(np.linspace(w/(2.*n), w - w/(2.*n), n))
-    ax2.set_xticklabels(sus_label_list)
-    ax2.tick_params(labelbottom='off',labeltop='on', labelleft="off", labelright='off',
-        bottom='off', left='off', right='off', labelsize=12)
-    ax2.set_title('$\chi$ (S.I.)', fontsize=14, pad=30)
-    plt.draw()
-    ax2.set_position(ax.get_position())
     ax.grid(which='minor', color='k', linewidth=2)
     if filename == '':
         pass
@@ -2468,7 +2458,7 @@ def plot_complex_matrix(z0, intensity, matrix, vmin, vmax, filename=''):
     plt.ylabel('$z_0$ (m)', fontsize=14)
     plt.xlabel('$m_0$ (A/m)', fontsize=12)
     plt.plot(1.5, 1.5, '^r', markersize=12)
-    plt.plot(1.75, 1.75, 'Dc', markersize=12, linewidth=2)
+    plt.plot(1.75, 1.75, 'Dw', markersize=12, linewidth=2)
     x_label_list = []
     y_label_list = []
     for xl, yl in zip(intensity,z0):
@@ -2739,13 +2729,14 @@ def plot_real_solution_4figures(xp, yp, zp, residuals, solution, initial, filena
     # horizontal projections of the estimated prisms
     for prism_i in solution:
         mpl.polygon(prism_i.topolygon(), linewidth=0, fill='k',
-                    alpha=0.05, xy2ne=True)
-    plt.xlim(683000, 693000)
+                    alpha=0.1, xy2ne=True)
+    plt.ylim(6916000, 6926000)
     plt.xlabel('$y$(m)', fontsize=12)
     plt.ylabel('$x$(m)', fontsize=12)
     clb = plt.colorbar(pad=0.01, aspect=20, shrink=1)
     clb.ax.set_title('nT', pad=-285)
     clb.ax.tick_params(labelsize=13)
+    mpl.m2km()
     # histogram in the inset
     inset = inset_axes(ax, width="40%", height="30%", loc=1, borderpad=0.7)
     mean = np.mean(residuals)
@@ -2754,7 +2745,7 @@ def plot_real_solution_4figures(xp, yp, zp, residuals, solution, initial, filena
     n, bins, patches = plt.hist(residuals,bins=nbins,
                                 normed=True, facecolor='blue')
     props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
-    inset.text(0.6, 0.95,
+    inset.text(0.55, 0.95,
                "$\mu$ = {:.2f}\n$\sigma$ = {:.2f}".format(mean,std),
                 transform=inset.transAxes, fontsize=8,
                 va='top', ha='left', bbox=props)
@@ -2769,14 +2760,16 @@ def plot_real_solution_4figures(xp, yp, zp, residuals, solution, initial, filena
     ax.add_collection3d(Poly3DCollection(verts_initial, alpha=0.3, 
      facecolor='r', linewidths=0.5, edgecolors='k'))
 
-    ax.set_ylim(np.min(x), np.max(x), 100)
-    ax.set_xlim(np.min(y), np.max(y), 100)
-    ax.set_zlim(5.5, -2, 100)
+    ax.set_ylim(6919, 6924, 100)
+    ax.set_xlim(686, 691, 100)
+    ax.set_zlim(6, 0, 100)
     ax.tick_params(labelsize= 10)
     ax.set_ylabel('x (km)', fontsize= 14)
     ax.set_xlabel('y (km)', fontsize= 14)
     ax.set_zlabel('z (km)', fontsize= 14)
-    ax.view_init(30, 45)
+    ax.set_xticks(np.arange(686, 692, 2))
+    ax.set_yticks(np.arange(6919, 6925, 2))
+    ax.view_init(25, -130)
     ax.text2D(-0.1, 0.07, '(b)', fontsize= 15)
 
     # inverse model view 1
@@ -2786,14 +2779,16 @@ def plot_real_solution_4figures(xp, yp, zp, residuals, solution, initial, filena
     ax.add_collection3d(Poly3DCollection(verts, alpha=0.3, 
      facecolor='r', linewidths=0.5, edgecolors='k'))
 
-    ax.set_ylim(np.min(x), np.max(x), 100)
-    ax.set_xlim(np.min(y), np.max(y), 100)
-    ax.set_zlim(5.5, -2, 100)
+    ax.set_ylim(6915, 6922, 100)
+    ax.set_xlim(686, 692, 100)
+    ax.set_zlim(5.5, 0, 100)
     ax.tick_params(labelsize= 10)
     ax.set_ylabel('x (km)', fontsize= 14)
     ax.set_xlabel('y (km)', fontsize= 14)
     ax.set_zlabel('z (km)', fontsize= 14)
-    ax.view_init(15, 45)
+    ax.set_xticks(np.arange(686, 693, 2))
+    ax.set_yticks(np.arange(6915, 6923, 2))
+    ax.view_init(30, 45)
     ax.text2D(-0.11, 0.07, '(c)', fontsize= 15)
 
     # inverse model view 2
@@ -2803,31 +2798,32 @@ def plot_real_solution_4figures(xp, yp, zp, residuals, solution, initial, filena
     ax.add_collection3d(Poly3DCollection(verts, alpha=0.3, 
      facecolor='r', linewidths=0.5, edgecolors='k'))
 
-    ax.set_ylim(np.min(x), np.max(x), 100)
-    ax.set_xlim(np.min(y), np.max(y), 100)
-    ax.set_zlim(5.5, -2, 100)
+    ax.set_ylim(6915, 6922, 100)
+    ax.set_xlim(686, 692, 100)
+    ax.set_zlim(5.5, 0, 100)
     ax.tick_params(labelsize= 10)
     ax.set_ylabel('x (km)', fontsize= 14)
     ax.set_xlabel('y (km)', fontsize= 14)
     ax.set_zlabel('z (km)', fontsize= 14)
-    ax.view_init(-3, -140)
+    ax.set_xticks(np.arange(686, 693, 2))
+    ax.set_yticks(np.arange(6915, 6923, 2))
+    ax.view_init(-15, 145)
     ax.text2D(-0.1, 0.07, '(d)', fontsize= 15)
 
     plt.tight_layout()
     plt.savefig(filename, dpi=300, bbox_inches='tight')
     return plt.show()
 
-def plot_obs_alt(x, y, xa, ya, obs, alt, initial, filename):
+def plot_obs_alt(x, y, obs, alt, topo, initial, filename):
     '''
     Returns a plot of upward continued total-field anomaly
     data and the elevation of the observations
     
     input
-    x, y: 1D array - Cartesian coordinates of the upward
-                    continued total-field anomaly data
-    xa, ya: 1D array - Cartesian coordinates of the observations
+    x, y: 1D array - Cartesian coordinates of the observations
     obs: 1D array - upward continued total-field anomaly data
     alt: 1D array - geometric heigt of the observations
+    topo: 1D array - geometric heigt of the topography
     initial: list - fatiando.mesher.PolygonalPrism
                     of the initial approximate
     filename: string - directory and filename of the figure
@@ -2836,11 +2832,11 @@ def plot_obs_alt(x, y, xa, ya, obs, alt, initial, filename):
     fig: figure - plot
     '''
 
-    plt.figure(figsize=(13,5))
+    plt.figure(figsize=(13,11))
 
-    ax=plt.subplot(1,2,1)
-    plt.tricontour(y, x, obs, 20, linewidths=0.5, colors='k')
-    plt.tricontourf(y, x, obs, 20, cmap='RdBu_r',
+    ax=plt.subplot(2,2,1)
+    plt.tricontour(y, x, obs, 30, linewidths=0.4, colors='k')
+    plt.tricontourf(y, x, obs, 30, cmap='RdBu_r',
                    vmin=-np.max(obs),
                    vmax=np.max(obs)).ax.tick_params(labelsize=12)
     estimate = mpl.polygon(initial, '.-r', xy2ne=True)
@@ -2852,16 +2848,28 @@ def plot_obs_alt(x, y, xa, ya, obs, alt, initial, filename):
     ax.text(681000, 6925000, '(a)', fontsize= 15)
     mpl.m2km()
 
-    ax=plt.subplot(1,2,2)
-    plt.tricontourf(ya, xa, alt, 10, cmap='viridis').ax.tick_params(labelsize=12)
-    plt.plot(ya, xa, 'ko', markersize=1.)
+    ax=plt.subplot(2,2,2)
+    plt.tricontourf(y, x, alt, 10, cmap='gray').ax.tick_params(labelsize=12)
+    plt.plot(y, x, 'ko', markersize=1.)
     plt.xlabel('$y$(km)', fontsize=14)
     plt.ylabel('$x$(km)', fontsize=14)
-    estimate = mpl.polygon(prism, '.-r', xy2ne=True)
+    estimate = mpl.polygon(initial, '.-r', xy2ne=True)
     clb = plt.colorbar(pad=0.01, aspect=40, shrink=1)
     clb.ax.set_title('m', pad=-285)
     clb.ax.tick_params(labelsize=13)
-    ax.text(681000, 6925000, '(b)', fontsize= 15)
+    ax.text(681500, 6925000, '(b)', fontsize= 15)
+    mpl.m2km()
+
+    ax=plt.subplot(2,2,3)
+    plt.tricontourf(y, x, topo, 10, cmap='terrain_r', vmax=500).ax.tick_params(labelsize=12)
+    plt.plot(y, x, 'ko', markersize=1.)
+    plt.xlabel('$y$(km)', fontsize=14)
+    plt.ylabel('$x$(km)', fontsize=14)
+    estimate = mpl.polygon(initial, '.-r', xy2ne=True)
+    clb = plt.colorbar(pad=0.01, aspect=40, shrink=1)
+    clb.ax.set_title('m', pad=-285)
+    clb.ax.tick_params(labelsize=13)
+    ax.text(681000, 6925000, '(c)', fontsize= 15)
     mpl.m2km()
 
     plt.savefig(filename, dpi=300, bbox_inches='tight')
