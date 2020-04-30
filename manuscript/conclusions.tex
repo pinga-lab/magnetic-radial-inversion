@@ -5,14 +5,17 @@ of an isolated 3-D geological body assuming the knowledge about its
 total-magnetization direction. We approximate the body by a set of vertically 
 stacked right prisms. The horizontal cross-section of each prism is a polygon 
 defined by a given number of equally spaced vertices from 0$^\circ$ to 360$^\circ$. 
-We run our inversion for a set of given depths to the top and total-magnetization 
-intensities. For each depth to the top and total-magnetization intensity,
-our method estimates the geometry of the cross-sections, the depth extent and 
-the horizontal position of the prisms approximating the 3-D geological body by 
-solving a constrained nonlinear inversion.
-The estimated bodies producing the lowest values of the goal function form the 
-set of candidate solutions. 
-To stabilize the inversions, we introduce a set of seven constraints on the source 
+We peformed our inversion for a set of given depths to the top and total-magnetization 
+intensities these results illustrate the inherent ambiguity of potential-field methods in 
+retrieving both the physical-property distribution and volume of the sources. 
+In this case, some a priori information must 
+be used to constraint the range of reliable solutions. For each depth to the top and total-magnetization intensity,
+our method estimates the geometry of the cross-sections (the radii associated with the polygon vertices), the thickness and 
+the horizontal position of the prisms. The estimated model approximates the 3-D geological body by 
+solving a constrained nonlinear magnetic inversion.
+The estimated bodies producing the samllest values of the goal function form the 
+set of candidate solutions that yields an acceptable data fitting satisfying stabilizing functions. 
+To obtain stable solutions, we introduce a set of seven constraints on the source 
 shape.
 Our method is an extension of previous works developed for retrieving the geometry 
 of 3-D bodies by inverting gravity and gravity-gradient data. 
@@ -29,13 +32,10 @@ Both tests with synthetic data show that our method is able to retrieve the
 source's shape and fit the data.
 
 We applied our method to interpret a total-field anomaly data over the 
-alkaline-carbonatitic complex of Anit{\'a}polis, Santa Catarina state, Brazil. 
+alkaline-carbonatitic complex of Anit{\'a}polis, in southern Brazil. 
 We obtained two candidate models having similar shapes, depths to the top and 
 total-magnetic intensities, all of them in close agreement with the available 
-a priori information. 
-The histogram of the residuals produced by both models show that they equally 
-fit the observed total-field anomaly.
-Both models suggest that the emplacement of the 
+a priori information. Both estimated models suggest that the emplacement of the 
 Anit{\'a}polis complex seems to be controlled by NW-SE-trending faults at depth.
 This is the same direction associated with the Serra Geral Lineament, 
 crossing the study area, and the prominent structural features 
