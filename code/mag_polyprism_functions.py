@@ -2131,7 +2131,7 @@ def misfit_matrix(n, m, results):
     results: list - inversion results from the pickle file
                     made by multiple inversion notebook
     output
-    gamma_matrix: 2D array - misfit function values  
+    phi_matrix: 2D array - misfit function values  
     '''
     misfit_matrix = np.zeros((n,m))
     for i in range(n):
@@ -2284,10 +2284,10 @@ def plot_simple_solution_4figures(xp, yp, zp, residuals, solution, initial, mode
     ax=plt.subplot(2,2,1)
     #plt.title('Residual', fontsize=20)
     plt.tricontourf(y, x, residuals, 20,
-                    cmap='RdBu_r', vmin=np.min(residuals),
-                    vmax=np.min(residuals)*(-1)).ax.tick_params(labelsize=12)
-    plt.xlabel('$y$(m)', fontsize=14)
-    plt.ylabel('$x$(m)', fontsize=14)
+                    cmap='RdBu_r', vmin=-np.max(residuals),
+                    vmax=np.max(residuals)).ax.tick_params(labelsize=12)
+    plt.xlabel('$y$(km)', fontsize=14)
+    plt.ylabel('$x$(km)', fontsize=14)
     clb = plt.colorbar(pad=0.01, aspect=20, shrink=1)
     clb.ax.set_title('nT', pad=-285)
     clb.ax.tick_params(labelsize=13)
@@ -2396,14 +2396,14 @@ def plot_simple_model_data(x, y, obs, initial, model, filename):
     plt.tricontourf(y, x, obs, 20,
                     cmap='RdBu_r', vmin=np.min(obs),
                     vmax=-np.min(obs)).ax.tick_params(labelsize=12)
+    plt.plot(y, x, 'ko', markersize=.25)
     estimate = mpl.polygon(initial, '.-r', xy2ne=True)
-    plt.xlabel('$y$(m)', fontsize=14)
-    plt.ylabel('$x$(m)', fontsize=14)
+    plt.xlabel('$y$(km)', fontsize=14)
+    plt.ylabel('$x$(km)', fontsize=14)
     clb = plt.colorbar(pad=0.01, aspect=20, shrink=1)
-    clb.ax.set_title('nT', pad=-315)
+    clb.ax.set_title('nT', pad=-305)
     mpl.m2km()
     clb.ax.tick_params(labelsize=13)
-    plt.plot(y, x, 'ko', markersize=.5, label='Gaussian')
     plt.text(-6700, 3800, '(a)', fontsize= 15)
 
     verts_true = plot_prisms(model, scale=0.001)
@@ -2502,19 +2502,23 @@ def plot_complex_model_data(x, y, obs, alt, initial, model, filename):
     fig: figure - plot
     '''
 
+    for i in range(len(model)):
+        model[i].z1 += 430.
+        model[i].z2 += 430.
+
     verts_true = plot_prisms(model, scale=0.001)
 
     plt.figure(figsize=(10,9))
 
     # sinthetic data
     ax=plt.subplot(2,2,1)
-    plt.tricontour(y, x, obs, 20,
-                    cmap='RdBu_r', linewidths=1)
+    plt.tricontour(y, x, obs, 20, linewidths=0.5, colors='k')
     plt.tricontourf(y, x, obs, 20,
                     cmap='RdBu_r', vmin=np.min(obs),
                     vmax=-np.min(obs)).ax.tick_params(labelsize=10)
-    plt.xlabel('$y$(m)', fontsize=14)
-    plt.ylabel('$x$(m)', fontsize=14)
+    plt.plot(y, x, 'ko', markersize=.25)
+    plt.xlabel('$y$(km)', fontsize=14)
+    plt.ylabel('$x$(km)', fontsize=14)
     clb = plt.colorbar(pad=0.01, aspect=20, shrink=1)
     clb.ax.set_title('nT', pad=-315)
     yplot = []
@@ -2522,20 +2526,20 @@ def plot_complex_model_data(x, y, obs, alt, initial, model, filename):
     estimate = mpl.polygon(initial, '.-r', xy2ne=True)
     mpl.m2km()
     clb.ax.tick_params(labelsize=13)
-    plt.plot(y, x, 'k.', markersize=.25, label='Gaussian')
+    plt.plot(y, x, 'k.', markersize=.25)
     plt.text(-5500, 3800, '(a)', fontsize= 15)
 
     # plot elevation
     ax=plt.subplot(2,2,2)
     plt.tricontourf(y, x, alt, 20,
-                    cmap='inferno').ax.tick_params(labelsize=10)
-    plt.xlabel('$y$(m)', fontsize=14)
-    plt.ylabel('$x$(m)', fontsize=14)
+                    cmap='gray').ax.tick_params(labelsize=10)
+    plt.xlabel('$y$(km)', fontsize=14)
+    plt.ylabel('$x$(km)', fontsize=14)
     clb = plt.colorbar(pad=0.01, aspect=20, shrink=1)
     clb.ax.set_title('m', pad=-315)
     mpl.m2km()
     clb.ax.tick_params(labelsize=13)
-    plt.plot(y, x, 'ko', markersize=.25, label='Gaussian')
+    plt.plot(y, x, 'ko', markersize=.25)
     plt.text(-5500, 3800, '(b)', fontsize= 15)
 
     # true model
@@ -2601,6 +2605,16 @@ def plot_complex_solution_4figures(xp, yp, zp, residuals, solution, initial, mod
 
     plt.figure(figsize=(10,9))
 
+    for i in range(len(solution)):
+        solution[i].z1 += 430.
+        solution[i].z2 += 430.
+        initial[i].z1 += 430.
+        initial[i].z2 += 430.
+
+    for i in range(len(model)):
+        model[i].z1 += 430.
+        model[i].z2 += 430.
+
     verts = plot_prisms(solution, scale=0.001)
     verts_true = plot_prisms(model, scale=0.001)
     verts_initial = plot_prisms(initial, scale=0.001)
@@ -2609,8 +2623,8 @@ def plot_complex_solution_4figures(xp, yp, zp, residuals, solution, initial, mod
     ax=plt.subplot(2,2,1)
     #plt.title('Residual', fontsize=20)
     plt.tricontourf(y, x, residuals, 20,
-                    cmap='RdBu_r', vmin=np.min(residuals),
-                    vmax=np.min(residuals)*(-1)).ax.tick_params(labelsize=12)
+                    cmap='RdBu_r', vmin=-np.max(residuals),
+                    vmax=np.max(residuals)).ax.tick_params(labelsize=12)
     plt.xlabel('$y$(m)', fontsize=14)
     plt.ylabel('$x$(m)', fontsize=14)
     clb = plt.colorbar(pad=0.01, aspect=20, shrink=1)
@@ -2724,15 +2738,15 @@ def plot_real_solution_4figures(xp, yp, zp, residuals, solution, initial, filena
     # residual data and histogram
     ax=plt.subplot(2,2,1)
     plt.tricontourf(yp, xp, residuals, 20,
-                    cmap='RdBu_r', vmin=-50.,
-                    vmax=50.).ax.tick_params(labelsize=12)
+                    cmap='RdBu_r', vmin=-np.max(residuals),
+                    vmax=np.max(residuals)).ax.tick_params(labelsize=12)
     # horizontal projections of the estimated prisms
     for prism_i in solution:
         mpl.polygon(prism_i.topolygon(), linewidth=0, fill='k',
                     alpha=0.1, xy2ne=True)
     plt.ylim(6916000, 6926000)
-    plt.xlabel('$y$(m)', fontsize=12)
-    plt.ylabel('$x$(m)', fontsize=12)
+    plt.xlabel('$y$(km)', fontsize=12)
+    plt.ylabel('$x$(km)', fontsize=12)
     clb = plt.colorbar(pad=0.01, aspect=20, shrink=1)
     clb.ax.set_title('nT', pad=-285)
     clb.ax.tick_params(labelsize=13)
@@ -2839,6 +2853,7 @@ def plot_obs_alt(x, y, obs, alt, topo, initial, filename):
     plt.tricontourf(y, x, obs, 30, cmap='RdBu_r',
                    vmin=-np.max(obs),
                    vmax=np.max(obs)).ax.tick_params(labelsize=12)
+    plt.plot(y, x, 'ko', markersize=.25)
     estimate = mpl.polygon(initial, '.-r', xy2ne=True)
     plt.xlabel('$y$(km)', fontsize=14)
     plt.ylabel('$x$(km)', fontsize=14)
@@ -2850,7 +2865,7 @@ def plot_obs_alt(x, y, obs, alt, topo, initial, filename):
 
     ax=plt.subplot(2,2,2)
     plt.tricontourf(y, x, alt, 10, cmap='gray').ax.tick_params(labelsize=12)
-    plt.plot(y, x, 'ko', markersize=1.)
+    plt.plot(y, x, 'ko', markersize=.25)
     plt.xlabel('$y$(km)', fontsize=14)
     plt.ylabel('$x$(km)', fontsize=14)
     estimate = mpl.polygon(initial, '.-r', xy2ne=True)
@@ -2862,7 +2877,7 @@ def plot_obs_alt(x, y, obs, alt, topo, initial, filename):
 
     ax=plt.subplot(2,2,3)
     plt.tricontourf(y, x, topo, 10, cmap='terrain_r', vmax=500).ax.tick_params(labelsize=12)
-    plt.plot(y, x, 'ko', markersize=1.)
+    plt.plot(y, x, 'ko', markersize=.25)
     plt.xlabel('$y$(km)', fontsize=14)
     plt.ylabel('$x$(km)', fontsize=14)
     estimate = mpl.polygon(initial, '.-r', xy2ne=True)
