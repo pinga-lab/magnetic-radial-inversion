@@ -2182,7 +2182,7 @@ def plot_simple_matrix(z0, intensity, matrix, vmin, vmax, filename=''):
     ax.set_xticks(np.linspace(0, w, n+1), minor=True)
     ax.set_yticks(np.linspace(0, w, m+1), minor=True)
     clb = plt.colorbar(img, pad=0.01, aspect=30, shrink=0.865)
-    clb.ax.set_title('nT', pad=-295)
+    clb.ax.set_title('nT$^2$', pad=-297)
     clb.ax.tick_params(labelsize=14)
     ax.grid(which='minor', color='k', linewidth=2)
     if filename == '':
@@ -2224,14 +2224,9 @@ def plot_real_matrix(z0, intensity, matrix, vmin, vmax, sus, filename=''):
         bottom='off', left='off', right='off',labelsize=14)
     plt.ylabel('$z_0$ (m)', fontsize=14)
     plt.xlabel('$m_0$ (A/m)', fontsize=14)
-<<<<<<< HEAD
-    plt.plot(7*w/(2*n), w/(2*m), 'cD', markersize=12)
-    plt.plot(11*w/(2*n), 1*w/(2*m), 'mD', markersize=12)
-=======
     plt.plot(7*w/(2*n), w/(2*m), 'wD', markersize=12)
     plt.plot(7*w/(2*n), 3*w/(2*m), 'mD', markersize=12)
     #plt.plot(15*w/(2*n), 9*w/(2*m), 'gD', markersize=12)
->>>>>>> 39c02114de0a0ba2a1a191655d8fe6f7ddd00797
     x_label_list = []
     y_label_list = []
     sus_label_list = []
@@ -2245,7 +2240,7 @@ def plot_real_matrix(z0, intensity, matrix, vmin, vmax, sus, filename=''):
     ax.set_xticks(np.linspace(0, w, n+1), minor=True)
     ax.set_yticks(np.linspace(0, w, m+1), minor=True)
     clb = plt.colorbar(img, pad=0.01, aspect=30, shrink=0.865)
-    clb.ax.set_title('$\Gamma$', pad=-295)
+    clb.ax.set_title('nT$^2$', pad=-297)
     clb.ax.tick_params(labelsize=14)
     ax.grid(which='minor', color='k', linewidth=2)
     if filename == '':
@@ -2478,7 +2473,7 @@ def plot_complex_matrix(z0, intensity, matrix, vmin, vmax, filename=''):
     ax.set_yticks(np.linspace(0, w, m+1), minor=True);
     ax.grid(which='minor', color='k', linewidth=2)
     clb = plt.colorbar(img, pad=0.01, aspect=20, shrink=1)
-    clb.ax.set_title('nT', pad=-285)
+    clb.ax.set_title('nT$^2$', pad=-287)
     clb.ax.tick_params(labelsize=13)
     if filename == '':
         pass
@@ -2525,7 +2520,7 @@ def plot_complex_model_data(x, y, obs, alt, initial, model, filename):
     plt.xlabel('$y$(km)', fontsize=14)
     plt.ylabel('$x$(km)', fontsize=14)
     clb = plt.colorbar(pad=0.01, aspect=20, shrink=1)
-    clb.ax.set_title('nT', pad=-315)
+    clb.ax.set_title('nT', pad=-285)
     yplot = []
     xplot = []
     estimate = mpl.polygon(initial, '.-r', xy2ne=True)
@@ -2541,7 +2536,7 @@ def plot_complex_model_data(x, y, obs, alt, initial, model, filename):
     plt.xlabel('$y$(km)', fontsize=14)
     plt.ylabel('$x$(km)', fontsize=14)
     clb = plt.colorbar(pad=0.01, aspect=20, shrink=1)
-    clb.ax.set_title('m', pad=-315)
+    clb.ax.set_title('m', pad=-285)
     mpl.m2km()
     clb.ax.tick_params(labelsize=13)
     plt.plot(y, x, 'ko', markersize=.25)
@@ -2630,8 +2625,8 @@ def plot_complex_solution_4figures(xp, yp, zp, residuals, solution, initial, mod
     plt.tricontourf(y, x, residuals, 20,
                     cmap='RdBu_r', vmin=-np.max(residuals),
                     vmax=np.max(residuals)).ax.tick_params(labelsize=12)
-    plt.xlabel('$y$(m)', fontsize=14)
-    plt.ylabel('$x$(m)', fontsize=14)
+    plt.xlabel('$y$(km)', fontsize=14)
+    plt.ylabel('$x$(km)', fontsize=14)
     clb = plt.colorbar(pad=0.01, aspect=20, shrink=1)
     clb.ax.set_title('nT', pad=-285)
     clb.ax.tick_params(labelsize=13)
