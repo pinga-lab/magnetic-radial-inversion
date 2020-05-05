@@ -1670,7 +1670,8 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
     m0: 1D array - initial parameters vector
     M: integer - number of vertices
     L: int - number of prisms
-    delta: 1D vector - (deltax, deltay, deltar, deltaz) increments for x, y, r and z coordinate in meters
+    delta: 1D vector - (deltax, deltay, deltar, deltaz) increments
+            for x, y, r and z coordinate in meters
     maxit: int - number of iterations
     maxsteps: int - number of steps
     lamb: float - Marquadt's parameter
@@ -1754,6 +1755,163 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
 
         # gradient vector
         grad = -2.*np.dot(G.T, res0)/N
+
+        grad = gradient_phi_1(M, L, grad, alpha[0])
+        grad = gradient_phi_2(M, L, grad, alpha[1])
+        grad = gradient_phi_3(M, L, grad, m_out, alpha[2])
+        grad = gradient_phi_4(M, L, grad, m_out[-2:], alpha[3])
+        grad = gradient_phi_5(M, L, grad, alpha[4])
+        grad = gradient_phi_6(M, L, grad, alpha[5])
+        grad = gradient_phi_7(M, L, grad, alpha[6])
+
+        # positivity constraint
+        H *= ((mmax - m0 + 1e-10)*(m0 - mmin + 1e-10))/(mmax - mmin)
+
+        # Hessian normalization
+        D = 1./np.sqrt(np.diag(H))
+
+        for it_marq in range(maxsteps):
+
+            delta_mt = D*(np.linalg.solve((D*(H.T*D).T) + lamb*np.identity(mt.size), -D*grad)).T
+            #delta_mt = np.linalg.solve(H + lamb*np.identity(mt.size), -grad).T
+            m_est = inv_log_barrier(mt + delta_mt, M, L, mmax, mmin)
+            model_est = param2polyprism(m_est, M, L, z0, props)
+            d_fit = polyprism.tf(xp, yp, zp, model_est, inc, dec)
+            res = dobs - d_fit
+            phi = np.sum(res*res)/N
+            phi += phi_1(M, L, m_est, alpha[0]) + \
+                    phi_2(M, L, m_est, alpha[1]) + \
+                    phi_3(M, L, m_est, m_out, alpha[2]) + \
+                    phi_4(M, L, m_est, m_out[-2:], alpha[3]) + \
+                    phi_5(M, L, m_est, alpha[4]) + \
+                    phi_6(M, L, m_est, alpha[5]) + \
+                    phi_7(M, L, m_est, alpha[6])
+
+            dphi = phi - phi0
+
+            print 'it: %2d   it_marq: %2d   lambda: %.e   init obj.: %.5e  fin obj.: %.5e' % (it, it_marq, lamb, phi0, phi)
+
+            if (dphi > 0.):
+                lamb *= dlamb
+                if it_marq == maxsteps - 1:
+                    phi = phi0
+            else:
+                if lamb/dlamb < 1e-15:
+                    lamb = 1e-15
+                else:
+                    lamb /= dlamb
+                break
+
+        phi_list.append(phi)
+        model_list.append(model_est)
+        res_list.append(res)
+        if (abs(dphi/phi0) < tol):
+            break
+        else:
+            d0 = d_fit.copy()
+            m0 = m_est.copy()
+            model0 = model_est
+            res0 = res.copy()
+            phi0 = phi
+
+    return d_fit, m_est, model_est, phi_list, model_list, res_list
+
+def l1_levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, mmin, mmax, m_out, dobs, inc, dec, props, alpha, z0, dz):
+    '''
+    This function minimizes the goal function of a set of polygonal prism
+    for total-field-anomaly using the Levenberg-Marqudt algorithm.
+
+    input
+
+    xp, yp, zp: 1D array - observation points
+    m0: 1D array - initial parameters vector
+    M: integer - number of vertices
+    L: int - number of prisms
+    delta: 1D vector - (deltax, deltay, deltar, deltaz) increments
+            for x, y, r and z coordinate in meters
+    maxit: int - number of iterations
+    maxsteps: int - number of steps
+    lamb: float - Marquadt's parameter
+    dlamb: float - variation of Marquadt's parameter
+    tol: float - convergence criterion
+    mmin: array - minimum values for each parameters (rmin, x0min, y0min)
+    mmax: array - maximum values for each parameters (rmax, x0max, y0max)
+    m_out: array - parameters from the outcropping body (M+2)
+    dobs: array - observed data
+    inc, dec: float - inclination and declination of the local-geomagnetic field
+    props: dictionary - direction of magnetization
+    alpha: 1D vector - (a1, a2, a3, a4 , a5, a6, a7) regularization parameters
+    z0: float - the top of the source
+    dz: float - thickness of the prisms
+    output
+
+    d_fit: array - fitted data
+    m_est: array - estimated parameters
+    model_est: list - objects of fatiando.mesher.polyprisms
+    phi_list: list - solutions of objective funtion
+    model_list: list - estimated models at each iteration
+    res_list: list - calculated residual at each iteration
+    '''
+    P = L*(M + 2) + 1
+    assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
+    assert xp.shape == yp.shape == zp.shape, 'xp, yp and zp must have the same shape'
+    assert m0.size == P, 'The size of m0 must be equal to P'
+    assert m0.shape == (P,), 'The shape of m0 must be equal to (P,)'
+    assert np.alltrue > (alpha.all >= 0.), 'The regularization parameters must be positive or zero'
+    assert dz > 0., 'dz must be a positive number'
+    assert lamb > 0., 'lamb must be a positive number'
+    assert dlamb > 0., 'dlamb must be a positive number'
+    assert tol > 0., 'tol must be a positive number'
+
+    model0 = param2polyprism(m0, M, L, z0, props) # list of classes of prisms
+    d0 = polyprism.tf(xp, yp, zp, model0, inc, dec) # predict data
+    res0 = dobs - d0
+    N = xp.size
+    phi0 = np.sum(res0*res0)/N
+    phi_list = [phi0]
+    model_list = [model0]
+    res_list = [res0]
+    G0 = Jacobian_tf(xp, yp, zp, model0, M, L, delta[0], delta[1], delta[2], delta[3], inc, dec)
+
+    # Scale factor of misfit function
+    th = np.trace(2.*np.dot(G0.T, G0)/N)
+
+    # Scale factors of the constraint functions
+    th_constraints = []
+    d0, d1, dM = diags_phi_1(M, L)
+    th_constraints.append(np.sum(d0)) # phi1
+    d0, d1 = diags_phi_2(M, L)
+    th_constraints.append(np.sum(d0)) # phi2
+    th_constraints.append(2.*(M+2)) # phi3
+    th_constraints.append(2.*2) # phi4
+    d0, d1 = diags_phi_5(M, L)
+    th_constraints.append(np.sum(d0)) # phi5
+    d0 = diags_phi_6(M, L)
+    th_constraints.append(np.sum(d0)) # phi6
+    th_constraints.append(2.) # phi7
+
+    alpha *= th/th_constraints
+
+    for it in range(maxit):
+        mt = log_barrier(m0, M, L, mmax, mmin)
+
+        # Jacobian matrix
+        G = Jacobian_tf(xp, yp, zp, model0, M, L, delta[0], delta[1], delta[2], delta[3], inc, dec)
+
+        # Hessian matrix
+        H = 2.*np.dot(G.T*1./np.absolute(res0), G)/N
+
+        # weighting the regularization parameters
+        H = Hessian_phi_1(M, L, H, alpha[0])
+        H = Hessian_phi_2(M, L, H, alpha[1])
+        H = Hessian_phi_3(M, L, H, alpha[2])
+        H = Hessian_phi_4(M, L, H, alpha[3])
+        H = Hessian_phi_5(M, L, H, alpha[4])
+        H = Hessian_phi_6(M, L, H, alpha[5])
+        H = Hessian_phi_7(M, L, H, alpha[6])
+
+        # gradient vector
+        grad = -2.*np.dot(G.T*1./np.absolute(res0), res0)/N
 
         grad = gradient_phi_1(M, L, grad, alpha[0])
         grad = gradient_phi_2(M, L, grad, alpha[1])
@@ -2224,14 +2382,9 @@ def plot_real_matrix(z0, intensity, matrix, vmin, vmax, sus, filename=''):
         bottom='off', left='off', right='off',labelsize=14)
     plt.ylabel('$z_0$ (m)', fontsize=14)
     plt.xlabel('$m_0$ (A/m)', fontsize=14)
-<<<<<<< HEAD
-    plt.plot(7*w/(2*n), w/(2*m), 'cD', markersize=12)
-    plt.plot(11*w/(2*n), 1*w/(2*m), 'mD', markersize=12)
-=======
     plt.plot(7*w/(2*n), w/(2*m), 'wD', markersize=12)
     plt.plot(7*w/(2*n), 3*w/(2*m), 'mD', markersize=12)
     #plt.plot(15*w/(2*n), 9*w/(2*m), 'gD', markersize=12)
->>>>>>> 39c02114de0a0ba2a1a191655d8fe6f7ddd00797
     x_label_list = []
     y_label_list = []
     sus_label_list = []
