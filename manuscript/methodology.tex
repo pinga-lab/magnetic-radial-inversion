@@ -21,7 +21,13 @@ is the total-field anomaly produced by the ensemble of $L$ prisms at the $i$th o
 
 \subsection{Inverse problem formulation}
 
-The total-magnetization of the source $m_{0}$ and depth to the top of the shallowest prism $z_{0}$ are hyperparameters of the inversion, i. e., they are not estimated during the inversion, but their value influences the final solution. Given a set of tentative values for  $m_{0}$ and $z_{0}$, we solve a constrained non-linear problem to estimate the parameter vector $\mathbf{p}$ (eq. \ref{eq:p-vector}) by minimizing the goal function
+%The total-magnetization of the source $m_{0}$ and depth to the top of the shallowest 
+%prism $z_{0}$ are hyperparameters of the inversion, i. e., they are not estimated during 
+%the inversion, but their value influences the final solution. 
+Given a set of tentative values for the total-magnetization intensity $m_{0}$ and 
+depth to the top of the shallowest prism $z_{0}$, we solve a constrained non-linear 
+problem to estimate the parameter vector $\mathbf{p}$ (eq. \ref{eq:p-vector}) 
+by minimizing the goal function
 \begin{equation}
 \Gamma (\mathbf{p}) = \phi (\mathbf{p}) + \sum\limits^{7}_{\ell =1} \alpha_{\ell} \, \varphi_{\ell}(\mathbf{p}) \: ,
 \label{eq:gamma}
@@ -35,9 +41,24 @@ where $\phi (\mathbf{p})$ is the data-misfit function given by
 \begin{equation}\label{eq:misfit}
 \phi (\mathbf{p}) = \frac{1}{N} \| \mathbf{d}^{o} - \mathbf{d}(\mathbf{p}) \|_{2}^{2} \: ,
 \end{equation}
-which represents the normalized squared Euclidean norm of the difference between the observed data vector $\mathbf{d}^{o}$ and the predicted data vector $\mathbf{d}(\mathbf{p})$, $\alpha_{\ell}$ is a positive number representing the weight of the $\ell$th constraint function $\varphi_{\ell}(\mathbf{p})$ and $p_{l}^{min}$ and $p_{l}^{max}$ are, respectively, the lower and upper limits for the $l$th element $p_{l}$ of the parameter vector $\mathbf{p}$ (eq. \ref{eq:p-vector}). These limits are defined by the interpreter based on both the horizontal extent of the magnetic anomaly and the knowledge about the source.
+which represents the normalized squared Euclidean norm of the difference between the 
+observed $\mathbf{d}^{o}$ and predicted $\mathbf{d}(\mathbf{p})$ data vector,
+$\alpha_{\ell}$ is a positive number representing the weight of the $\ell$th constraint 
+function $\varphi_{\ell}(\mathbf{p})$ and $p_{l}^{min}$ and $p_{l}^{max}$ are, 
+respectively, the lower and upper limits for the $l$th element $p_{l}$ of the parameter 
+vector $\mathbf{p}$ (eq. \ref{eq:p-vector}). These limits are defined by the interpreter 
+based on both the horizontal extent of the magnetic anomaly and the knowledge about the 
+source.
+On the discrete mapping of the goal function $\Gamma (\mathbf{p})$ 
+(eq. \ref{eq:gamma}) obtained by using each previously defined pair $(m_{0}, z_{0})$, 
+we select the optimum values of $m_{0}$ and $z_{0}$ 
+as those producing the smallest value of the goal function $\Gamma (\mathbf{p})$.
 
-To solve our nonlinear inverse problem, we use a gradient-based method and, consequently, we need to define the gradient vector $\boldsymbol{\nabla}\Gamma(\mathbf{p})$ and Hessian matrix $\mathbf{H}(\mathbf{p})$ of the goal function $\Gamma(\mathbf{p})$ (eq. \ref{eq:gamma}):
+To solve our nonlinear inverse problem for each pair of total-magnetization 
+intensity $m_{0}$ and depth to the top of the shallowest prism $z_{0}$, 
+we use a gradient-based method and, consequently, we need to define the gradient vector 
+$\boldsymbol{\nabla}\Gamma(\mathbf{p})$ and Hessian matrix $\mathbf{H}(\mathbf{p})$ of 
+the goal function $\Gamma(\mathbf{p})$ (eq. \ref{eq:gamma}):
 \begin{equation}\label{eq:gamma_gradient}
 \boldsymbol{\nabla}\Gamma (\mathbf{p}) = \boldsymbol{\nabla}\phi (\mathbf{p}) + 
 \sum\limits^{7}_{\ell =1} \alpha_{\ell} \, \boldsymbol{\nabla}\varphi_{\ell}(\mathbf{p})
@@ -46,20 +67,24 @@ and
 \begin{equation}\label{eq:gamma_hessian}
 \mathbf{H} (\mathbf{p}) = \mathbf{H}_\phi (\mathbf{p}) + \sum\limits^{7}_{\ell =1} \alpha_{\ell} \, \mathbf{H}_\ell \: ,
 \end{equation}
-where 
+where the gradient vector and the Hessian matrix of the misfit function 
+$\phi(\mathbf{p})$ (eq. \ref{eq:gamma}) are respectively given by:
 \begin{equation}\label{eq:phi_gradient}
 \boldsymbol{\nabla} \phi(\mathbf{p}) =  - \frac{2}{N}\mathbf{G}(\mathbf{p})^{\mathsf{T}}[\mathbf{d}^o - \mathbf{d}(\mathbf{p})]
 \end{equation} 
 and 
 \begin{equation}\label{eq:phi_hessian}
-\mathbf{H}_{\phi}(\mathbf{p}) = \frac{2}{N}\mathbf{G}(\mathbf{p})^{\mathsf{T}}\mathbf{G}(\mathbf{p})
+\mathbf{H}_{\phi}(\mathbf{p}) = \frac{2}{N}\mathbf{G}(\mathbf{p})^{\mathsf{T}}\mathbf{G}(\mathbf{p}) \: .
 \end{equation}
-are the gradient vector of the Hessian matrix of the misfit function $\phi(\mathbf{p})$ (eq. 5), respectively, the terms  $\boldsymbol{\nabla} \varphi_{\ell}(\mathbf{p})$ and $\mathbf{H}_{\ell}$, $\ell = 1, \dots, 7$, are the gradient vectors and Hessian matrices of the constraint functions, respectively, and $\mathbf{G}(\mathbf{p})$ is an $N \times M$ matrix whose element $ij$ is the derivative of the predicted data $d_{i}(\mathbf{p})$ (eq. \ref{eq:predicted-data-i}) with respect to the $j$ element $p_{j}$ of 
+In eqs. \ref{eq:gamma_gradient} and \ref{eq:gamma_hessian}, the terms 
+$\boldsymbol{\nabla} \varphi_{\ell}(\mathbf{p})$ and $\mathbf{H}_{\ell}$, 
+$\ell = 1, \dots, 7$, are the gradient vectors and Hessian matrices of the constraint functions, respectively. In eqs. \ref{eq:phi_gradient} and \ref{eq:phi_hessian},
+$\mathbf{G}(\mathbf{p})$ is an $N \times M$ matrix whose element $ij$ is the derivative of the predicted data $d_{i}(\mathbf{p})$ (eq. \ref{eq:predicted-data-i}) with respect to the $j$ element $p_{j}$ of 
 the parameter vector $\mathbf{p}$ (eq. \ref{eq:p-vector}). Details about the constraint functions $\varphi_\ell(\mathbf{p})$, $\ell = 1, \dots, 7$, as well as the numerical procedure to solve this nonlinear inverse problem are given in the following sections.
 
 \subsection{Constraint functions}\label{sec:constraints}
 
-We have divided the constraint functions $\varphi_{\ell}(\mathbf{p})$ (eq. \ref{eq:gamma}), $\ell = 1, \dots, 7$, used here to obtain stable solutions and introduce prior information about the magnetic source into the following three groups.
+To explain the constraint functions $\varphi_{\ell}(\mathbf{p})$ (eq. \ref{eq:gamma}), $\ell = 1, \dots, 7$, used here to obtain stable solutions and introduce prior information about the magnetic source, we have organized  then into the following three groups.
 
 \subsubsection{Smoothness constraints}
 
@@ -196,7 +221,8 @@ and
 \end{bmatrix}_{(V+2)\times M},
 \label{eq:R4-matrix}
 \end{equation}
-where $\mathbf{I}_{V+2}$ is the identity matrix of order $V+2$ and $\mathbf{0}_{(V+2) \times (M-V-2)}$ is a matrix 
+where $\mathbf{I}_{V+2}$ is the identity matrix of order $V+2$ and 
+$\mathbf{0}_{(V+2) \times (M-V-2)}$ is a $(V+2) \times (M-V-2)$ matrix 
 with null elements. The gradient and Hessian of function $\varphi_{4}(\mathbf{p})$ (eq. \ref{eq:phi4}) are given by:
 \begin{equation}\label{eq:phi4_grad}
 \boldsymbol{\nabla}\varphi_{4}(\mathbf{p}) = 2 \mathbf{R}_{4}^{\mathsf{T}} 
@@ -231,8 +257,9 @@ and
 \end{bmatrix}_{2 \times M},
 \label{eq:R5-matrix}
 \end{equation}
-where $\mathbf{I}_{2}$ is the identity matrix of order $2$ and $\mathbf{0}_{2 \times (M-V-2)}$ and 
-$\mathbf{0}_{2 \times V}$ are matrices with null elements. The gradient and Hessian of function $\varphi_{5}(\mathbf{p})$ (eq. \ref{eq:phi5}) are given by:
+where $\mathbf{0}_{2 \times (M-V-2)}$ is a $2 \times (M-V-2)$ matrix 
+with null elements. 
+The gradient and Hessian of function $\varphi_{5}(\mathbf{p})$ (eq. \ref{eq:phi5}) are given by:
 \begin{equation}\label{eq:phi5_grad}
 \boldsymbol{\nabla}\varphi_{5}(\mathbf{p}) = 2\mathbf{R}_{5}^{\mathsf{T}}
 \left(\mathbf{R}_{5} \mathbf{p} - \mathbf{b}\right) \quad ,
@@ -307,8 +334,11 @@ and
 
 \subsection{Computational procedures}
 
-To estimate the parameter vector $\mathbf{p}$ (eq. \ref{eq:p-vector}) that minimizes the goal function 
-$\Gamma(\mathbf{p})$ (eq. \ref{eq:gamma}), subject to the inequality constraint (eq. \ref{eq:inequality-constraint}), we use the Levenberg-Marquardt method \cite[e.g., ][ p. 240]{aster-etal2019}. 
+To estimate the parameter vector $\mathbf{p}$ (eq. \ref{eq:p-vector}) that minimizes 
+the goal function $\Gamma(\mathbf{p})$ (eq. \ref{eq:gamma}) 
+for a given pair of total-magnetization intensity $m_{0}$ and depth to the top of the 
+shallowest prism $z_{0}$, 
+subject to the inequality constraint (eq. \ref{eq:inequality-constraint}), we use the Levenberg-Marquardt method \cite[e.g., ][ p. 240]{aster-etal2019}. 
 This is an iterative gradient-based method that, at each iteration $k$, updates the estimate parameter vector $\hat{\mathbf{p}}_{(k)}$ (where the superscript hat ``~$\hat{}$~" denotes estimated) 
 to obtain a new estimated parameter vector $\hat{\mathbf{p}}_{(k+1)}$.
 We compute this update by following the same strategy of \cite{barbosa-1999b}, \cite{oliveirajr-etal2011} and \cite{oliveirajr-barbosa2013} to incorporate the inequality constraint (eq. \ref{eq:inequality-constraint}). This strategy consists in transforming each element $\hat{p}_{l}$ of the estimated parameter vector 
@@ -349,13 +379,16 @@ for the parameter vector $ \mathbf{p} $ (eq. \ref{eq:p-vector}) at the beginning
 
 \subsubsection{Inversion algorithm}
 
-At each iteration $k$ of our algorithm, the correction $\boldsymbol{\Delta}\hat{\mathbf{p}}^{\dagger}_{(k)}$ is computed by solving the following linear system:
+At each iteration $k$ of our algorithm for minimizing the 
+goal function $\Gamma(\mathbf{p})$ (eq. \ref{eq:gamma}), 
+the correction $\boldsymbol{\Delta}\hat{\mathbf{p}}^{\dagger}_{(k)}$ is 
+computed by solving the following linear system:
 \begin{equation}\label{eq:linear-system}
-\mathbf{Q}_{(k)} \left[\mathbf{Q}_{(k)} \mathbf{H}^{\dagger}(\hat{\mathbf{p}}_{(k)}) \mathbf{Q}_{(k)} + \lambda_{(k)} \mathbf{I}\right] \mathbf{Q}_{(k)} \boldsymbol{\Delta} \hat{\mathbf{p}}^{\dagger}_{(k)} = -\boldsymbol{\nabla}\Gamma(\hat{\mathbf{p}}_{(k)}) \: ,
+\mathbf{Q}_{(k)} \left[\mathbf{Q}_{(k)} \mathbf{H}^{\dagger}(\hat{\mathbf{p}}_{(k)}) \mathbf{Q}_{(k)} + \lambda_{(k)} \mathbf{I}_{M} \right] \mathbf{Q}_{(k)} \boldsymbol{\Delta} \hat{\mathbf{p}}^{\dagger}_{(k)} = -\boldsymbol{\nabla}\Gamma(\hat{\mathbf{p}}_{(k)}) \: ,
 \end{equation}
 where $\lambda_{(k)}$ is a positive scalar (known as Marquardt parameter) which is adjusted at each iteration and 
 is associated with the Levenberg-Marquardt method \cite[e.g., ][ p. 240]{silva-2001,aster-etal2019},
-$\mathbf{I}$ is the identity matrix with order $M$, $\boldsymbol{\nabla}\Gamma(\hat{\mathbf{p}})$
+$\mathbf{I}_{M}$ is the identity matrix with order $M$, $\boldsymbol{\nabla}\Gamma(\hat{\mathbf{p}}_{(k)})$
 is the gradient of the 
 goal function (eq. \ref{eq:gamma_gradient}) and $\mathbf{H}^{\dagger}(\hat{\mathbf{p}}_{(k)})$ is a matrix given by
 \begin{equation}\label{eq:H-dagger}
