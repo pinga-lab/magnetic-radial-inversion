@@ -5,17 +5,15 @@ Geological Survey of Brazil (CPRM) over the Anit{\'a}polis complex,
 in southern Brazil. 
 The airborne survey was flown with north-south and east-west lines spaced by $500$ m and $10\,000$ m from each other, respectively. 
 The total-field anomaly data were corrected from daytime variation and 
-subtracted from the main geomagnetic field using the IGRF. 
+from the main geomagnetic field using the IGRF. 
 The inclination, declination and intensity of the main geomanetic field at the study area, 
 for the period of the survey, are $-37.05^{\circ}$, $-18.17^{\circ}$ and 
 $\approx 22 \, 768 $ nT, respectively.
-To isolate the target total-field anomaly, we have applied 
-a regional separation using a second-order polynomial fit resulting in the residual data 
-shown in Fig. \ref{fig:real_data}a. 
-Fig. \ref{fig:real_data}b and \ref{fig:real_data}c show the geometric height
-(referred to the WGS84 ellipsoid) and UTM horizontal coordinates of the data and the 
-topography, respectively. For convenience, we have subtracted $ 800 $ m from the height 
-values.
+The residual total-field anomaly shown in Fig. \ref{fig:real_data}a was obtained by 
+removing a second-order polynomial from the original data (not shown). 
+Figs \ref{fig:real_data}b and \ref{fig:real_data}c show the geometric height
+the observed data and the topography of the study area, respectively. 
+For convenience, we have subtracted $ 800 $ m from their values.
 
 The Anit{\'a}polis alkaline-carbonatitic complex forms a circular concentric body 
 ($\approx 6$ km$^{2}$ in area) containing magnetite as part of its mineralogical 
@@ -43,15 +41,17 @@ another alkaline complex located northward of the study area,
 with the same age as the Anit{\'a}polis complex, 
 show total-magnetization intensities values varying from approximately 
 $0.01$ to $29.90$ A/m \citep[][ tb. 1]{valdivia-2009}.
-We used these values as a priori information to constraint the 
-total-magnetization intensity $m_{0}$ of the Anit{\'a}polis complex.
+We used these values as a priori information to set the range of possible values 
+for the total-magnetization intensity $m_{0}$ in the Anit{\'a}polis complex.
 
 We used an interpretation model formed by $L = 6$ prisms, each one with 
 $V = 20$ vertices defining their horizontal cross-sections.
 We inverted the observed total-field anomaly (Fig. \ref{fig:real_data}a) for each 
 pair of $m_0$ and $z_0$ shown in Fig. \ref{fig:real_map}, resulting in $100$ estimated 
 models. 
-For all models, we set an initial approximation $\hat{\mathbf{p}}_{(0)}$ with origin 
+For all models, we set the same initial approximation $\hat{\mathbf{p}}_{(0)}$ 
+(red prisms in Figs \ref{fig:real_result2}b and \ref{fig:real_result}b) 
+with origin 
 at $(x_0^k, y_0^k) = (6921, 688)$ km, constant radii $r_j^k = 700$ m for 
 all vertices forming all prisms and the same constant thickness $dz = 900$ m.
 We also set the same weights which were used in the synthetic tests, i.e., $\tilde{\alpha}_1 = 10^{-4}$, 
@@ -59,47 +59,34 @@ $\tilde{\alpha}_2 = 10^{-3}$,
 $\tilde{\alpha}_3 = 10^{-4}$, $\tilde{\alpha}_4 = 0$, $\tilde{\alpha}_5 = 0$, 
 $\tilde{\alpha}_6 = 10^{-8}$, and $\tilde{\alpha}_7 = 10^{-5}$ (eq. \ref{eq:alphas}). 
 
-Fig. \ref{fig:real_map} shows that, similarly to the previous synthetic test with the 
-complex model (Fig. \ref{fig:complex_map}), there is a region containing 
-candidate solutions producing small values for the goal function 
+Fig. \ref{fig:real_map} shows that there is a region containing 
+candidate solutions producing small values of the goal function 
 $\Gamma(\mathbf{p})$ (eq. \ref{eq:gamma}), with different values of $m_0$ and $z_0$.
-The pink diamond in Fig. \ref{fig:real_map} represents the estimated model 
-shown in Fig. \ref{fig:real_result2}. 
-This model produces the smallest value for $ \Gamma(\mathbf{p}) $ (\ref{eq:gamma}),
-it has a volume $ 9.96 $ km$ ^3 $, total thickness of $ 4\,596.55 $ m 
+The pink diamond in Fig. \ref{fig:real_map} represents the 
+non-outcropping estimated model shown in Fig. \ref{fig:real_result2}. 
+This model produces not only the smallest value for $ \Gamma(\mathbf{p}) $ (eq. \ref{eq:gamma}), but also reasonable data fit (Fig. \ref{fig:real_result2}a). 
+It has a volume $ 9.96 $ km$ ^3 $, total thickness of $ 4\,596.55 $ m 
 ($ dz = 766.10 $), depth-to-the-top $z_0 = 20$ m and total-magnetization intensity 
 $m_0 = 14.0$ A/m.
-Fig. \ref{fig:real_result}a shows that this estimated model produces a reasonable data fit.
-This estimated depth-to-the-top $z_20$ indicates a non-outcropping source, 
-which is compatible with a priori information a the study area. 
-We do not have evidences of an outcropping source for this anomaly, 
+The non-outcropping estimated model (Figs \ref{fig:real_result2}c and d) 
+is compatible with a priori information because 
+we do not have evidences of an outcropping source for this anomaly, 
 although there are outcropping intrusions in the area of the Anit{\'a}polis 
 complex \cite[]{gibson-1999}.
-The estimated total-magnetization intensity $ m_0 $ is also compatible with the 
-available a priori information. It is within the range found by 
-\citet{valdivia-2009} in the Jacupiranga complex.
+Besides, its total-magnetization intensity $m_0 = 14$ A/m is within the range found by 
+\citet{valdivia-2009} for intrusions located at the Jacupiranga complex.
 
-The white diamond in Fig. \ref{fig:real_map} represents the alternative model 
-show in Fig. \ref{fig:real_result}. This model is similar to that shown in 
+The white diamond in Fig. \ref{fig:real_map} represents the alternative 
+model show in Fig. \ref{fig:real_result}. This model is similar to that shown in 
 Fig. \ref{fig:real_result2}. It has a volume $ 9.57 $ km$ ^3 $, total thickness 
 $ 4\,419.34 $ m ($ dz = 736.56 $), depth-to-the-top $z_0 = 0$ m and 
 total-magnetization intensity $m_0 = 14$ A/m. 
-In comparison with the estimated model shown in Fig. \ref{fig:real_result2}, the 
-alternative model shown in Fig. \ref{fig:real_result} has a shallower top and a 
-very similar geometry.
+In comparison with the non-outcropping model shown in Fig. \ref{fig:real_result2}, the 
+alternative model shown in Fig. \ref{fig:real_result} has very similar geometry,
+but it outcrops.
 Both estimated models show a nearly N30W elongated body with accentuated dip 
 along depth (Figs \ref{fig:real_result2} and \ref{fig:real_result}), 
 which coincides with the topographic low observed in Fig \ref{fig:real_data}c. 
-This result is consistent with those presented by 
-\citet{melcher-coutinho1966} and \citet{horbach-marimon1980}, whose considered that 
-the Anit{\'a}polis complex is controlled by N-S and N30W faults, respectively.
-It is important to bear in mind, however, the possible bias in the geometry of the
-estimated body due to errors in the total-magnetization direction used as 
-a priori information.
-%is the same direction associated with the Serra Geral Lineament, 
-%crossing the study area, the Ponta Grossa Arch and the Torres syncline,
-%which are prominent structural features located, respectively, 
-%northward and southward of the study area \citep[e.g., ][ p. 535]{scheibe-etal2005}.
-The total-magnetization intensities and depths-to-the-top estimates are compatible with 
-the available a priori information and produce reasonable data fits.
-Hence, both models represent the possible geometry of the Anit{\'a}polis complex. 
+Hence, these estimates agree with the interpretation proposed by 
+\citet{horbach-marimon1980}, that considered the presence of N30W-trending fault 
+controlling the Anit{\'a}polis complex.
