@@ -775,8 +775,6 @@ def Hessian_phi_4(M, L, H, alpha):
     assert H.shape == (P, P), 'The hessian shape must be (P, P)'
     assert alpha >= 0., 'alpha must be greater or equal to 0'
 
-    i, j = np.diag_indices(P) # indices of the diagonal elements
-
     H[M,M] += 2.*alpha
     H[M+1,M+1] += 2.*alpha
 
@@ -809,7 +807,6 @@ def Hessian_phi_5(M, L, H, alpha):
 
     i, j = np.diag_indices_from(H) # indices of the diagonal elements
 
-    k = np.full(P-1, 1, dtype=np.int) # array iterable
     l = np.full(P-M-2, M+2, dtype=np.int) # array iterable
 
     H[i,j] += alpha*d0
@@ -1670,7 +1667,8 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
     m0: 1D array - initial parameters vector
     M: integer - number of vertices
     L: int - number of prisms
-    delta: 1D vector - (deltax, deltay, deltar, deltaz) increments for x, y, r and z coordinate in meters
+    delta: 1D vector - (deltax, deltay, deltar, deltaz) increments
+            for x, y, r and z coordinate in meters
     maxit: int - number of iterations
     maxsteps: int - number of steps
     lamb: float - Marquadt's parameter
@@ -1778,6 +1776,163 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
             d_fit = polyprism.tf(xp, yp, zp, model_est, inc, dec)
             res = dobs - d_fit
             phi = np.sum(res*res)/N
+            phi += phi_1(M, L, m_est, alpha[0]) + \
+                    phi_2(M, L, m_est, alpha[1]) + \
+                    phi_3(M, L, m_est, m_out, alpha[2]) + \
+                    phi_4(M, L, m_est, m_out[-2:], alpha[3]) + \
+                    phi_5(M, L, m_est, alpha[4]) + \
+                    phi_6(M, L, m_est, alpha[5]) + \
+                    phi_7(M, L, m_est, alpha[6])
+
+            dphi = phi - phi0
+
+            print 'it: %2d   it_marq: %2d   lambda: %.e   init obj.: %.5e  fin obj.: %.5e' % (it, it_marq, lamb, phi0, phi)
+
+            if (dphi > 0.):
+                lamb *= dlamb
+                if it_marq == maxsteps - 1:
+                    phi = phi0
+            else:
+                if lamb/dlamb < 1e-15:
+                    lamb = 1e-15
+                else:
+                    lamb /= dlamb
+                break
+
+        phi_list.append(phi)
+        model_list.append(model_est)
+        res_list.append(res)
+        if (abs(dphi/phi0) < tol):
+            break
+        else:
+            d0 = d_fit.copy()
+            m0 = m_est.copy()
+            model0 = model_est
+            res0 = res.copy()
+            phi0 = phi
+
+    return d_fit, m_est, model_est, phi_list, model_list, res_list
+
+def l1_levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, mmin, mmax, m_out, dobs, inc, dec, props, alpha, z0, dz):
+    '''
+    This function minimizes the goal function of a set of polygonal prism
+    for total-field-anomaly using the Levenberg-Marqudt algorithm.
+
+    input
+
+    xp, yp, zp: 1D array - observation points
+    m0: 1D array - initial parameters vector
+    M: integer - number of vertices
+    L: int - number of prisms
+    delta: 1D vector - (deltax, deltay, deltar, deltaz) increments
+            for x, y, r and z coordinate in meters
+    maxit: int - number of iterations
+    maxsteps: int - number of steps
+    lamb: float - Marquadt's parameter
+    dlamb: float - variation of Marquadt's parameter
+    tol: float - convergence criterion
+    mmin: array - minimum values for each parameters (rmin, x0min, y0min)
+    mmax: array - maximum values for each parameters (rmax, x0max, y0max)
+    m_out: array - parameters from the outcropping body (M+2)
+    dobs: array - observed data
+    inc, dec: float - inclination and declination of the local-geomagnetic field
+    props: dictionary - direction of magnetization
+    alpha: 1D vector - (a1, a2, a3, a4 , a5, a6, a7) regularization parameters
+    z0: float - the top of the source
+    dz: float - thickness of the prisms
+    output
+
+    d_fit: array - fitted data
+    m_est: array - estimated parameters
+    model_est: list - objects of fatiando.mesher.polyprisms
+    phi_list: list - solutions of objective funtion
+    model_list: list - estimated models at each iteration
+    res_list: list - calculated residual at each iteration
+    '''
+    P = L*(M + 2) + 1
+    assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
+    assert xp.shape == yp.shape == zp.shape, 'xp, yp and zp must have the same shape'
+    assert m0.size == P, 'The size of m0 must be equal to P'
+    assert m0.shape == (P,), 'The shape of m0 must be equal to (P,)'
+    assert np.alltrue > (alpha.all >= 0.), 'The regularization parameters must be positive or zero'
+    assert dz > 0., 'dz must be a positive number'
+    assert lamb > 0., 'lamb must be a positive number'
+    assert dlamb > 0., 'dlamb must be a positive number'
+    assert tol > 0., 'tol must be a positive number'
+
+    model0 = param2polyprism(m0, M, L, z0, props) # list of classes of prisms
+    d0 = polyprism.tf(xp, yp, zp, model0, inc, dec) # predict data
+    res0 = dobs - d0 + 1e-10
+    N = xp.size
+    phi0 = np.sum(np.absolute(res0))/N
+    phi_list = [phi0]
+    model_list = [model0]
+    res_list = [res0]
+    G0 = Jacobian_tf(xp, yp, zp, model0, M, L, delta[0], delta[1], delta[2], delta[3], inc, dec)
+
+    # Scale factor of misfit function
+    th = np.trace(2.*np.dot(G0.T, G0)/N)
+
+    # Scale factors of the constraint functions
+    th_constraints = []
+    d0, d1, dM = diags_phi_1(M, L)
+    th_constraints.append(np.sum(d0)) # phi1
+    d0, d1 = diags_phi_2(M, L)
+    th_constraints.append(np.sum(d0)) # phi2
+    th_constraints.append(2.*(M+2)) # phi3
+    th_constraints.append(2.*2) # phi4
+    d0, d1 = diags_phi_5(M, L)
+    th_constraints.append(np.sum(d0)) # phi5
+    d0 = diags_phi_6(M, L)
+    th_constraints.append(np.sum(d0)) # phi6
+    th_constraints.append(2.) # phi7
+
+    alpha *= th/th_constraints
+
+    for it in range(maxit):
+        mt = log_barrier(m0, M, L, mmax, mmin)
+
+        # Jacobian matrix
+        G = Jacobian_tf(xp, yp, zp, model0, M, L, delta[0], delta[1], delta[2], delta[3], inc, dec)
+
+        # Hessian matrix
+        H = 2.*np.dot(G.T*1./np.absolute(res0), G)/N
+
+        # weighting the regularization parameters
+        H = Hessian_phi_1(M, L, H, alpha[0])
+        H = Hessian_phi_2(M, L, H, alpha[1])
+        H = Hessian_phi_3(M, L, H, alpha[2])
+        H = Hessian_phi_4(M, L, H, alpha[3])
+        H = Hessian_phi_5(M, L, H, alpha[4])
+        H = Hessian_phi_6(M, L, H, alpha[5])
+        H = Hessian_phi_7(M, L, H, alpha[6])
+
+        # gradient vector
+        grad = -2.*np.dot(G.T*1./np.absolute(res0), res0)/N
+
+        grad = gradient_phi_1(M, L, grad, alpha[0])
+        grad = gradient_phi_2(M, L, grad, alpha[1])
+        grad = gradient_phi_3(M, L, grad, m_out, alpha[2])
+        grad = gradient_phi_4(M, L, grad, m_out[-2:], alpha[3])
+        grad = gradient_phi_5(M, L, grad, alpha[4])
+        grad = gradient_phi_6(M, L, grad, alpha[5])
+        grad = gradient_phi_7(M, L, grad, alpha[6])
+
+        # positivity constraint
+        H *= ((mmax - m0 + 1e-10)*(m0 - mmin + 1e-10))/(mmax - mmin)
+
+        # Hessian normalization
+        D = 1./np.sqrt(np.diag(H))
+
+        for it_marq in range(maxsteps):
+
+            delta_mt = D*(np.linalg.solve((D*(H.T*D).T) + lamb*np.identity(mt.size), -D*grad)).T
+            #delta_mt = np.linalg.solve(H + lamb*np.identity(mt.size), -grad).T
+            m_est = inv_log_barrier(mt + delta_mt, M, L, mmax, mmin)
+            model_est = param2polyprism(m_est, M, L, z0, props)
+            d_fit = polyprism.tf(xp, yp, zp, model_est, inc, dec)
+            res = dobs - d_fit + 1e-10
+            phi = np.sum(np.absolute(res))/N
             phi += phi_1(M, L, m_est, alpha[0]) + \
                     phi_2(M, L, m_est, alpha[1]) + \
                     phi_3(M, L, m_est, m_out, alpha[2]) + \
@@ -2136,242 +2291,27 @@ def misfit_matrix(n, m, results):
     misfit_matrix = np.zeros((n,m))
     for i in range(n):
         for j in range(m):
-            misfit_matrix[i, j] = np.linalg.norm(results[i*n+j][3])**2./results[i*n+j][3].size
+            misfit_matrix[i, j] = np.sum(results[i*n+j][3]*results[i*n+j][3])/results[i*n+j][3].size
     return misfit_matrix
 
-def plot_simple_matrix(z0, intensity, matrix, vmin, vmax, filename=''):
+def l1_misfit_matrix(n, m, results):
     '''
-    Returns a plot of the goal function values for each inversion
+    Returns the l1 misfit function values for each inversion
     organized in a matrix
     
     input
-    z0: 1D array - range of depth to the top values in meters
-    intensity: 1D array - range of total-magnetization
-                        intensity values in nT
-    matrix: 2D array - values for the goal or misfit function
-                    produced by the solutions of the multiple
-                    inversions
-    vmin: float - minimum value for the colorbar
-    vmin: float - maximum value for the colorbar
-    filename: string - directory and filename of the figure
-
+    n, m: integer - number of values of depth to the top (z0)
+                    and magnetic intensity (m0)
+    results: list - inversion results from the pickle file
+                    made by multiple inversion notebook
     output
-    fig: figure - plot of the result
+    phi_matrix: 2D array - misfit function values  
     '''
-
-    n = z0.size
-    m = intensity.size
-    fig, ax = plt.subplots(1,1)
-    fig.set_size_inches(6,6)
-    w = 3.
-    img = ax.imshow(matrix, vmin=vmin, vmax=vmax, origin='lower',extent=[0,w,0,w])
-    img.axes.tick_params(labelbottom='on',labeltop='off', labelleft="on", labelright='off',
-        bottom='off', left='off', right='off',labelsize=14)
-    plt.ylabel('$z_0$ (m)', fontsize=14)
-    plt.xlabel('$m_0$ (A/m)', fontsize=14)
-    plt.plot(7*w/(2*n), 3*w/(2*m), '^r', markersize=12)
-    x_label_list = []
-    y_label_list = []
-    for xl, yl in zip(intensity,z0):
-        x_label_list.append(str(xl))
-        y_label_list.append(str(yl)[:-2])
-    ax.set_xticks(np.linspace(w/(2.*n), w - w/(2.*n), n))
-    ax.set_yticks(np.linspace(w/(2.*m), w - w/(2.*m), m))
-    ax.set_xticklabels(x_label_list)
-    ax.set_yticklabels(y_label_list)
-    ax.set_xticks(np.linspace(0, w, n+1), minor=True)
-    ax.set_yticks(np.linspace(0, w, m+1), minor=True)
-    clb = plt.colorbar(img, pad=0.01, aspect=30, shrink=0.865)
-    clb.ax.set_title('nT', pad=-295)
-    clb.ax.tick_params(labelsize=14)
-    ax.grid(which='minor', color='k', linewidth=2)
-    if filename == '':
-        pass
-    else:
-        plt.savefig(filename, dpi=300, bbox_inches='tight')
-    return plt.show()
-
-def plot_real_matrix(z0, intensity, matrix, vmin, vmax, sus, filename=''):
-    '''
-    Returns a plot of the goal function values for each inversion
-    organized in a matrix
-    
-    input
-    z0: 1D array - range of depth to the top values in meters
-    intensity: 1D array - range of total-magnetization
-                        intensity values in nT
-    matrix: 2D array - values for the goal or misfit function
-                    produced by the solutions of the multiple
-                    inversions
-    vmin: float - minimum value for the colorbar
-    vmin: float - maximum value for the colorbar
-    sus: 1D array - range of susceptibility values in S.I.
-                    equivalent to intensity
-    filename: string - directory and filename of the figure
-
-
-    output
-    fig: figure - plot of the result
-    '''
-
-    n = z0.size
-    m = intensity.size
-    fig, ax = plt.subplots(1,1)
-    fig.set_size_inches(6,6)
-    w = 3.
-    img = ax.imshow(matrix, vmin=vmin, vmax=vmax, origin='lower',extent=[0,w,0,w])
-    img.axes.tick_params(labelbottom='on',labeltop='off', labelleft="on", labelright='off',
-        bottom='off', left='off', right='off',labelsize=14)
-    plt.ylabel('$z_0$ (m)', fontsize=14)
-    plt.xlabel('$m_0$ (A/m)', fontsize=14)
-<<<<<<< HEAD
-    plt.plot(7*w/(2*n), w/(2*m), 'cD', markersize=12)
-    plt.plot(11*w/(2*n), 1*w/(2*m), 'mD', markersize=12)
-=======
-    plt.plot(7*w/(2*n), w/(2*m), 'wD', markersize=12)
-    plt.plot(7*w/(2*n), 3*w/(2*m), 'mD', markersize=12)
-    #plt.plot(15*w/(2*n), 9*w/(2*m), 'gD', markersize=12)
->>>>>>> 39c02114de0a0ba2a1a191655d8fe6f7ddd00797
-    x_label_list = []
-    y_label_list = []
-    sus_label_list = []
-    for xl, yl in zip(intensity,z0):
-        x_label_list.append(str(xl)[:-2])
-        y_label_list.append(str(yl)[:-2])
-    ax.set_xticks(np.linspace(w/(2.*n), w - w/(2.*n), n))
-    ax.set_yticks(np.linspace(w/(2.*m), w - w/(2.*m), m))
-    ax.set_xticklabels(x_label_list)
-    ax.set_yticklabels(y_label_list)
-    ax.set_xticks(np.linspace(0, w, n+1), minor=True)
-    ax.set_yticks(np.linspace(0, w, m+1), minor=True)
-    clb = plt.colorbar(img, pad=0.01, aspect=30, shrink=0.865)
-    clb.ax.set_title('$\Gamma$', pad=-295)
-    clb.ax.tick_params(labelsize=14)
-    ax.grid(which='minor', color='k', linewidth=2)
-    if filename == '':
-        pass
-    else:
-        plt.savefig(filename, dpi=300, bbox_inches='tight')
-    return plt.show()
-
-def plot_simple_solution_4figures(xp, yp, zp, residuals, solution, initial, model, filename):
-    '''
-    Returns a plot of the resdiuals, initial approximate
-    and two perspective views of the solution for the
-    simple model
-    
-    input
-    xp, yp, zp: 1D array - Cartesian coordinates of the residuals
-    residuals: 1D array - residuals between observed and predicted data
-    solution: list - list of a fatiando.mesher.PolygonalPrism
-                    of the estimated model
-    initial: list - list of a fatiando.mesher.PolygonalPrism
-                    of the initial approximate
-    model: list - list of a fatiando.mesher.PolygonalPrism
-                    of the true model
-    filename: string - directory and filename of the figure
-
-    output
-    fig: figure - plot of the result
-    '''
-    # converting coordinates
-    x=xp/1000.
-    y=yp/1000.
-    z=zp/1000.
-
-    plt.figure(figsize=(10,9))
-
-    verts = plot_prisms(solution, scale=0.001)
-    verts_true = plot_prisms(model, scale=0.001)
-    verts_initial = plot_prisms(initial, scale=0.001)
-    
-    # residual data and histogram
-    ax=plt.subplot(2,2,1)
-    #plt.title('Residual', fontsize=20)
-    plt.tricontourf(y, x, residuals, 20,
-                    cmap='RdBu_r', vmin=-np.max(residuals),
-                    vmax=np.max(residuals)).ax.tick_params(labelsize=12)
-    plt.xlabel('$y$(km)', fontsize=14)
-    plt.ylabel('$x$(km)', fontsize=14)
-    clb = plt.colorbar(pad=0.01, aspect=20, shrink=1)
-    clb.ax.set_title('nT', pad=-285)
-    clb.ax.tick_params(labelsize=13)
-    inset = inset_axes(ax, width="40%", height="30%", loc=1, borderpad=0.7)
-    mean = np.mean(residuals)
-    std = np.std(residuals)
-    nbins=30
-    n, bins, patches = plt.hist(residuals,bins=nbins, normed=True, facecolor='blue')
-    props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
-    inset.text(0.6, 0.95, "$\mu$ = {:.2f}\n$\sigma$ = {:.2f}".format(mean, std),
-                    transform=inset.transAxes, fontsize=8,
-                va='top', ha='left', bbox=props)
-    gauss = sp.norm.pdf(bins, mean, std)
-    plt.plot(bins, gauss, 'k--', linewidth=1., label='Gaussian')
-    ax.text(-5.5, 5.5, '(a)', fontsize= 15)
-
-    # initial approximate
-    ax = plt.subplot(2,2,2, projection='3d')
-
-    # plot sides
-    ax.add_collection3d(Poly3DCollection(verts_initial, alpha=0.3, 
-     facecolor='r', linewidths=0.5, edgecolors='k'))
-    ax.add_collection3d(Poly3DCollection(verts_true, alpha=0.3, 
-     facecolor='b', linewidths=0.5, edgecolors='k'))
-
-    ax.set_xlim(-2.5, 2.5, 100)
-    ax.set_ylim(-2.5, 2.5, 100)
-    ax.set_zlim(2, -0.1, 100)
-    ax.tick_params(labelsize= 10)
-    ax.set_ylabel('x (km)', fontsize= 14)
-    ax.set_xlabel('y (km)', fontsize= 14)
-    ax.set_zlabel('z (km)', fontsize= 14)
-    ax.set_zticklabels(np.linspace(0, 2, 9))
-    ax.view_init(10, 50)
-    ax.text2D(-0.1, 0.1, '(b)', fontsize= 15)
-
-    # inverse model view 1
-    ax = plt.subplot(2,2,3, projection='3d')
-
-    # plot sides
-    ax.add_collection3d(Poly3DCollection(verts, alpha=0.3, 
-     facecolor='r', linewidths=0.5, edgecolors='k'))
-    ax.add_collection3d(Poly3DCollection(verts_true, alpha=0.3, 
-     facecolor='b', linewidths=0.5, edgecolors='k'))
-
-    ax.set_xlim(-2.5, 2.5, 100)
-    ax.set_ylim(-2.5, 2.5, 100)
-    ax.set_zlim(2, -0.1, 100)
-    ax.tick_params(labelsize= 10)
-    ax.set_ylabel('x (km)', fontsize= 14)
-    ax.set_xlabel('y (km)', fontsize= 14)
-    ax.set_zlabel('z (km)', fontsize= 14)
-    ax.set_zticklabels(np.linspace(0, 2, 9))
-    ax.view_init(10, 50)
-    ax.text2D(-0.12, 0.07, '(c)', fontsize= 15)
-
-    # inverse model view 2
-    ax = plt.subplot(2,2,4, projection='3d')
-
-    # plot sides
-    ax.add_collection3d(Poly3DCollection(verts, alpha=0.3, 
-     facecolor='r', linewidths=0.5, edgecolors='k'))
-    ax.add_collection3d(Poly3DCollection(verts_true, alpha=0.3, 
-     facecolor='b', linewidths=0.5, edgecolors='k'))
-
-    ax.set_xlim(-2.5, 2.5, 100)
-    ax.set_ylim(-2.5, 2.5, 100)
-    ax.set_zlim(2, -0.1, 100)
-    ax.tick_params(labelsize= 10)
-    ax.set_ylabel('x (km)', fontsize= 14)
-    ax.set_xlabel('y (km)', fontsize= 14)
-    ax.set_zlabel('z (km)', fontsize= 14)
-    ax.set_zticklabels(np.linspace(0, 2, 9))
-    ax.view_init(-15, -160)
-    ax.text2D(-0.1, 0.07, '(d)', fontsize= 15)
-
-    plt.tight_layout()
-    plt.savefig(filename, dpi=300, bbox_inches='tight')
-    return plt.show()
+    misfit_matrix = np.zeros((n,m))
+    for i in range(n):
+        for j in range(m):
+            misfit_matrix[i, j] = np.sum(np.absolute(results[i*n+j][3]))/results[i*n+j][3].size
+    return misfit_matrix
 
 def plot_simple_model_data(x, y, obs, initial, model, filename):
     '''
@@ -2402,7 +2342,7 @@ def plot_simple_model_data(x, y, obs, initial, model, filename):
                     cmap='RdBu_r', vmin=np.min(obs),
                     vmax=-np.min(obs)).ax.tick_params(labelsize=12)
     plt.plot(y, x, 'ko', markersize=.25)
-    estimate = mpl.polygon(initial, '.-r', xy2ne=True)
+    mpl.polygon(initial, '.-r', xy2ne=True)
     plt.xlabel('$y$(km)', fontsize=14)
     plt.ylabel('$x$(km)', fontsize=14)
     clb = plt.colorbar(pad=0.01, aspect=20, shrink=1)
@@ -2433,7 +2373,7 @@ def plot_simple_model_data(x, y, obs, initial, model, filename):
 
     return plt.show()
 
-def plot_complex_matrix(z0, intensity, matrix, vmin, vmax, filename=''):
+def plot_matrix(z0, intensity, matrix, vmin, vmax, solutions, truevalues=[0,0], filename=''):
     '''
     Returns a plot of the goal function values for each inversion
     organized in a matrix
@@ -2447,6 +2387,10 @@ def plot_complex_matrix(z0, intensity, matrix, vmin, vmax, filename=''):
                     inversions
     vmin: float - minimum value for the colorbar
     vmin: float - maximum value for the colorbar
+    truevalues: list - list of position [x, y] on the map of the
+                        true values for the parameters z0 and intensity
+    solutions: list - list of position on the map of the chosen
+                        solutions for the plots [[x1, y1],[x2, y2]]
     filename: string - directory and filename of the figure
 
     output
@@ -2462,23 +2406,28 @@ def plot_complex_matrix(z0, intensity, matrix, vmin, vmax, filename=''):
     img.axes.tick_params(labelsize=14)
     plt.ylabel('$z_0$ (m)', fontsize=14)
     plt.xlabel('$m_0$ (A/m)', fontsize=12)
-    plt.plot(1.5, 1.5, '^r', markersize=12)
-    plt.plot(1.75, 1.75, 'Dw', markersize=12, linewidth=2)
+    if truevalues == [0,0]:
+        pass
+    else:
+        plt.plot((2.*truevalues[1]+1.)*w/(2.*m), (2.*truevalues[0]+1.)*w/(2.*n), '^r', markersize=12)
+    colors = ['Dw', 'Dm']
+    for s, c in zip(solutions, colors):
+        plt.plot((2.*s[1]+1.)*w/(2.*m), (2.*s[0]+1.)*w/(2.*n), c, markersize=12)
     x_label_list = []
     y_label_list = []
     for xl, yl in zip(intensity,z0):
-        x_label_list.append(str(xl))
+        x_label_list.append(str(xl)[:-2])
         y_label_list.append(str(yl)[:-2])
     ax.set_xticks(np.linspace(w/(2.*n), w - w/(2.*n), n))
     ax.set_yticks(np.linspace(w/(2.*m), w - w/(2.*m), m))
     ax.set_xticklabels(x_label_list)
     ax.set_yticklabels(y_label_list)
     # Minor ticks
-    ax.set_xticks(np.linspace(0, w, n+1), minor=True);
-    ax.set_yticks(np.linspace(0, w, m+1), minor=True);
+    ax.set_xticks(np.linspace(0, w, n+1), minor=True)
+    ax.set_yticks(np.linspace(0, w, m+1), minor=True)
     ax.grid(which='minor', color='k', linewidth=2)
     clb = plt.colorbar(img, pad=0.01, aspect=20, shrink=1)
-    clb.ax.set_title('nT', pad=-285)
+    clb.ax.set_title('nT$^2$', pad=-288)
     clb.ax.tick_params(labelsize=13)
     if filename == '':
         pass
@@ -2526,9 +2475,7 @@ def plot_complex_model_data(x, y, obs, alt, initial, model, filename):
     plt.ylabel('$x$(km)', fontsize=14)
     clb = plt.colorbar(pad=0.01, aspect=20, shrink=1)
     clb.ax.set_title('nT', pad=-315)
-    yplot = []
-    xplot = []
-    estimate = mpl.polygon(initial, '.-r', xy2ne=True)
+    mpl.polygon(initial, '.-r', xy2ne=True)
     mpl.m2km()
     clb.ax.tick_params(labelsize=13)
     plt.plot(y, x, 'k.', markersize=.25)
@@ -2583,7 +2530,10 @@ def plot_complex_model_data(x, y, obs, alt, initial, model, filename):
 
     return plt.show()
 
-def plot_complex_solution_4figures(xp, yp, zp, residuals, solution, initial, model, filename):
+def plot_solution(xp, yp, zp,
+    residuals, solution, initial,
+    angles=[], area=[], model=[],
+    filename='', inter=False):
     '''
     Returns a plot of the resdiuals, initial approximate
     and two perspective views of the solution for the
@@ -2596,9 +2546,16 @@ def plot_complex_solution_4figures(xp, yp, zp, residuals, solution, initial, mod
                     of the estimated model
     initial: list - list of a fatiando.mesher.PolygonalPrism
                     of the initial approximate
+    angles: list - list of perspective angles of the 3D plots,
+                    default: [10, 50, 10, 50, 20, 160]
+    area: list - list of minimum and maximum values for the
+                    Cartesian coord. of the 3D plots
+                    [xmin, xmax, ymin, ymax, zmin, zmax]
     model: list - list of a fatiando.mesher.PolygonalPrism
-                    of the true model
+                    of the true model or a second solution,
+                    default: []
     filename: string - directory and filename of the figure
+    inter: boolean - presence of an interfering body
 
     output
     fig: figure - plot of the result
@@ -2606,24 +2563,34 @@ def plot_complex_solution_4figures(xp, yp, zp, residuals, solution, initial, mod
    # converting coordinates
     x=xp/1000.
     y=yp/1000.
-    z=zp/1000.
+
+    V = model[0].x.size
+
+    if solution[-1].z2 >= model[-1].z2:
+        zb = solution[-1].z2/1000. + 1
+    else:
+        zb = model[-1].z2/1000. + 1
 
     plt.figure(figsize=(10,9))
 
-    for i in range(len(solution)):
-        solution[i].z1 += 430.
-        solution[i].z2 += 430.
-        initial[i].z1 += 430.
-        initial[i].z2 += 430.
-
-    for i in range(len(model)):
-        model[i].z1 += 430.
-        model[i].z2 += 430.
-
     verts = plot_prisms(solution, scale=0.001)
-    verts_true = plot_prisms(model, scale=0.001)
     verts_initial = plot_prisms(initial, scale=0.001)
+    if model == []:
+        pass
+    else:
+        verts_true = plot_prisms(model, scale=0.001)
     
+    if area != []:
+        pass
+    else:
+        area = [np.min(x), np.max(x), np.min(y),
+        np.max(y)]
+
+    if angles != []:
+        pass
+    else:
+        angles = [10, 50, 10, 50, 20, 160]
+
     # residual data and histogram
     ax=plt.subplot(2,2,1)
     #plt.title('Residual', fontsize=20)
@@ -2641,12 +2608,12 @@ def plot_complex_solution_4figures(xp, yp, zp, residuals, solution, initial, mod
     nbins=30
     n, bins, patches = plt.hist(residuals,bins=nbins, normed=True, facecolor='blue')
     props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
-    inset.text(0.6, 0.95, "$\mu$ = {:.2f}\n$\sigma$ = {:.2f}".format(mean, std),
+    inset.text(0.55, 0.95, "$\mu$ = {:.1f}\n$\sigma$ = {:.1f}".format(mean, std),
                     transform=inset.transAxes, fontsize=8,
                 va='top', ha='left', bbox=props)
     gauss = sp.norm.pdf(bins, mean, std)
     plt.plot(bins, gauss, 'k--', linewidth=1., label='Gaussian')
-    ax.text(-5, 4.6, '(a)', fontsize= 15)
+    ax.text(np.min(y)-1., np.max(x)+.6, '(a)', fontsize= 15)
 
     # initial approximate
     ax = plt.subplot(2,2,2, projection='3d')
@@ -2654,18 +2621,27 @@ def plot_complex_solution_4figures(xp, yp, zp, residuals, solution, initial, mod
     # plot sides
     ax.add_collection3d(Poly3DCollection(verts_initial, alpha=0.3, 
      facecolor='r', linewidths=0.5, edgecolors='k'))
-    ax.add_collection3d(Poly3DCollection(verts_true, alpha=0.3, 
-     facecolor='b', linewidths=0.5, edgecolors='k'))
+    if model == []:
+        pass
+    elif inter == True:
+        ax.add_collection3d(Poly3DCollection(verts_true[:-V/2-2], alpha=0.3, 
+        facecolor='b', linewidths=0.5, edgecolors='k'))
+        ax.add_collection3d(Poly3DCollection(verts_true[-V/2-2:], alpha=1., 
+        facecolor='y', linewidths=0.5, edgecolors='k'))
+    else:
+        ax.add_collection3d(Poly3DCollection(verts_true, alpha=0.3, 
+        facecolor='b', linewidths=0.5, edgecolors='k'))
 
-    ax.set_xlim(-2.5, 2.5, 100)
-    ax.set_ylim(-2.5, 2.5, 100)
-    ax.set_zlim(7, -0.2, 100)
+    ax.set_ylim(area[0], area[1], 100)
+    ax.set_xlim(area[2], area[3], 100)
+    ax.set_zlim(initial[-1].z2/1000. + 1, 0., 100)
     ax.tick_params(labelsize= 10)
     ax.set_ylabel('x (km)', fontsize= 14)
     ax.set_xlabel('y (km)', fontsize= 14)
     ax.set_zlabel('z (km)', fontsize= 14)
-    ax.set_zticklabels(np.linspace(0, 2, 9))
-    ax.view_init(10, 50)
+    ax.set_yticks(np.linspace(area[0], area[1], 2))
+    ax.set_xticks(np.linspace(area[2], area[3], 2))
+    ax.view_init(angles[0], angles[1])
     ax.text2D(-0.1, 0.1, '(b)', fontsize= 15)
 
     # inverse model view 1
@@ -2674,18 +2650,27 @@ def plot_complex_solution_4figures(xp, yp, zp, residuals, solution, initial, mod
     # plot sides
     ax.add_collection3d(Poly3DCollection(verts, alpha=0.3, 
      facecolor='r', linewidths=0.5, edgecolors='k'))
-    ax.add_collection3d(Poly3DCollection(verts_true, alpha=0.3, 
-     facecolor='b', linewidths=0.5, edgecolors='k'))
+    if model == []:
+        pass
+    elif inter == True:
+        ax.add_collection3d(Poly3DCollection(verts_true[:-V/2-2], alpha=0.3, 
+        facecolor='b', linewidths=0.5, edgecolors='k'))
+        ax.add_collection3d(Poly3DCollection(verts_true[-V/2-2:], alpha=1., 
+        facecolor='y', linewidths=0.5, edgecolors='k'))
+    else:
+        ax.add_collection3d(Poly3DCollection(verts_true, alpha=0.3, 
+        facecolor='b', linewidths=0.5, edgecolors='k'))
 
-    ax.set_xlim(-2.5, 2.5, 100)
-    ax.set_ylim(-2.5, 2.5, 100)
-    ax.set_zlim(7, -0.2, 100)
+    ax.set_ylim(area[0], area[1], 100)
+    ax.set_xlim(area[2], area[3], 100)
+    ax.set_zlim(zb, 0., 100)
     ax.tick_params(labelsize= 10)
     ax.set_ylabel('x (km)', fontsize= 14)
     ax.set_xlabel('y (km)', fontsize= 14)
     ax.set_zlabel('z (km)', fontsize= 14)
-    ax.set_zticklabels(np.linspace(0, 2, 9))
-    ax.view_init(10, 50)
+    ax.set_yticks(np.linspace(area[0], area[1], 2))
+    ax.set_xticks(np.linspace(area[2], area[3], 2))
+    ax.view_init(angles[0], angles[1])
     ax.text2D(-0.12, 0.07, '(c)', fontsize= 15)
 
     # inverse model view 2
@@ -2694,143 +2679,33 @@ def plot_complex_solution_4figures(xp, yp, zp, residuals, solution, initial, mod
     # plot sides
     ax.add_collection3d(Poly3DCollection(verts, alpha=0.3, 
      facecolor='r', linewidths=0.5, edgecolors='k'))
-    ax.add_collection3d(Poly3DCollection(verts_true, alpha=0.3, 
-     facecolor='b', linewidths=0.5, edgecolors='k'))
+    if model == []:
+        pass
+    elif inter == True:
+        ax.add_collection3d(Poly3DCollection(verts_true[:-V/2-2], alpha=0.3, 
+        facecolor='b', linewidths=0.5, edgecolors='k'))
+        ax.add_collection3d(Poly3DCollection(verts_true[-V/2-2:], alpha=1., 
+        facecolor='y', linewidths=0.5, edgecolors='k'))
+    else:
+        ax.add_collection3d(Poly3DCollection(verts_true, alpha=0.3, 
+        facecolor='b', linewidths=0.5, edgecolors='k'))
 
-    ax.set_xlim(-2.5, 2.5, 100)
-    ax.set_ylim(-2.5, 2.5, 100)
-    ax.set_zlim(7, -0.2, 100)
+    ax.set_ylim(area[0], area[1], 100)
+    ax.set_xlim(area[2], area[3], 100)
+    ax.set_zlim(zb, 0, 100)
     ax.tick_params(labelsize= 10)
     ax.set_ylabel('x (km)', fontsize= 14)
     ax.set_xlabel('y (km)', fontsize= 14)
     ax.set_zlabel('z (km)', fontsize= 14)
-    ax.set_zticklabels(np.linspace(0, 2, 9))
-    ax.view_init(20, 160)
+    ax.set_yticks(np.linspace(area[0], area[1], 2))
+    ax.set_xticks(np.linspace(area[2], area[3], 2))
+    ax.view_init(angles[0], angles[1])
     ax.text2D(-0.1, 0.07, '(d)', fontsize= 15)
 
-    plt.tight_layout()
-    plt.savefig(filename, dpi=300, bbox_inches='tight')
-    return plt.show()
-
-def plot_real_solution_4figures(xp, yp, zp, residuals, solution, initial, filename):
-    '''
-    Returns a plot of the resdiuals, initial approximate
-    and two perspective views of the solution
-    
-    input
-    xp, yp, zp: 1D array - Cartesian coordinates of the residuals
-    residuals: 1D array - residuals between observed and predicted data
-    solution: list - list of a fatiando.mesher.PolygonalPrism
-                    of the estimated model
-    initial: list - list of a fatiando.mesher.PolygonalPrism
-                    of the initial approximate
-    filename: string - directory and filename of the figure
-
-    output
-    fig: figure - plot of the result
-    '''
-
-    # converting coordinates
-    x=xp/1000.
-    y=yp/1000.
-    z=zp/1000.
-
-    verts = plot_prisms(prisms=solution, scale=0.001)
-    verts_initial = plot_prisms(prisms=initial, scale=0.001)
-
-    plt.figure(figsize=(10,9))
-
-    # residual data and histogram
-    ax=plt.subplot(2,2,1)
-    plt.tricontourf(yp, xp, residuals, 20,
-                    cmap='RdBu_r', vmin=-np.max(residuals),
-                    vmax=np.max(residuals)).ax.tick_params(labelsize=12)
-    # horizontal projections of the estimated prisms
-    for prism_i in solution:
-        mpl.polygon(prism_i.topolygon(), linewidth=0, fill='k',
-                    alpha=0.1, xy2ne=True)
-    plt.ylim(6916000, 6926000)
-    plt.xlabel('$y$(km)', fontsize=12)
-    plt.ylabel('$x$(km)', fontsize=12)
-    clb = plt.colorbar(pad=0.01, aspect=20, shrink=1)
-    clb.ax.set_title('nT', pad=-285)
-    clb.ax.tick_params(labelsize=13)
-    mpl.m2km()
-    # histogram in the inset
-    inset = inset_axes(ax, width="40%", height="30%", loc=1, borderpad=0.7)
-    mean = np.mean(residuals)
-    std = np.std(residuals)
-    nbins=30
-    n, bins, patches = plt.hist(residuals,bins=nbins,
-                                normed=True, facecolor='blue')
-    props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
-    inset.text(0.55, 0.95,
-               "$\mu$ = {:.2f}\n$\sigma$ = {:.2f}".format(mean,std),
-                transform=inset.transAxes, fontsize=8,
-                va='top', ha='left', bbox=props)
-    gauss = sp.norm.pdf(bins, mean, std)
-    plt.plot(bins, gauss, 'k--', linewidth=1., label='Gaussian')
-    ax.text(681000, 6925000, '(a)', fontsize= 15)
-
-    # initial approximate
-    ax = plt.subplot(2,2,2, projection='3d')
-
-    # plot sides
-    ax.add_collection3d(Poly3DCollection(verts_initial, alpha=0.3, 
-     facecolor='r', linewidths=0.5, edgecolors='k'))
-
-    ax.set_ylim(6919, 6924, 100)
-    ax.set_xlim(686, 691, 100)
-    ax.set_zlim(6, 0, 100)
-    ax.tick_params(labelsize= 10)
-    ax.set_ylabel('x (km)', fontsize= 14)
-    ax.set_xlabel('y (km)', fontsize= 14)
-    ax.set_zlabel('z (km)', fontsize= 14)
-    ax.set_xticks(np.arange(686, 692, 2))
-    ax.set_yticks(np.arange(6919, 6925, 2))
-    ax.view_init(25, -130)
-    ax.text2D(-0.1, 0.07, '(b)', fontsize= 15)
-
-    # inverse model view 1
-    ax = plt.subplot(2,2,3, projection='3d')
-
-    # plot sides
-    ax.add_collection3d(Poly3DCollection(verts, alpha=0.3, 
-     facecolor='r', linewidths=0.5, edgecolors='k'))
-
-    ax.set_ylim(6915, 6922, 100)
-    ax.set_xlim(686, 692, 100)
-    ax.set_zlim(5.5, 0, 100)
-    ax.tick_params(labelsize= 10)
-    ax.set_ylabel('x (km)', fontsize= 14)
-    ax.set_xlabel('y (km)', fontsize= 14)
-    ax.set_zlabel('z (km)', fontsize= 14)
-    ax.set_xticks(np.arange(686, 693, 2))
-    ax.set_yticks(np.arange(6915, 6923, 2))
-    ax.view_init(30, 45)
-    ax.text2D(-0.11, 0.07, '(c)', fontsize= 15)
-
-    # inverse model view 2
-    ax = plt.subplot(2,2,4, projection='3d')
-
-    # plot sides
-    ax.add_collection3d(Poly3DCollection(verts, alpha=0.3, 
-     facecolor='r', linewidths=0.5, edgecolors='k'))
-
-    ax.set_ylim(6915, 6922, 100)
-    ax.set_xlim(686, 692, 100)
-    ax.set_zlim(5.5, 0, 100)
-    ax.tick_params(labelsize= 10)
-    ax.set_ylabel('x (km)', fontsize= 14)
-    ax.set_xlabel('y (km)', fontsize= 14)
-    ax.set_zlabel('z (km)', fontsize= 14)
-    ax.set_xticks(np.arange(686, 693, 2))
-    ax.set_yticks(np.arange(6915, 6923, 2))
-    ax.view_init(-15, 145)
-    ax.text2D(-0.1, 0.07, '(d)', fontsize= 15)
-
-    plt.tight_layout()
-    plt.savefig(filename, dpi=300, bbox_inches='tight')
+    if filename == '':
+        pass
+    else:
+        plt.savefig(filename, dpi=300, bbox_inches='tight')
     return plt.show()
 
 def plot_obs_alt(x, y, obs, alt, topo, initial, filename):
@@ -2859,7 +2734,7 @@ def plot_obs_alt(x, y, obs, alt, topo, initial, filename):
                    vmin=-np.max(obs),
                    vmax=np.max(obs)).ax.tick_params(labelsize=12)
     plt.plot(y, x, 'ko', markersize=.25)
-    estimate = mpl.polygon(initial, '.-r', xy2ne=True)
+    mpl.polygon(initial, '.-r', xy2ne=True)
     plt.xlabel('$y$(km)', fontsize=14)
     plt.ylabel('$x$(km)', fontsize=14)
     clb = plt.colorbar(pad=0.01, aspect=40, shrink=1)
