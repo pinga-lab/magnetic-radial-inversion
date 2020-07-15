@@ -1,0 +1,300 @@
+%%gji_extra_guide.tex
+
+\documentclass[extra,mreferee]{gji}
+%\usepackage{timet}
+
+\title[\texttt{gji\_extra.sty} ]  
+  {\texttt{gji\_extra} - additional facilities for use with GJI
+manuscripts} 
+  
+\author[]  {}  
+
+\newcommand{\btx}{\textsc{BibTeX}}
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+The following set of features are derived from other packages with
+slight modifications to make them compatible with the \verb"gji"
+documentclass. They can be accessed by including the \verb"extra"
+option to the \verb"gji" document class e.g.
+\begin{verbatim}
+  \documentclass[extra,mreferee]{gji}
+\end{verbatim}
+
+\section{Reserved Space and Boxed Figures }
+
+It is possible to reserve space for a figure (or to draw a box of
+a specified size) using the \verb!\figbox! command.
+
+The \verb!\figbox! command takes 3 arguments: the
+horizontal and vertical sizes of the space that is to be left blank, as well
+as the contents of the box.
+
+
+For example,
+\begin{verbatim}
+\begin{figure}
+\figbox{6cm}{5cm}{Paste orbits here}
+\caption{The orbits of some planets}
+\end{figure}
+\end{verbatim}
+\begin{figure*}
+\figbox{6cm}{5cm}{Paste orbits here}
+\caption{Illustrating the use of the figbox command for a
+display of the orbits of some planets}
+\end{figure*}
+makes a box 4~cm wide and 6~cm high with the caption text below it.
+The text `Paste orbits here' is simply a note to the author that is
+printed centered in the framed box. This third argument could be left empty,
+or could contain commands for importing a computer plot.  
+
+There is also a starred version \verb!\figbox*! that behaves exactly the same
+as \verb!\figbox! except that no frame is drawn around the figure. This is
+most useful for real figures, whereas the unstarred command is more
+appropriate for reserved space for glued-in figures.
+
+It is possible to have \verb!\figbox! and \verb!\figbox*! scale automatically
+to the size of its contents, something that is also appropriate when the
+contents are an imported graphics file. In this case, leave both the
+dimensions empty. As an example, if the orbit plot exists as an encapsulated
+PostScript file named \texttt{orbit.eps}, then it could be included directly
+with the commands
+\begin{verbatim}
+\begin{figure}
+\figbox*{}{}{%
+ \includegraphics[width=4cm]{orbit.eps}}
+\caption{The orbits of some planets}
+\end{figure}
+\end{verbatim}
+For this to work, you must have loaded the \texttt{graphicx} package with
+\verb!\usepackage! at the beginning of the file, and you must have a
+PostScript driver for the output. (There are other packages with
+different syntaxes for importing graphics; use the one that you are
+most familiar with.)
+
+
+\section{Alternative texts for one or two columns}
+Mathematical formulas often have to be fiddled to fit them into the
+narrow confines of a single column in two-column format, whereas they
+will fit with no problem in the wide columns of the manuscript mode.
+This often results in the author having to massage his formulas when he
+changes between manuscript and camera-ready options, and then back again
+when he want to print the manuscript once more.
+
+The special command \verb!\iftwocol! allows both versions of the text to
+be included in the one document, for automatic selection depending on
+whether two-column mode is active or not. Its syntax is\label{iftwocol}
+\begin{quote}
+\normalsize
+\verb!\iftwocol{!{\em yes\/}\verb!}{!{\em no\/}\verb!}!
+\end{quote}
+where {\em yes\/} is the text that is inserted if two-columns are in
+effect, and {\em no\/} the text that is otherwise taken.
+
+This command may be used in other situations, but the main application 
+is in the case of mathematics.
+
+\section{Literature citations}
+\textit{Geophysical Journal International} uses the
+author-year system of literature citation, something that is not
+supported by standard \LaTeX. The \verb"gji" documentclass
+provides partial support but more comprehensive features are 
+available using features from the \verb"egs" package and the
+\verb"natbib" module developed by P.W.Daly. 
+
+Since there are two ways of making a citation in the author-year system,
+either as Jones et al.\ (1990) or as (Jones et al., 1990), there
+are two variations of the original \verb!\cite! command.
+Suppose the key for the above reference is \texttt{jones90}, then use
+\begin{flushleft}
+\verb!\citet{jones90}! for Jones et al.\ (1990)\\
+\verb!\citep{jones90}! for (Jones et al., 1990)\\
+\verb!\citep[p.~32]{jones90}! for (Jones et al., 1990, p.~32)\\
+\verb!\citep[e.g.,][]{jones90}! for (e.g., Jones et al., 1990)\\
+\verb!\citep[e.g.,][p.~32]{jones90}! for (e.g., Jones et al., 1990, p.~32).
+
+\end{flushleft}
+Note that the use of the optional arguments to add notes within the
+brackets of the citation:
+a single note behaves as in standard \LaTeX, as a note
+\emph{after} the citation; however, with two notes (non-standard), the
+first goes \emph{before}, the second \emph{after} it.
+
+Two other citation commands are available:
+\begin{flushleft}
+\verb!\citeauthor{jones90}! prints Jones et al.\\
+\verb!\citeyear{jones90}! prints 1990.
+\end{flushleft}
+
+For the above examples to function properly, either the \verb"gji"
+bibliography style must be used with \btx, or the
+\texttt{thebibliography} environment must be formatted accordingly.
+
+\begin{flushleft}
+With \btx\\[1ex]
+\verb!\bibliographystyle{!gji\verb!}!\\
+\verb!\bibliography{!{\em bib\_file\_name\/}\verb!}!\\[1ex]
+Without \btx\\[0.5ex]
+\begin{verbatim}
+\begin{thebibliography}{}
+\bibitem[Jones et al.(1990)]{jones90}
+  Jones, J. K., Thomas, P. R. 
+  \& Peters, R. F., 1990.
+  The best results of fitting curves. 
+  \textit{J. Math. Dev.}, \textbf{12}, 1245--1261.
+\end{thebibliography}
+\end{verbatim}
+\end{flushleft}
+
+As an example the References at the end of these notes are
+the same set as used in \verb"gjilguid2e.tex"
+but now cast in the appropriate bibliography environment.
+
+\section{Balancing columns}
+It is possible to make the two columns on the last page to be nearly the
+same height. It is only necessary to give the command \verb!\balance!
+somewhere within the text of the first column on the last page. Issuing
+\verb!\balance! too soon can yield strange results on earlier pages;
+calling it too late has no effect.
+
+It is best to print out the last page without \verb!\balance! when the
+work is nearly completed. If this page has more than one column of text,
+then find some appropriate place within the {\em first\/} column,
+preferably between paragraphs, and add \verb!\balance! to the text there.
+If there is less than one column of text on the last page, then
+\verb!\balance! may be inserted anywhere within the text of that column.
+
+\section{planotables}
+The {\tt planotable} environment that facilitates the 
+formatting of lengthy tables. Tables longer than 
+one page will require the use of {\tt planotable}.
+
+It is possible to create fairly complex tables with 
+arbitrary spacing, straddle heads, rules, etc. in \LaTeX.
+Authors who need to create complicated tables should 
+consult the \LaTeX\ manual [{\it Lamport}, 1985] for 
+details.  Most of \LaTeX's {\tt tabular} capabilities 
+are applicable to {\tt planotables} as well.
+
+Planotables automatically produce table lines and
+vertical table spacing.
+In addition, planotables have several capabilities that 
+facilitate the formatting of tables.  For instance, 
+it is possible to break long planotables across pages, 
+and, where tabular tables print at an automatic width,
+authors may choose a specific planotable width.
+
+Type \verb"\begin{planotable}{COLS}", 
+where {\tt COLS}
+sets the justification for each column.
+Choose one letter (``l,'' ``c,'' or ``r'') for each 
+column, indicating left, center, or right justification.
+
+To set a planotable to a specific width, type 
+\verb"\tablewidth{}", with the desired table width between 
+the curly braces, after the \verb"\begin{planotable}" 
+command.  For instance, to create a single-column table 
+type \verb"\tablewidth{20pc}", where ``20pc'' represents 20 picas.
+
+Type planotable titles within the curly braces of
+\verb"\tablecaption{}" commands.  Capitalize the first
+letter of each word (except for prepositions, conjunctions,
+and articles that are three letters or shorter).  Do not
+allow table caption lines to hyphenate; use a
+\verb"\protect\\" command to break lines where necessary.
+The \verb"\tablecaption" command automatically generates
+the ``{\bf Table \#.}'' information.  
+
+Type a \verb"\startdata" command, and then type your table
+data.  The startdata command formats column headings, 
+engages the tabular formatting, and produces the table 
+caption.  Data within a table row are separated by {\tt \&} 
+(ampersand) characters.  The end of each row is indicated 
+with a \verb"\nl" command.  Extra vertical space can be 
+inserted between rows with a \verb"\vspace{}" command 
+(type the desired amount of space between the curly
+braces).
+
+If a planotable is longer than one page, \LaTeX\ will 
+automatically break it across pages.  To force a page 
+break in a particular place, type a \verb"\tablebreak" 
+command.  This command affects the following line of 
+table data (not the line it appears with) as shown 
+in the sample.tex document.
+
+If a cell contains no data, type a \verb"\nodata" 
+command to create a ``no data'' symbol.
+
+
+\subsection{Table footnotes and table comments}
+
+If your table contains material requiring footnotes, use a
+\verb"\tablemark{TAG}" command to indicate the footnote,
+then type the associated information (with a corresponding
+{\tt TAG}) within a \verb"\tablenotetext{TAG}{}" command.
+
+Short table comments can be created using a\\
+\verb"\tablenotetext{\null}{TEXT}"\\
+command, with a 
+\verb"\null" argument as the tag.  Longer comments may
+be placed within a \verb"\tablecomment{TEXT}" command.
+Lists of table references should use the following
+format: \verb"\tablecomment{References:  Names of your references.}".
+Only one paragraph of material is permitted  at the end of a table,
+(excluding superscripted footnotes), so if both references and notes
+exist, they should be run in together.  
+
+Both \verb"\tablenotetext" and \verb"\tablecomment" 
+commands must appear after the column heading information
+and before the table data; otherwise, they will affect
+indentation of the last table cell.  These commands 
+work with planotables and tabular tables.
+
+
+\begin{acknowledgments}
+Much of this material has been derived from the work of Patrick W. Daly
+for the European Geophysical Society and his efforts in providing
+robust and easy to use features are to be commended.  The American
+Geophysical Union is also to be thanked for permission to use the
+\verb"planotable"  material
+\end{acknowledgments}
+
+\begin{thebibliography}{}  
+  \bibitem[Butcher(1992)]{bu}  
+    Butcher J. 1992. {\it Copy-editing: The Cambridge  
+    Handbook}, 3rd edn, Cambridge Univ. Press, Cambridge.
+  \bibitem[The Chicago Manual(1982)]{cm}  
+    {\it The Chicago Manual of Style}, Univ.   
+    Chicago Press, Chicago, 1982.
+  \bibitem[Chao(1985)]{ch} 
+    Chao, B. F., 1985. Normal mode study of the Earth's rigid 
+     body motions, {\it Geophys. Res. Lett.}, {\bf 12}, 526-529.
+  \bibitem[Hinderer(1986)]{hi}  
+    Hinderer, J., 1986. Resonance effects of the earth's fluid
+    core in earth rotation, in {\it Solved and Unsolved 
+    Problems}, pp. 277-296, ed. Cazenave A., Reidel, 
+    Dordrecht.
+  \bibitem[Kopka \& Daly(1995)]{kd}  
+    Kopka H. \& Daly P.W., 1995, \textit{A guide to} \LaTeX2e,
+    Addison--Wesley, New York  
+  \bibitem[Lamport(1986)]{la}  
+    Lamport L., 1986,  \LaTeX: {\it A Document   
+    Preparation System}, Addison--Wesley, New York  
+  \bibitem[Lindberg (1986)]{bl}  
+    Lindberg, C., 1986.  Multiple taper harmonic analysis of 
+    terrestrial free oscillations, {\it PhD thesis}, 
+    University of California.
+  \bibitem[Maupin(1992)]{ma} 
+    Maupin, V., 1992. Modelling of laterally trapped surface 
+    waves with application to Rayleigh waves in the Hawaiian 
+    swell, {\it Geophys. J. Int.}. {\bf 110}, 553-570.     	
+  \bibitem[Rutherford \& Hawker(1981)]{rh}
+      Rutherford, S. R. \& Hawker, K. E., 1981, 
+    Consistent coupled mode theory of sound propagation for a 
+    class of non-separable problems, 
+   {\it J. acoust. Soc. Am.}, {\bf 71}, 554-564
+\end{thebibliography}  
+  
+\end{document}
