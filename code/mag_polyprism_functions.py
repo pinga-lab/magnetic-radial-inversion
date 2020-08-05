@@ -1896,7 +1896,7 @@ def l1_levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol
         G = Jacobian_tf(xp, yp, zp, model0, M, L, delta[0], delta[1], delta[2], delta[3], inc, dec)
 
         # Hessian matrix
-        H = 2.*np.dot(G.T*1./np.absolute(res0), G)/N
+        H = np.dot(G.T*1./np.absolute(res0), G)/N
 
         # weighting the regularization parameters
         H = Hessian_phi_1(M, L, H, alpha[0])
@@ -1908,7 +1908,7 @@ def l1_levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol
         H = Hessian_phi_7(M, L, H, alpha[6])
 
         # gradient vector
-        grad = -2.*np.dot(G.T*1./np.absolute(res0), res0)/N
+        grad = -np.dot(G.T*1./np.absolute(res0), res0)/N
 
         grad = gradient_phi_1(M, L, grad, alpha[0])
         grad = gradient_phi_2(M, L, grad, alpha[1])
@@ -2375,6 +2375,7 @@ def plot_simple_model_data(x, y, obs, initial, model, filename):
 
 def plot_matrix(z0, intensity, matrix, vmin,
     vmax, solutions, xtitle, ytitle, unity,
+    figsize, dpi=300,
     truevalues=[], filename=''):
     '''
     Returns a plot of the goal function values for each inversion
@@ -2391,11 +2392,13 @@ def plot_matrix(z0, intensity, matrix, vmin,
     vmin: float - maximum value for the colorbar
     solutions: list - list of position on the map of the chosen
                         solutions for the plots [[x1, y1],[x2, y2]]
-    truevalues: list - list of position [x, y] on the map of the
-                        true values for the parameters z0 and intensity
     xtitle: string - x axis title
     ytitle: string - y axis title
     unity: string - unity of the function
+    figsize: tuple - size of the figure
+    dpi: integer - resolution of the figure
+    truevalues: list - list of position [x, y] on the map of the
+                true values for the parameters z0 and intensity
     filename: string - directory and filename of the figure
 
     output
@@ -2440,7 +2443,8 @@ def plot_matrix(z0, intensity, matrix, vmin,
         plt.savefig(filename, dpi=300, bbox_inches='tight')
     return plt.show()
 
-def plot_complex_model_data(x, y, obs, alt, initial, model, filename):
+def plot_complex_model_data(x, y, obs, alt, initial, model,
+        figsize, dpi=300, filename=''):
     '''
     Returns a plot of synthetic total-field anomaly
     data produced by the complex model and the true model
@@ -2455,19 +2459,17 @@ def plot_complex_model_data(x, y, obs, alt, initial, model, filename):
                     of the initial approximate
     model: list - list of fatiando.mesher.PolygonalPrism
                     of the simple model
+    figsize: tuple - size of the figure
+    dpi: integer - resolution of the figure
     filename: string - directory and filename of the figure
 
     output
     fig: figure - plot
     '''
 
-    for i in range(len(model)):
-        model[i].z1 += 430.
-        model[i].z2 += 430.
-
     verts_true = plot_prisms(model, scale=0.001)
 
-    plt.figure(figsize=(10,9))
+    plt.figure(figsize=figsize)
 
     # sinthetic data
     ax=plt.subplot(2,2,1)
@@ -2531,14 +2533,140 @@ def plot_complex_model_data(x, y, obs, alt, initial, model, filename):
 
     plt.tight_layout()
 
-    plt.savefig(filename, dpi=300, bbox_inches='tight')
+    if filename == '':
+        pass
+    else:
+        plt.savefig(filename, dpi=dpi, bbox_inches='tight')
+
+    return plt.show()
+
+def plot_inter_model_data(x, y, z, obs, initial, model,
+    inc, dec, figsize, dpi=300, 
+    angles=[], area=[], filename=''):
+    '''
+    Returns a plot of synthetic total-field anomaly
+    data produced by the complex model and the true model
+    
+    input
+    x, y, z: 1D array - Cartesian coordinates of the 
+                        total-field anomaly data
+    xa, ya: 1D array - Cartesian coordinates of the observations
+    obs: 1D array - synthetic total-field anomaly data
+    alt: 1D array - geometric heigt of the observations
+    initial: list - fatiando.mesher.PolygonalPrism
+                    of the initial approximate
+    insetposition: tuple - position of the inset histogram   
+    model: list - list of fatiando.mesher.PolygonalPrism
+                    of the simple model
+    inc, dec: float - inclination and declination of
+                        Earth's main field
+    figsize: tuple - size of the figure
+    dpi: integer - resolution of the figure
+    filename: string - directory and filename of the figure
+
+    output
+    fig: figure - plot
+    '''
+    inter_data = polyprism.tf(x, y, z, [model[-1]], inc, dec)
+
+    if area != []:
+        pass
+    else:
+        area = [np.min(x)/1000., np.max(x)/1000.,
+        np.min(y)/1000., np.max(y)/1000.]
+
+    if angles != []:
+        pass
+    else:
+        angles = [10, 50, 10, 50, 20, 160]
+    
+    V = model[0].x.size
+
+    verts_true = plot_prisms(model, scale=0.001)
+
+    plt.figure(figsize=figsize)
+
+    # sinthetic data
+    ax=plt.subplot(2,2,1)
+    plt.tricontour(y, x, obs, 20, linewidths=0.5, colors='k')
+    plt.tricontourf(y, x, obs, 20,
+                    cmap='RdBu_r', vmin=-np.max(obs),
+                    vmax=np.max(obs)).ax.tick_params(labelsize=10)
+    plt.plot(y, x, 'ko', markersize=.25)
+    plt.xlabel('$y$(km)', fontsize=14)
+    plt.ylabel('$x$(km)', fontsize=14)
+    clb = plt.colorbar(pad=0.01, aspect=20, shrink=1)
+    clb.ax.set_title('nT', pad=-315)
+    #mpl.polygon(initial, '.-r', xy2ne=True)
+    mpl.polygon(model[0], '.-b', xy2ne=True)
+    mpl.polygon(model[-1], '.-y', xy2ne=True)
+    mpl.m2km()
+    clb.ax.tick_params(labelsize=13)
+    plt.plot(y, x, 'k.', markersize=.25)
+    plt.text(-5600, 3800, '(a)', fontsize= 15)
+
+    # plot interfering data
+    ax=plt.subplot(2,2,2)
+    plt.tricontour(y, x, inter_data, 20, linewidths=0.5, colors='k')
+    plt.tricontourf(y, x, inter_data, 20,
+                    cmap='RdBu_r', vmin=-np.max(inter_data),
+                    vmax=np.max(inter_data)).ax.tick_params(labelsize=10)
+    plt.xlabel('$y$(km)', fontsize=14)
+    plt.ylabel('$x$(km)', fontsize=14)
+    clb = plt.colorbar(pad=0.01, aspect=20, shrink=1)
+    clb.ax.set_title('nT', pad=-315)
+    mpl.polygon(model[-1], '.-y', xy2ne=True)
+    mpl.m2km()
+    clb.ax.tick_params(labelsize=13)
+    plt.plot(y, x, 'ko', markersize=.25)
+    plt.text(-5600, 3800, '(b)', fontsize= 15)
+
+    # true model
+    ax = plt.subplot(2,2,3, projection='3d')
+    ax.add_collection3d(Poly3DCollection(verts_true[:-V/2-2], alpha=0.3, 
+    facecolor='b', linewidths=0.5, edgecolors='k'))
+    ax.add_collection3d(Poly3DCollection(verts_true[-V/2-2:], alpha=1., 
+    facecolor='y', linewidths=0.5, edgecolors='k'))
+
+    ax.set_xlim(area[0]/2, area[1]/2, 100)
+    ax.set_ylim(area[2]/2, area[3]/2, 100)
+    ax.set_zlim(7, -0.2, 100)
+    ax.tick_params(labelsize= 10)
+    ax.set_ylabel('y (km)', fontsize= 14)
+    ax.set_xlabel('x (km)', fontsize= 14)
+    ax.set_zlabel('z (km)', fontsize= 14)
+    ax.view_init(15, 45)
+    ax.text2D(-0.12, 0.07, '(c)', fontsize= 15)
+
+    # true model
+    ax = plt.subplot(2,2,4, projection='3d')
+    ax.add_collection3d(Poly3DCollection(verts_true[:V+2], alpha=0.3, 
+    facecolor='b', linewidths=0.5, edgecolors='k'))
+    ax.add_collection3d(Poly3DCollection(verts_true[-V/2-2:], alpha=1., 
+    facecolor='y', linewidths=0.5, edgecolors='k'))
+
+    ax.set_xlim(area[0]/4. + 0.5, area[1]/4. +1., 100)
+    ax.set_ylim(area[2]/4., area[3]/4., 100)
+    ax.set_zlim(1, -0.2, 100)
+    ax.tick_params(labelsize= 10)
+    ax.set_ylabel('y (km)', fontsize= 14)
+    ax.set_xlabel('x (km)', fontsize= 14)
+    ax.set_zlabel('z (km)', fontsize= 14)
+    ax.view_init(15, 135)
+    ax.text2D(-0.12, 0.07, '(d)', fontsize= 15)
+
+    if filename == '':
+        pass
+    else:
+        plt.savefig(filename, dpi=dpi, bbox_inches='tight')
 
     return plt.show()
 
 def plot_solution(xp, yp, zp,
     residuals, solution, initial,
+    figsize, dpi=300, insetposition=(0.5, 0.95),
     angles=[], area=[], model=[],
-    filename='', inter=False):
+    filename='', inter=False, norm=2):
     '''
     Returns a plot of the resdiuals, initial approximate
     and two perspective views of the solution for the
@@ -2551,6 +2679,9 @@ def plot_solution(xp, yp, zp,
                     of the estimated model
     initial: list - list of a fatiando.mesher.PolygonalPrism
                     of the initial approximate
+    figsize: tuple - size of the figure
+    dpi: integer - resolution of the figure
+    insetposition: tuple - position of the inset histogram
     angles: list - list of perspective angles of the 3D plots,
                     default: [10, 50, 10, 50, 20, 160]
     area: list - list of minimum and maximum values for the
@@ -2561,6 +2692,7 @@ def plot_solution(xp, yp, zp,
                     default: []
     filename: string - directory and filename of the figure
     inter: boolean - presence of an interfering body
+    norm: interger - norm order of the misfit function (1 or 2)
 
     output
     fig: figure - plot of the result
@@ -2592,14 +2724,14 @@ def plot_solution(xp, yp, zp,
             else:
                 zb = solution[-1].z2/1000. + 0.5
         elif inter == True:
-            if model[-1].z2 >= solution[-2].z2:
-                zb = model[-1].z2/1000. + 0.5
+            if model[-2].z2 >= solution[-1].z2:
+                zb = model[-2].z2/1000. + 0.5
             else:
-                zb = solution[-2].z2/1000. + 0.5
+                zb = solution[-1].z2/1000. + 0.5
     else:
         zb = solution[-1].z2/1000. + 0.5
 
-    plt.figure(figsize=(10,9))
+    plt.figure(figsize=figsize)
 
     # residual data and histogram
     ax=plt.subplot(2,2,1)
@@ -2625,13 +2757,20 @@ def plot_solution(xp, yp, zp,
     mean = np.mean(residuals)
     std = np.std(residuals)
     nbins=30
-    n, bins, patches = plt.hist(residuals,bins=nbins, normed=True, facecolor='blue')
+    n, bins, patches = plt.hist(residuals,bins=nbins, density=True, facecolor='blue')
     props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
-    inset.text(0.5, 0.95, "$\mu$ = {:.1f}\n$\sigma$ = {:.1f}".format(mean, std),
-                    transform=inset.transAxes, fontsize=8,
-                va='top', ha='left', bbox=props)
-    gauss = sp.norm.pdf(bins, mean, std)
-    plt.plot(bins, gauss, 'k--', linewidth=1., label='Gaussian')
+    inset.text(
+        insetposition[0], insetposition[1],
+        "$\mu$ = {:.1f}\n$\sigma$ = {:.1f}".format(mean, std),
+        transform=inset.transAxes, fontsize=8,
+        va='top', ha='left', bbox=props
+        )
+    if norm == 2:
+        gauss = sp.norm.pdf(bins, mean, std)
+        plt.plot(bins, gauss, 'k--', linewidth=1., label='Gaussian')
+    else:
+        laplace = sp.laplace.pdf(bins, mean, std)
+        plt.plot(bins, laplace, 'k--', linewidth=1., label='Laplacian')
     ax.text(np.min(y)-1., np.max(x)+.6, '(a)', fontsize= 15)
 
     # initial approximate
@@ -2653,7 +2792,7 @@ def plot_solution(xp, yp, zp,
 
     ax.set_ylim(area[0], area[1], 100)
     ax.set_xlim(area[2], area[3], 100)
-    ax.set_zlim(initial[-1].z2/1000. + 1, 0., 100)
+    ax.set_zlim(initial[-1].z2/1000. + 1, -0.5, 100)
     ax.tick_params(labelsize= 10)
     ax.set_ylabel('x (km)', fontsize= 14)
     ax.set_xlabel('y (km)', fontsize= 14)
@@ -2674,7 +2813,7 @@ def plot_solution(xp, yp, zp,
     elif inter == True:
         ax.add_collection3d(Poly3DCollection(verts_true[:-V/2-2], alpha=0.3, 
         facecolor='b', linewidths=0.5, edgecolors='k'))
-        ax.add_collection3d(Poly3DCollection(verts_true[-V/2-2:], alpha=1., 
+        ax.add_collection3d(Poly3DCollection(verts_true[-V/2-2:], alpha=1.,
         facecolor='y', linewidths=0.5, edgecolors='k'))
     else:
         ax.add_collection3d(Poly3DCollection(verts_true, alpha=0.3, 
@@ -2682,7 +2821,7 @@ def plot_solution(xp, yp, zp,
 
     ax.set_ylim(area[0], area[1], 100)
     ax.set_xlim(area[2], area[3], 100)
-    ax.set_zlim(zb, 0., 100)
+    ax.set_zlim(zb, -0.5, 100)
     ax.tick_params(labelsize= 10)
     ax.set_ylabel('x (km)', fontsize= 14)
     ax.set_xlabel('y (km)', fontsize= 14)
@@ -2711,7 +2850,7 @@ def plot_solution(xp, yp, zp,
 
     ax.set_ylim(area[0], area[1], 100)
     ax.set_xlim(area[2], area[3], 100)
-    ax.set_zlim(zb, 0, 100)
+    ax.set_zlim(zb, -0.5, 100)
     ax.tick_params(labelsize= 10)
     ax.set_ylabel('x (km)', fontsize= 14)
     ax.set_xlabel('y (km)', fontsize= 14)
@@ -2724,10 +2863,11 @@ def plot_solution(xp, yp, zp,
     if filename == '':
         pass
     else:
-        plt.savefig(filename, dpi=300, bbox_inches='tight')
+        plt.savefig(filename, dpi=dpi)
     return plt.show()
 
-def plot_obs_alt(x, y, obs, alt, topo, initial, filename):
+def plot_obs_alt(x, y, obs, alt, topo,
+    initial, figsize, dpi=300, filename=''):
     '''
     Returns a plot of upward continued total-field anomaly
     data and the elevation of the observations
@@ -2739,13 +2879,15 @@ def plot_obs_alt(x, y, obs, alt, topo, initial, filename):
     topo: 1D array - geometric heigt of the topography
     initial: list - fatiando.mesher.PolygonalPrism
                     of the initial approximate
+    figsize: tuple - size of the figure
+    dpi: integer - resolution of the figure
     filename: string - directory and filename of the figure
 
     output
     fig: figure - plot
     '''
 
-    plt.figure(figsize=(13,11))
+    plt.figure(figsize=figsize)
 
     ax=plt.subplot(2,2,1)
     plt.tricontour(y, x, obs, 30, linewidths=0.4, colors='k')
@@ -2759,7 +2901,7 @@ def plot_obs_alt(x, y, obs, alt, topo, initial, filename):
     clb = plt.colorbar(pad=0.01, aspect=40, shrink=1)
     clb.ax.tick_params(labelsize=13)
     clb.ax.set_title('nT', pad=-285)
-    ax.text(681000, 6925000, '(a)', fontsize= 15)
+    ax.text(np.min(y)-1000, np.max(x)+300, '(a)', fontsize= 15)
     mpl.m2km()
 
     ax=plt.subplot(2,2,2)
@@ -2771,11 +2913,11 @@ def plot_obs_alt(x, y, obs, alt, topo, initial, filename):
     clb = plt.colorbar(pad=0.01, aspect=40, shrink=1)
     clb.ax.set_title('m', pad=-285)
     clb.ax.tick_params(labelsize=13)
-    ax.text(681500, 6925000, '(b)', fontsize= 15)
+    ax.text(np.min(y)-1000, np.max(x)+300, '(b)', fontsize= 15)
     mpl.m2km()
 
     ax=plt.subplot(2,2,3)
-    plt.tricontourf(y, x, topo, 10, cmap='terrain_r', vmax=500).ax.tick_params(labelsize=12)
+    plt.tricontourf(y, x, topo, 10, cmap='terrain_r', vmax=300).ax.tick_params(labelsize=12)
     plt.plot(y, x, 'ko', markersize=.25)
     plt.xlabel('$y$(km)', fontsize=14)
     plt.ylabel('$x$(km)', fontsize=14)
@@ -2783,8 +2925,11 @@ def plot_obs_alt(x, y, obs, alt, topo, initial, filename):
     clb = plt.colorbar(pad=0.01, aspect=40, shrink=1)
     clb.ax.set_title('m', pad=-285)
     clb.ax.tick_params(labelsize=13)
-    ax.text(681000, 6925000, '(c)', fontsize= 15)
+    ax.text(np.min(y)-1000, np.max(x)+300, '(c)', fontsize= 15)
     mpl.m2km()
 
-    plt.savefig(filename, dpi=300, bbox_inches='tight')
+    if filename == '':
+        pass
+    else:
+        plt.savefig(filename, dpi=dpi)
     return plt.show()
