@@ -1813,7 +1813,9 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
 
     return d_fit, m_est, model_est, phi_list, model_list, res_list
 
-def l1_levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, mmin, mmax, m_out, dobs, inc, dec, props, alpha, z0, dz):
+def l1_levmarq_tf(xp, yp, zp, m0, M, L, delta,
+        maxit, maxsteps, lamb, dlamb, tol, mmin,
+        mmax, m_out, dobs, inc, dec, props, alpha, z0, dz):
     '''
     This function minimizes the goal function of a set of polygonal prism
     for total-field-anomaly using the Levenberg-Marqudt algorithm.
@@ -1871,7 +1873,7 @@ def l1_levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol
     G0 = Jacobian_tf(xp, yp, zp, model0, M, L, delta[0], delta[1], delta[2], delta[3], inc, dec)
 
     # Scale factor of misfit function
-    th = np.trace(2.*np.dot(G0.T, G0)/N)
+    th = np.trace(2.*np.dot(G0.T*1./np.absolute(res0), G0)/N)
 
     # Scale factors of the constraint functions
     th_constraints = []
@@ -2737,12 +2739,12 @@ def plot_solution(xp, yp, zp,
     ax=plt.subplot(2,2,1)
     plt.tricontourf(y, x, residuals, 20,
                     cmap='RdBu_r', vmin=-np.max(residuals),
-                    vmax=np.max(residuals)).ax.tick_params(labelsize=12)
-    plt.xlabel('$y$(m)', fontsize=14)
-    plt.ylabel('$x$(m)', fontsize=14)
+                    vmax=np.max(residuals)).ax.tick_params(labelsize=6)
+    plt.xlabel('$y$(km)', fontsize=8, labelpad=0)
+    plt.ylabel('$x$(km)', fontsize=8, labelpad=0)
     clb = plt.colorbar(pad=0.01, aspect=20, shrink=1)
-    clb.ax.set_title('nT', pad=-285)
-    clb.ax.tick_params(labelsize=13)
+    clb.ax.set_title('nT', pad=-115, fontsize=6)
+    clb.ax.tick_params(labelsize=6)
 
     # horizontal projection of the prisms
     for s in solution:
@@ -2753,16 +2755,17 @@ def plot_solution(xp, yp, zp,
         mpl.polygon(s, fill='k', alpha=0.1, linealpha=0.1, xy2ne=True)
 
     # histogram inset
-    inset = inset_axes(ax, width="40%", height="30%", loc=1, borderpad=0.7)
+    inset = inset_axes(ax, width="40%", height="30%", loc=1, borderpad=0.5)
     mean = np.mean(residuals)
     std = np.std(residuals)
     nbins=30
-    n, bins, patches = plt.hist(residuals,bins=nbins, density=True, facecolor='blue')
+    n, bins, patches = plt.hist(residuals, bins=nbins, density=True, facecolor='blue')
+    plt.tick_params(labelsize=6)
     props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
     inset.text(
         insetposition[0], insetposition[1],
         "$\mu$ = {:.1f}\n$\sigma$ = {:.1f}".format(mean, std),
-        transform=inset.transAxes, fontsize=8,
+        transform=inset.transAxes, fontsize=4,
         va='top', ha='left', bbox=props
         )
     if norm == 2:
@@ -2771,7 +2774,7 @@ def plot_solution(xp, yp, zp,
     else:
         laplace = sp.laplace.pdf(bins, mean, std)
         plt.plot(bins, laplace, 'k--', linewidth=1., label='Laplacian')
-    ax.text(np.min(y)-1., np.max(x)+.6, '(a)', fontsize= 15)
+    ax.text(np.min(y)-1., np.max(x)+.6, '(a)', fontsize= 10)
 
     # initial approximate
     ax = plt.subplot(2,2,2, projection='3d')
@@ -2793,14 +2796,14 @@ def plot_solution(xp, yp, zp,
     ax.set_ylim(area[0], area[1], 100)
     ax.set_xlim(area[2], area[3], 100)
     ax.set_zlim(initial[-1].z2/1000. + 1, -0.5, 100)
-    ax.tick_params(labelsize= 10)
-    ax.set_ylabel('x (km)', fontsize= 14)
-    ax.set_xlabel('y (km)', fontsize= 14)
-    ax.set_zlabel('z (km)', fontsize= 14)
+    ax.tick_params(labelsize= 6, pad=-2)
+    ax.set_ylabel('x (km)', fontsize= 8, labelpad=-6)
+    ax.set_xlabel('y (km)', fontsize= 8, labelpad=-6)
+    ax.set_zlabel('z (km)', fontsize= 8, labelpad=-6)
     ax.set_yticks(np.arange(area[0], area[1], 2))
     ax.set_xticks(np.arange(area[2], area[3], 2))
     ax.view_init(angles[0], angles[1])
-    ax.text2D(-0.1, 0.1, '(b)', fontsize= 15)
+    ax.text2D(-0.1, 0.1, '(b)', fontsize=  10)
 
     # inverse model view 1
     ax = plt.subplot(2,2,3, projection='3d')
@@ -2822,14 +2825,14 @@ def plot_solution(xp, yp, zp,
     ax.set_ylim(area[0], area[1], 100)
     ax.set_xlim(area[2], area[3], 100)
     ax.set_zlim(zb, -0.5, 100)
-    ax.tick_params(labelsize= 10)
-    ax.set_ylabel('x (km)', fontsize= 14)
-    ax.set_xlabel('y (km)', fontsize= 14)
-    ax.set_zlabel('z (km)', fontsize= 14)
+    ax.tick_params(labelsize= 6, pad=-2)
+    ax.set_ylabel('x (km)', fontsize= 8, labelpad=-6)
+    ax.set_xlabel('y (km)', fontsize= 8, labelpad=-6)
+    ax.set_zlabel('z (km)', fontsize= 8, labelpad=-6)
     ax.set_yticks(np.arange(area[0], area[1], 2))
     ax.set_xticks(np.arange(area[2], area[3], 2))
     ax.view_init(angles[2], angles[3])
-    ax.text2D(-0.12, 0.07, '(c)', fontsize= 15)
+    ax.text2D(-0.12, 0.07, '(c)', fontsize=  10)
 
     # inverse model view 2
     ax = plt.subplot(2,2,4, projection='3d')
@@ -2851,14 +2854,14 @@ def plot_solution(xp, yp, zp,
     ax.set_ylim(area[0], area[1], 100)
     ax.set_xlim(area[2], area[3], 100)
     ax.set_zlim(zb, -0.5, 100)
-    ax.tick_params(labelsize= 10)
-    ax.set_ylabel('x (km)', fontsize= 14)
-    ax.set_xlabel('y (km)', fontsize= 14)
-    ax.set_zlabel('z (km)', fontsize= 14)
+    ax.tick_params(labelsize= 6, pad=-2)
+    ax.set_ylabel('x (km)', fontsize= 8, labelpad=-6)
+    ax.set_xlabel('y (km)', fontsize= 8, labelpad=-6)
+    ax.set_zlabel('z (km)', fontsize= 8, labelpad=-6)
     ax.set_yticks(np.arange(area[0], area[1], 2))
     ax.set_xticks(np.arange(area[2], area[3], 2))
     ax.view_init(angles[4], angles[5])
-    ax.text2D(-0.1, 0.07, '(d)', fontsize= 15)
+    ax.text2D(-0.1, 0.07, '(d)', fontsize=  10)
 
     if filename == '':
         pass
