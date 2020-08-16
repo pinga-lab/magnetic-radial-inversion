@@ -1813,323 +1813,6 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
 
     return d_fit, m_est, model_est, phi_list, model_list, res_list
 
-def l1_levmarq_tf(xp, yp, zp, m0, M, L, delta,
-        maxit, maxsteps, lamb, dlamb, tol, mmin,
-        mmax, m_out, dobs, inc, dec, props, alpha, z0, dz):
-    '''
-    This function minimizes the goal function of a set of polygonal prism
-    for total-field-anomaly using the Levenberg-Marqudt algorithm.
-
-    input
-
-    xp, yp, zp: 1D array - observation points
-    m0: 1D array - initial parameters vector
-    M: integer - number of vertices
-    L: int - number of prisms
-    delta: 1D vector - (deltax, deltay, deltar, deltaz) increments
-            for x, y, r and z coordinate in meters
-    maxit: int - number of iterations
-    maxsteps: int - number of steps
-    lamb: float - Marquadt's parameter
-    dlamb: float - variation of Marquadt's parameter
-    tol: float - convergence criterion
-    mmin: array - minimum values for each parameters (rmin, x0min, y0min)
-    mmax: array - maximum values for each parameters (rmax, x0max, y0max)
-    m_out: array - parameters from the outcropping body (M+2)
-    dobs: array - observed data
-    inc, dec: float - inclination and declination of the local-geomagnetic field
-    props: dictionary - direction of magnetization
-    alpha: 1D vector - (a1, a2, a3, a4 , a5, a6, a7) regularization parameters
-    z0: float - the top of the source
-    dz: float - thickness of the prisms
-    output
-
-    d_fit: array - fitted data
-    m_est: array - estimated parameters
-    model_est: list - objects of fatiando.mesher.polyprisms
-    phi_list: list - solutions of objective funtion
-    model_list: list - estimated models at each iteration
-    res_list: list - calculated residual at each iteration
-    '''
-    P = L*(M + 2) + 1
-    assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
-    assert xp.shape == yp.shape == zp.shape, 'xp, yp and zp must have the same shape'
-    assert m0.size == P, 'The size of m0 must be equal to P'
-    assert m0.shape == (P,), 'The shape of m0 must be equal to (P,)'
-    assert np.alltrue > (alpha.all >= 0.), 'The regularization parameters must be positive or zero'
-    assert dz > 0., 'dz must be a positive number'
-    assert lamb > 0., 'lamb must be a positive number'
-    assert dlamb > 0., 'dlamb must be a positive number'
-    assert tol > 0., 'tol must be a positive number'
-
-    model0 = param2polyprism(m0, M, L, z0, props) # list of classes of prisms
-    d0 = polyprism.tf(xp, yp, zp, model0, inc, dec) # predict data
-    res0 = dobs - d0 + 1e-10
-    N = xp.size
-    phi0 = np.sum(np.absolute(res0))/N
-    phi_list = [phi0]
-    model_list = [model0]
-    res_list = [res0]
-    G0 = Jacobian_tf(xp, yp, zp, model0, M, L, delta[0], delta[1], delta[2], delta[3], inc, dec)
-
-    # Scale factor of misfit function
-    th = np.trace(2.*np.dot(G0.T*1./np.absolute(res0), G0)/N)
-
-    # Scale factors of the constraint functions
-    th_constraints = []
-    d0, d1, dM = diags_phi_1(M, L)
-    th_constraints.append(np.sum(d0)) # phi1
-    d0, d1 = diags_phi_2(M, L)
-    th_constraints.append(np.sum(d0)) # phi2
-    th_constraints.append(2.*(M+2)) # phi3
-    th_constraints.append(2.*2) # phi4
-    d0, d1 = diags_phi_5(M, L)
-    th_constraints.append(np.sum(d0)) # phi5
-    d0 = diags_phi_6(M, L)
-    th_constraints.append(np.sum(d0)) # phi6
-    th_constraints.append(2.) # phi7
-
-    alpha *= th/th_constraints
-
-    for it in range(maxit):
-        mt = log_barrier(m0, M, L, mmax, mmin)
-
-        # Jacobian matrix
-        G = Jacobian_tf(xp, yp, zp, model0, M, L, delta[0], delta[1], delta[2], delta[3], inc, dec)
-
-        # Hessian matrix
-        H = np.dot(G.T*1./np.absolute(res0), G)/N
-
-        # weighting the regularization parameters
-        H = Hessian_phi_1(M, L, H, alpha[0])
-        H = Hessian_phi_2(M, L, H, alpha[1])
-        H = Hessian_phi_3(M, L, H, alpha[2])
-        H = Hessian_phi_4(M, L, H, alpha[3])
-        H = Hessian_phi_5(M, L, H, alpha[4])
-        H = Hessian_phi_6(M, L, H, alpha[5])
-        H = Hessian_phi_7(M, L, H, alpha[6])
-
-        # gradient vector
-        grad = -np.dot(G.T*1./np.absolute(res0), res0)/N
-
-        grad = gradient_phi_1(M, L, grad, alpha[0])
-        grad = gradient_phi_2(M, L, grad, alpha[1])
-        grad = gradient_phi_3(M, L, grad, m_out, alpha[2])
-        grad = gradient_phi_4(M, L, grad, m_out[-2:], alpha[3])
-        grad = gradient_phi_5(M, L, grad, alpha[4])
-        grad = gradient_phi_6(M, L, grad, alpha[5])
-        grad = gradient_phi_7(M, L, grad, alpha[6])
-
-        # positivity constraint
-        H *= ((mmax - m0 + 1e-10)*(m0 - mmin + 1e-10))/(mmax - mmin)
-
-        # Hessian normalization
-        D = 1./np.sqrt(np.diag(H))
-
-        for it_marq in range(maxsteps):
-
-            delta_mt = D*(np.linalg.solve((D*(H.T*D).T) + lamb*np.identity(mt.size), -D*grad)).T
-            #delta_mt = np.linalg.solve(H + lamb*np.identity(mt.size), -grad).T
-            m_est = inv_log_barrier(mt + delta_mt, M, L, mmax, mmin)
-            model_est = param2polyprism(m_est, M, L, z0, props)
-            d_fit = polyprism.tf(xp, yp, zp, model_est, inc, dec)
-            res = dobs - d_fit + 1e-10
-            phi = np.sum(np.absolute(res))/N
-            phi += phi_1(M, L, m_est, alpha[0]) + \
-                    phi_2(M, L, m_est, alpha[1]) + \
-                    phi_3(M, L, m_est, m_out, alpha[2]) + \
-                    phi_4(M, L, m_est, m_out[-2:], alpha[3]) + \
-                    phi_5(M, L, m_est, alpha[4]) + \
-                    phi_6(M, L, m_est, alpha[5]) + \
-                    phi_7(M, L, m_est, alpha[6])
-
-            dphi = phi - phi0
-
-            print 'it: %2d   it_marq: %2d   lambda: %.e   init obj.: %.5e  fin obj.: %.5e' % (it, it_marq, lamb, phi0, phi)
-
-            if (dphi > 0.):
-                lamb *= dlamb
-                if it_marq == maxsteps - 1:
-                    phi = phi0
-            else:
-                if lamb/dlamb < 1e-15:
-                    lamb = 1e-15
-                else:
-                    lamb /= dlamb
-                break
-
-        phi_list.append(phi)
-        model_list.append(model_est)
-        res_list.append(res)
-        if (abs(dphi/phi0) < tol):
-            break
-        else:
-            d0 = d_fit.copy()
-            m0 = m_est.copy()
-            model0 = model_est
-            res0 = res.copy()
-            phi0 = phi
-
-    return d_fit, m_est, model_est, phi_list, model_list, res_list
-
-def levmarq_amf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, mmin, mmax, m_out, dobs, props, alpha, z0, dz):
-    '''
-    This function minimizes the goal function of a set of polygonal prism
-    for anomalous magnetic field amplitude using the Levenberg-Marqudt algorithm.
-
-    input
-
-    xp, yp, zp: 1D array - observation points
-    m0: 1D array - initial parameters vector
-    M: integer - number of vertices
-    L: int - number of prisms
-    delta: 1D vector - (deltax, deltay, deltar, deltaz) increments for x, y, r and z coordinate in meters
-    maxit: int - number of iterations
-    maxsteps: int - number of steps
-    lamb: float - Marquadt's parameter
-    dlamb: float - variation of Marquadt's parameter
-    tol: float - convergence criterion
-    mmin: array - minimum values for each parameters (rmin, x0min, y0min)
-    mmax: array - maximum values for each parameters (rmax, x0max, y0max)
-    m_out: array - parameters from the outcropping body (M+2)
-    dobs: array - observed data
-    props: dictionary - direction of magnetization
-    alpha: 1D vector - (a1, a2, a3, a4 , a5, a6, a7) regularization parameters
-    z0: float - the top of the source
-    dz: float - thickness of the prisms
-    output
-
-    d0: array - fitted data
-    m0: array - estimated parameters
-    model0: list - objects of fatiando.mesher.polyprisms
-    phi_list: list - solutions of objective funtion
-    model_list: list - estimated models at each iteration
-    res_list: list - calculated residual at each iteration
-    '''
-    P = L*(M + 2) + 1
-    assert xp.size == yp.size == zp.size, 'The number of points in x, y and z must be equal'
-    assert xp.shape == yp.shape == zp.shape, 'xp, yp and zp must have the same shape'
-    assert m0.size == P, 'The size of m0 must be equal to P'
-    assert m0.shape == (P,), 'The shape of m0 must be equal to (P,)'
-    assert np.alltrue > (alpha.all >= 0.), 'The regularization parameters must be positive or zero'
-    assert dz > 0., 'dz must be a positive number'
-    assert lamb > 0., 'lamb must be a positive number'
-    assert dlamb > 0., 'dlamb must be a positive number'
-    assert tol > 0., 'tol must be a positive number'
-
-    model0 = param2polyprism(m0, M, L, z0, props) # list of classes of prisms
-    d0 = np.sqrt(polyprism.bx(xp, yp, zp, model0)**2. + \
-                 polyprism.by(xp, yp, zp, model0)**2. + \
-                 polyprism.bz(xp, yp, zp, model0)**2.)
-    res0 = dobs - d0
-    N = xp.size
-    phi0 = np.sum(res0*res0)/N
-    phi_list = [phi0]
-    model_list = [model0]
-    res_list = [res0]
-    G0 = Jacobian_amf(xp, yp, zp, model0, M, L, delta[0], delta[1], delta[2], delta[3])
-
-    # Scale factor of misfit function
-    th = np.trace(2.*np.dot(G0.T, G0)/N)
-
-    # Scale factors of the constraint functions
-    th_constraints = []
-    d0, d1, dM = diags_phi_1(M, L)
-    th_constraints.append(np.sum(d0)) # phi1
-    d0, d1 = diags_phi_2(M, L)
-    th_constraints.append(np.sum(d0)) # phi2
-    th_constraints.append(2.*(M+2)) # phi3
-    th_constraints.append(2.*2) # phi4
-    d0, d1 = diags_phi_5(M, L)
-    th_constraints.append(np.sum(d0)) # phi5
-    d0 = diags_phi_6(M, L)
-    th_constraints.append(np.sum(d0)) # phi6
-    th_constraints.append(2.) # phi7
-
-    alpha *= th/th_constraints
-
-    for it in range(maxit):
-        mt = log_barrier(m0, M, L, mmax, mmin)
-
-        # Jacobian matrix
-        G = Jacobian_amf(xp, yp, zp, model0, M, L, delta[0], delta[1], delta[2], delta[3])
-
-        # Hessian matrix
-        H = 2.*np.dot(G.T, G)/N
-
-        # weighting the regularization parameters
-        H = Hessian_phi_1(M, L, H, alpha[0])
-        H = Hessian_phi_2(M, L, H, alpha[1])
-        H = Hessian_phi_3(M, L, H, alpha[2])
-        H = Hessian_phi_4(M, L, H, alpha[3])
-        H = Hessian_phi_5(M, L, H, alpha[4])
-        H = Hessian_phi_6(M, L, H, alpha[5])
-        H = Hessian_phi_7(M, L, H, alpha[6])
-
-        # gradient vector
-        grad = -2.*np.dot(G.T, res0)/N
-
-        grad = gradient_phi_1(M, L, grad, alpha[0])
-        grad = gradient_phi_2(M, L, grad, alpha[1])
-        grad = gradient_phi_3(M, L, grad, m_out, alpha[2])
-        grad = gradient_phi_4(M, L, grad, m_out[-2:], alpha[3])
-        grad = gradient_phi_5(M, L, grad, alpha[4])
-        grad = gradient_phi_6(M, L, grad, alpha[5])
-        grad = gradient_phi_7(M, L, grad, alpha[6])
-
-        # positivity constraint
-        H *= ((mmax - m0 + 1e-10)*(m0 - mmin + 1e-10))/(mmax - mmin)
-
-        # Hessian normalization
-        D = 1./np.sqrt(np.diag(H))
-
-        for it_marq in range(maxsteps):
-
-            delta_mt = D*(np.linalg.solve((D*(H.T*D).T) + lamb*np.identity(mt.size), -D*grad)).T
-            m_est = inv_log_barrier(mt + delta_mt, M, L, mmax, mmin)
-            model_est = param2polyprism(m_est, M, L, z0, props)
-            d_fit = np.sqrt(polyprism.bx(xp, yp, zp, model_est)**2. + \
-                            polyprism.by(xp, yp, zp, model_est)**2. + \
-                            polyprism.bz(xp, yp, zp, model_est)**2.)
-            res = dobs - d_fit
-            phi = np.sum(res*res)/N
-            phi += phi_1(M, L, m_est, alpha[0]) + \
-                    phi_2(M, L, m_est, alpha[1]) + \
-                    phi_3(M, L, m_est, m_out, alpha[2]) + \
-                    phi_4(M, L, m_est, m_out[-2:], alpha[3]) + \
-                    phi_5(M, L, m_est, alpha[4]) + \
-                    phi_6(M, L, m_est, alpha[5]) + \
-                    phi_7(M, L, m_est, alpha[6])
-
-            dphi = phi - phi0
-
-            print 'it: %2d   it_marq: %2d   lambda: %.e   init obj.: %.5e  fin obj.: %.5e' % (it, it_marq, lamb, phi0, phi)
-
-            if (dphi > 0.):
-                lamb *= dlamb
-                if it_marq == maxsteps - 1:
-                    phi = phi0
-            else:
-                if lamb/dlamb < 1e-15:
-                    lamb = 1e-15
-                else:
-                    lamb /= dlamb
-                break
-
-        phi_list.append(phi)
-        model_list.append(model_est)
-        res_list.append(res)
-        if (abs(dphi/phi0) < tol):
-            break
-        else:
-            d0 = d_fit.copy()
-            m0 = m_est.copy()
-            model0 = model_est
-            res0 = res.copy()
-            phi0 = phi
-
-    return d_fit, m_est, model_est, phi_list, model_list, res_list
-
 def plot_prisms(prisms, scale=1.):
     '''
     Returns a list of ordered vertices to build the model
@@ -2172,50 +1855,6 @@ def plot_prisms(prisms, scale=1.):
         verts.append(sides)
 
     return verts
-
-def varying_param(z0, varz, intensity, varint, inc, varinc, dec, vardec):
-    '''
-    Returns a list of fixed parameters for the
-    varying inversion
-
-    input
-
-    z0: float - depth to the top of the model
-    varz: float - variation for z0
-    intensity: float - magnetization intensity
-    varint: float - variation for intensity
-    inc: float - inclination
-    varinc: float - variation for inclination
-    dec: float - declination
-    vardec: float - variation for declination
-
-    output
-
-    param_list: list - list of modified fixed
-                parameters for varying the inversion
-    '''
-    param_list = []
-    param_list.append([z0, {'magnetization': utils.ang2vec(intensity, inc, dec)}])
-    param_list.append([z0+varz,{'magnetization': utils.ang2vec(intensity, inc, dec)}])
-    param_list.append([z0-varz,{'magnetization': utils.ang2vec(intensity, inc, dec)}])
-    param_list.append([z0,{'magnetization': utils.ang2vec(intensity+varint, inc, dec)}])
-    param_list.append([z0,{'magnetization': utils.ang2vec(intensity-varint, inc, dec)}])
-    param_list.append([z0,{'magnetization': utils.ang2vec(intensity, inc+varinc, dec+vardec)}])
-    param_list.append([z0,{'magnetization': utils.ang2vec(intensity, inc-varinc, dec-vardec)}])
-    param_list.append([z0+varz,{'magnetization': utils.ang2vec(intensity+varint, inc, dec)}])
-    param_list.append([z0+varz,{'magnetization': utils.ang2vec(intensity-varint, inc, dec)}])
-    param_list.append([z0+varz,{'magnetization': utils.ang2vec(intensity, inc+varinc, dec+vardec)}])
-    param_list.append([z0+varz,{'magnetization': utils.ang2vec(intensity, inc-varinc, dec-vardec)}])
-    param_list.append([z0-varz,{'magnetization': utils.ang2vec(intensity+varint, inc, dec)}])
-    param_list.append([z0-varz,{'magnetization': utils.ang2vec(intensity-varint, inc, dec)}])
-    param_list.append([z0-varz,{'magnetization': utils.ang2vec(intensity, inc+varinc, dec+vardec)}])
-    param_list.append([z0-varz,{'magnetization': utils.ang2vec(intensity, inc-varinc, dec-vardec)}])
-    param_list.append([z0,{'magnetization': utils.ang2vec(intensity+varint, inc+varinc, dec+vardec)}])
-    param_list.append([z0,{'magnetization': utils.ang2vec(intensity+varint, inc-varinc, dec-vardec)}])
-    param_list.append([z0,{'magnetization': utils.ang2vec(intensity-varint, inc+varinc, dec+vardec)}])
-    param_list.append([z0,{'magnetization': utils.ang2vec(intensity-varint, inc-varinc, dec-vardec)}])
-
-    return param_list
 
 def initial_cylinder(M, L, x0, y0, z0, dz, r, inc, dec, incs, decs, intensity):
     '''
@@ -2294,25 +1933,6 @@ def misfit_matrix(n, m, results):
     for i in range(n):
         for j in range(m):
             misfit_matrix[i, j] = np.sum(results[i*n+j][3]*results[i*n+j][3])/results[i*n+j][3].size
-    return misfit_matrix
-
-def l1_misfit_matrix(n, m, results):
-    '''
-    Returns the l1 misfit function values for each inversion
-    organized in a matrix
-    
-    input
-    n, m: integer - number of values of depth to the top (z0)
-                    and magnetic intensity (m0)
-    results: list - inversion results from the pickle file
-                    made by multiple inversion notebook
-    output
-    phi_matrix: 2D array - misfit function values  
-    '''
-    misfit_matrix = np.zeros((n,m))
-    for i in range(n):
-        for j in range(m):
-            misfit_matrix[i, j] = np.sum(np.absolute(results[i*n+j][3]))/results[i*n+j][3].size
     return misfit_matrix
 
 def plot_simple_model_data(x, y, obs, initial, model, filename):
@@ -2668,7 +2288,7 @@ def plot_solution(xp, yp, zp,
     residuals, solution, initial,
     figsize, dpi=300, insetposition=(0.5, 0.95),
     angles=[], area=[], model=[],
-    filename='', inter=False, norm=2):
+    filename='', inter=False):
     '''
     Returns a plot of the resdiuals, initial approximate
     and two perspective views of the solution for the
@@ -2694,7 +2314,6 @@ def plot_solution(xp, yp, zp,
                     default: []
     filename: string - directory and filename of the figure
     inter: boolean - presence of an interfering body
-    norm: interger - norm order of the misfit function (1 or 2)
 
     output
     fig: figure - plot of the result
@@ -2764,16 +2383,13 @@ def plot_solution(xp, yp, zp,
     props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
     inset.text(
         insetposition[0], insetposition[1],
-        "$\mu$ = {:.1f}\n$\sigma$ = {:.1f}".format(mean, std),
+        r'$\mu $ = {:.1f}\n$\sigma $ = {:.1f}'.format(mean, std),
         transform=inset.transAxes, fontsize=4,
         va='top', ha='left', bbox=props
         )
-    if norm == 2:
-        gauss = sp.norm.pdf(bins, mean, std)
-        plt.plot(bins, gauss, 'k--', linewidth=1., label='Gaussian')
-    else:
-        laplace = sp.laplace.pdf(bins, mean, std)
-        plt.plot(bins, laplace, 'k--', linewidth=1., label='Laplacian')
+    gauss = sp.norm.pdf(bins, mean, std)
+    plt.plot(bins, gauss, 'k--', linewidth=1., label='Gaussian')
+
     ax.text(np.min(y)-1., np.max(x)+.6, '(a)', fontsize= 10)
 
     # initial approximate
@@ -2912,7 +2528,7 @@ def plot_obs_alt(x, y, obs, alt, topo,
     plt.plot(y, x, 'ko', markersize=.25)
     plt.xlabel('$y$(km)', fontsize=14)
     plt.ylabel('$x$(km)', fontsize=14)
-    estimate = mpl.polygon(initial, '.-r', xy2ne=True)
+    mpl.polygon(initial, '.-r', xy2ne=True)
     clb = plt.colorbar(pad=0.01, aspect=40, shrink=1)
     clb.ax.set_title('m', pad=-285)
     clb.ax.tick_params(labelsize=13)
