@@ -1995,8 +1995,8 @@ def plot_simple_model_data(x, y, obs, initial, model, filename):
     clb = plt.colorbar(pad=0.01, aspect=20, shrink=1)
     clb.ax.set_title('nT', pad=-305)
     mpl.m2km()
-    clb.ax.tick_params(labelsize=13)
-    plt.text(-6700, 3800, '(a)', fontsize= 15)
+    clb.ax.tick_params(labelsize=14)
+    plt.text(-6700, 3800, '(a)', fontsize=20)
 
     verts_true = plot_prisms(model, scale=0.001)
     # true model
@@ -2007,12 +2007,12 @@ def plot_simple_model_data(x, y, obs, initial, model, filename):
     ax.set_xlim(-2.5, 2.5, 100)
     ax.set_ylim(-2.5, 2.5, 100)
     ax.set_zlim(2, -0.1, 100)
-    ax.tick_params(labelsize= 10)
+    ax.tick_params(labelsize=14)
     ax.set_ylabel('y (km)', fontsize= 14)
     ax.set_xlabel('x (km)', fontsize= 14)
     ax.set_zlabel('z (km)', fontsize= 14)
     ax.view_init(10, 50)
-    ax.text2D(-0.1, 0.07, '(b)', fontsize= 15)
+    ax.text2D(-0.1, 0.07, '(b)', fontsize=20)
 
     plt.tight_layout()
 
@@ -2060,7 +2060,7 @@ def plot_matrix(z0, intensity, matrix, vmin,
     img = ax.imshow(matrix, vmin=vmin, vmax=vmax, origin='lower',extent=[0,w,0,w])
     img.axes.tick_params(labelsize=14)
     plt.ylabel(ytitle, fontsize=14)
-    plt.xlabel(xtitle, fontsize=12)
+    plt.xlabel(xtitle, fontsize=14)
     if truevalues == []:
         pass
     else:
@@ -2083,7 +2083,7 @@ def plot_matrix(z0, intensity, matrix, vmin,
     ax.grid(which='minor', color='k', linewidth=2)
     clb = plt.colorbar(img, pad=0.01, aspect=20, shrink=1)
     clb.ax.set_title(unity, pad=-288)
-    clb.ax.tick_params(labelsize=13)
+    clb.ax.tick_params(labelsize=14)
     if filename == '':
         pass
     else:
@@ -2179,6 +2179,106 @@ def plot_complex_model_data(x, y, obs, alt, initial, model,
     ax.text2D(-0.1, 0.07, '(d)', fontsize= 15)
 
     plt.tight_layout()
+
+    if filename == '':
+        pass
+    else:
+        plt.savefig(filename, dpi=dpi, bbox_inches='tight')
+
+    return plt.show()
+
+def plot_inclined_model_data(x, y, obs, alt, initial, model,
+        figsize, dpi=300, filename=''):
+    '''
+    Returns a plot of synthetic total-field anomaly
+    data produced by the inclined model and the true model
+    
+    input
+    x, y: 1D array - Cartesian coordinates of the upward
+                    continued total-field anomaly data
+    xa, ya: 1D array - Cartesian coordinates of the observations
+    obs: 1D array - synthetic total-field anomaly data
+    alt: 1D array - geometric heigt of the observations
+    initial: list - fatiando.mesher.PolygonalPrism
+                    of the initial approximate
+    model: list - list of fatiando.mesher.PolygonalPrism
+                    of the simple model
+    figsize: tuple - size of the figure
+    dpi: integer - resolution of the figure
+    filename: string - directory and filename of the figure
+
+    output
+    fig: figure - plot
+    '''
+
+    verts_true = plot_prisms(model, scale=0.001)
+
+    plt.figure(figsize=figsize)
+
+    #===============================================================
+    # sinthetic data
+    ax=plt.subplot(2,2,1)
+    plt.tricontour(y, x, obs, 10, linewidths=0.1, colors='k')
+    plt.tricontourf(y, x, obs, 10,
+                    cmap='RdBu_r', vmin=np.min(obs),
+                    vmax=-np.min(obs)).ax.tick_params(labelsize=14)
+    plt.plot(y, x, 'k.', markersize=.1)
+    plt.xlabel('$y$(km)', fontsize=14)
+    plt.ylabel('$x$(km)', fontsize=14)
+    clb = plt.colorbar(pad=0.01, aspect=20, shrink=1)
+    clb.ax.set_title('nT', pad=-260, fontsize=14)
+    mpl.polygon(initial, '-r', xy2ne=True)
+    mpl.m2km()
+    clb.ax.tick_params(labelsize=14)
+    plt.text(np.min(y)-1000, np.max(x)+1000, '(a)', fontsize=20)
+
+    #==================================================================
+    # plot elevation
+    ax=plt.subplot(2,2,2)
+    plt.tricontourf(y, x, alt, 10,
+                    cmap='gray').ax.tick_params(labelsize=14)
+    plt.xlabel('$y$(km)', fontsize=14)
+    plt.ylabel('$x$(km)', fontsize=14)
+    clb = plt.colorbar(pad=0.01, aspect=20, shrink=1)
+    clb.ax.set_title('m', pad=-260, fontsize=14)
+    mpl.m2km()
+    clb.ax.tick_params(labelsize=14)
+    plt.plot(y, x, 'k.', markersize=.1)
+    plt.text(np.min(y)-1000, np.max(x)+1000, '(b)', fontsize=20)
+
+    #=====================================================================
+    # true model
+    ax = plt.subplot(2,2,3, projection='3d')
+    ax.add_collection3d(Poly3DCollection(verts_true, alpha=0.3, 
+    facecolor='b', linewidths=0.5, edgecolors='k'))
+
+    ax.set_ylim(-1.,6., 100)
+    ax.set_xlim(-2.5,2., 100)
+    ax.set_zlim(3.5, -0.2, 100)
+    ax.tick_params(labelsize=14, pad=-2)
+    ax.set_ylabel('x (km)', fontsize=14)
+    ax.set_xlabel('y (km)', fontsize=14)
+    ax.set_zlabel('z (km)', fontsize=14)
+    ax.view_init(5, 37)
+    ax.text2D(-0.11, 0.07, '(c)', fontsize=20)
+
+    #===================================================================
+    # true model
+    ax = plt.subplot(2,2,4, projection='3d')
+    ax.add_collection3d(Poly3DCollection(verts_true, alpha=0.3, 
+    facecolor='b', linewidths=0.5, edgecolors='k'))
+
+    ax.set_ylim(-1.,6., 100)
+    ax.set_xlim(-2.5,2., 100)
+    ax.set_zlim(3.5, -0.2, 100)
+    ax.tick_params(labelsize=14, pad=-2)
+    ax.set_ylabel('x (km)', fontsize=14)
+    ax.set_xlabel('y (km)', fontsize=14)
+    ax.set_zlabel('z (km)', fontsize=14)
+    ax.view_init(2, -150)
+    ax.text2D(-0.11, 0.07, '(d)', fontsize=20)
+
+    #plt.subplots_adjust(wspace=.5, hspace=.6)
 
     if filename == '':
         pass
@@ -2383,12 +2483,13 @@ def plot_solution(xp, yp, zp,
     ax=plt.subplot(2,2,1)
     plt.tricontourf(y, x, residuals, 20,
                     cmap='RdBu_r', vmin=-np.max(residuals),
-                    vmax=np.max(residuals)).ax.tick_params(labelsize=6)
-    plt.xlabel('$y$(km)', fontsize=8, labelpad=0)
-    plt.ylabel('$x$(km)', fontsize=8, labelpad=0)
+                    vmax=np.max(residuals)).ax.tick_params(labelsize=14)
+    plt.xlabel('$y$(km)', fontsize=14, labelpad=0)
+    plt.ylabel('$x$(km)', fontsize=14, labelpad=0)
+    plt.ylim(ymax=np.max(x))
     clb = plt.colorbar(pad=0.01, aspect=20, shrink=1)
-    clb.ax.set_title('nT', pad=-115, fontsize=6)
-    clb.ax.tick_params(labelsize=6)
+    clb.ax.set_title('nT', pad=-255, fontsize=14)
+    clb.ax.tick_params(labelsize=14)
 
     # horizontal projection of the prisms
     for s in solution:
@@ -2404,18 +2505,18 @@ def plot_solution(xp, yp, zp,
     std = np.std(residuals)
     nbins=30
     n, bins, patches = plt.hist(residuals, bins=nbins, density=True, facecolor='blue')
-    plt.tick_params(labelsize=6)
+    plt.tick_params(labelsize=14)
     props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
     inset.text(
         insetposition[0], insetposition[1],
-        r'$\mu $ = {:.1f}\n$\sigma $ = {:.1f}'.format(mean, std),
-        transform=inset.transAxes, fontsize=4,
+        '$\mu $ = {:.1f}\n$\sigma $ = {:.1f}'.format(mean, std),
+        transform=inset.transAxes, fontsize=10,
         va='top', ha='left', bbox=props
         )
     gauss = sp.norm.pdf(bins, mean, std)
     plt.plot(bins, gauss, 'k--', linewidth=1., label='Gaussian')
 
-    ax.text(np.min(y)-1., np.max(x)+.6, '(a)', fontsize= 10)
+    ax.text(np.min(y)-1., np.max(x)+1., '(a)', fontsize=20)
 
     # initial approximate
     ax = plt.subplot(2,2,2, projection='3d')
@@ -2437,14 +2538,14 @@ def plot_solution(xp, yp, zp,
     ax.set_ylim(area[0], area[1], 100)
     ax.set_xlim(area[2], area[3], 100)
     ax.set_zlim(initial[-1].z2/1000. + 1, -0.5, 100)
-    ax.tick_params(labelsize= 6, pad=-2)
-    ax.set_ylabel('x (km)', fontsize= 8, labelpad=-6)
-    ax.set_xlabel('y (km)', fontsize= 8, labelpad=-6)
-    ax.set_zlabel('z (km)', fontsize= 8, labelpad=-6)
+    ax.tick_params(labelsize=14, pad=-2)
+    ax.set_ylabel('x (km)', fontsize=14, labelpad=0)
+    ax.set_xlabel('y (km)', fontsize=14, labelpad=0)
+    ax.set_zlabel('z (km)', fontsize=14, labelpad=0)
     ax.set_yticks(np.arange(area[0], area[1], 2))
     ax.set_xticks(np.arange(area[2], area[3], 2))
     ax.view_init(angles[0], angles[1])
-    ax.text2D(-0.1, 0.1, '(b)', fontsize=  10)
+    ax.text2D(-0.1, 0.09, '(b)', fontsize=20)
 
     # inverse model view 1
     ax = plt.subplot(2,2,3, projection='3d')
@@ -2466,14 +2567,14 @@ def plot_solution(xp, yp, zp,
     ax.set_ylim(area[0], area[1], 100)
     ax.set_xlim(area[2], area[3], 100)
     ax.set_zlim(zb, -0.5, 100)
-    ax.tick_params(labelsize= 6, pad=-2)
-    ax.set_ylabel('x (km)', fontsize= 8, labelpad=-6)
-    ax.set_xlabel('y (km)', fontsize= 8, labelpad=-6)
-    ax.set_zlabel('z (km)', fontsize= 8, labelpad=-6)
+    ax.tick_params(labelsize=14, pad=-2)
+    ax.set_ylabel('x (km)', fontsize=14, labelpad=0)
+    ax.set_xlabel('y (km)', fontsize=14, labelpad=0)
+    ax.set_zlabel('z (km)', fontsize=14, labelpad=0)
     ax.set_yticks(np.arange(area[0], area[1], 2))
     ax.set_xticks(np.arange(area[2], area[3], 2))
     ax.view_init(angles[2], angles[3])
-    ax.text2D(-0.12, 0.07, '(c)', fontsize=  10)
+    ax.text2D(-0.11, 0.09, '(c)', fontsize=20)
 
     # inverse model view 2
     ax = plt.subplot(2,2,4, projection='3d')
@@ -2495,14 +2596,14 @@ def plot_solution(xp, yp, zp,
     ax.set_ylim(area[0], area[1], 100)
     ax.set_xlim(area[2], area[3], 100)
     ax.set_zlim(zb, -0.5, 100)
-    ax.tick_params(labelsize= 6, pad=-2)
-    ax.set_ylabel('x (km)', fontsize= 8, labelpad=-6)
-    ax.set_xlabel('y (km)', fontsize= 8, labelpad=-6)
-    ax.set_zlabel('z (km)', fontsize= 8, labelpad=-6)
+    ax.tick_params(labelsize=14, pad=-2)
+    ax.set_ylabel('x (km)', fontsize=14, labelpad=0)
+    ax.set_xlabel('y (km)', fontsize=14, labelpad=0)
+    ax.set_zlabel('z (km)', fontsize=14, labelpad=0)
     ax.set_yticks(np.arange(area[0], area[1], 2))
     ax.set_xticks(np.arange(area[2], area[3], 2))
     ax.view_init(angles[4], angles[5])
-    ax.text2D(-0.1, 0.07, '(d)', fontsize=  10)
+    ax.text2D(-0.1, 0.09, '(d)', fontsize=20)
 
     if filename == '':
         pass
