@@ -1656,7 +1656,10 @@ def inv_log_barrier(mt, M, L, mmax, mmin):
 
     return m
 
-def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, mmin, mmax, m_out, dobs, inc, dec, props, alpha, z0, dz):
+def levmarq_tf(xp, yp, zp, m0, M, L,
+    delta, maxit, maxsteps, lamb, dlamb,
+    tol, mmin, mmax, m_out, dobs, inc, dec,
+    props, alpha, z0, dz):
     '''
     This function minimizes the goal function of a set of polygonal prism
     for total-field-anomaly using the Levenberg-Marqudt algorithm.
@@ -1688,7 +1691,8 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
     d_fit: array - fitted data
     m_est: array - estimated parameters
     model_est: list - objects of fatiando.mesher.polyprisms
-    phi_list: list - solutions of objective funtion
+    list_reg: list - solutions of objective funtion
+                    and the regularizing functions
     model_list: list - estimated models at each iteration
     res_list: list - calculated residual at each iteration
     '''
@@ -1732,8 +1736,26 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
 
     alpha *= th/th_constraints
 
+    phi1_list = []
+    phi2_list = []
+    phi3_list = []
+    phi4_list = []
+    phi5_list = []
+    phi6_list = []
+    phi7_list = []
+
+
     for it in range(maxit):
         mt = log_barrier(m0, M, L, mmax, mmin)
+
+        # list of regularizing functions
+        phi1_list.append(phi_1(M, L, m0, alpha[0]))
+        phi2_list.append(phi_2(M, L, m0, alpha[1]))
+        phi3_list.append(phi_3(M, L, m0, m_out, alpha[2]))
+        phi4_list.append(phi_4(M, L, m0, m_out[-2:], alpha[3]))
+        phi5_list.append(phi_5(M, L, m0, alpha[4]))
+        phi6_list.append(phi_6(M, L, m0, alpha[5]))
+        phi7_list.append(phi_7(M, L, m0, alpha[6]))
 
         # Jacobian matrix
         G = Jacobian_tf(xp, yp, zp, model0, M, L, delta[0], delta[1], delta[2], delta[3], inc, dec)
@@ -1802,7 +1824,10 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
         phi_list.append(phi)
         model_list.append(model_est)
         res_list.append(res)
-        if (abs(dphi/phi0) < tol):
+        list_reg = [phi_list, phi1_list, phi2_list,
+            phi3_list, phi4_list, phi5_list,
+            phi6_list, phi7_list]
+        if (abs(dphi)/phi0 < tol):
             break
         else:
             d0 = d_fit.copy()
@@ -1811,7 +1836,7 @@ def levmarq_tf(xp, yp, zp, m0, M, L, delta, maxit, maxsteps, lamb, dlamb, tol, m
             res0 = res.copy()
             phi0 = phi
 
-    return d_fit, m_est, model_est, phi_list, model_list, res_list
+    return d_fit, m_est, model_est, list_reg, model_list, res_list
 
 def plot_prisms(prisms, scale=1.):
     '''
@@ -1913,7 +1938,7 @@ def goal_matrix(n, m, results):
     gamma_matrix = np.zeros((n,m))
     for i in range(n):
         for j in range(m):
-            gamma_matrix[i, j] = results[i*n+j][1][-1]
+            gamma_matrix[i, j] = results[i*n+j][1][0][-1]
     return gamma_matrix
 
 def misfit_matrix(n, m, results):
