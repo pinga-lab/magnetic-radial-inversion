@@ -19,6 +19,17 @@ d_{i} (\mathbf{p}) \equiv \sum\limits_{k=1}^{L} f_{i}^{k}(\mathbf{r}^{k}, x_{0}^
 \end{equation}
 is the total-field anomaly produced by the ensemble of $L$ prisms at the $i$th observation point ($x_{i}, y_{i}, z_{i}$). In eq. \ref{eq:predicted-data-i}, $f_{i}^{k}(\mathbf{r}^{k}, x_{0}^{k}, y_{0}^{k}, dz, z_{1}^{k}, m_{0})$ is the total-field anomaly produced, at the observation point ($x_{i}, y_{i}, z_{i}$), by the $k$th prism, with depth to the top $z_{1}^{k} = z_{0} + (k-1)dz$. We calculate $d_{i} (\mathbf{p})$ (eq. \ref{eq:predicted-data-i}) by using the Python package Fatiando a Terra \cite[]{uieda-etal2013}, which implements the formulas proposed by \cite{plouff1976}.
 
+It is noteworthy that eq. (\ref{eq:predicted-data-i}) can be rewritten as 
+\begin{equation}
+d_{i} (\mathbf{p}) \equiv m_{0} \: \sum\limits_{k=1}^{L} f_{i}^{k}(\mathbf{r}^{k}, x_{0}^{k}, y_{0}^{k}, dz, z_{1}^{k}, 1), \quad i = 1, \dots, N \: ,
+\label{eq:predicted-data-i-linear}
+\end{equation}
+because there is a linear relationship between the predicted data $\mathbf{d} (\mathbf{p})$
+and the total-magnetization intensity $m_{0}$. 
+In eq. (\ref{eq:predicted-data-i-linear}) the function 
+$f_{i}^{k}(\mathbf{r}^{k}, x_{0}^{k}, y_{0}^{k}, dz, z_{1}^{k}, 1)$ is numerically equal to the total-field anomaly produced by the $k$th prism, with unitary magnetization intensity at the $i$th observation position. 
+
+
 \subsection{Inverse problem formulation}
 
 %The total-magnetization of the source $m_{0}$ and depth to the top of the shallowest 
@@ -42,11 +53,17 @@ where $\phi (\mathbf{p})$ is the data-misfit function given by
 \phi (\mathbf{p}) = \frac{1}{N} \| \mathbf{d}^{o} - \mathbf{d}(\mathbf{p}) \|_{2}^{2} \: ,
 \end{equation}
 which represents the normalized squared Euclidean norm of the difference between the 
-observed $\mathbf{d}^{o}$ and predicted $\mathbf{d}(\mathbf{p})$ data vector,
-$\alpha_{\ell}$ is a positive number representing the weight of the $\ell$th constraint 
-function $\varphi_{\ell}(\mathbf{p})$ and $p_{l}^{min}$ and $p_{l}^{max}$ are, 
-respectively, the lower and upper limits for the $l$th element $p_{l}$ of the parameter 
-vector $\mathbf{p}$ (eq. \ref{eq:p-vector}). These limits are defined by the interpreter 
+observed $\mathbf{d}^{o}$ and predicted $\mathbf{d}(\mathbf{p})$ data vector.
+
+The second term in the right side of eq. (\ref{eq:gamma}) represents the weighted sum of
+the seven constraint functions $\varphi_{\ell}(\mathbf{p}), \: \ell = 1, \dots, 7$ 
+described in the subsection (\label{sec:constraints}).
+In eq.  (\ref{eq:gamma}), $\alpha_{\ell}$ is a positive number representing the weight of the $\ell$th constraint function $\varphi_{\ell}(\mathbf{p})$ 
+selected according to a criterion described in the subsection on choosing
+the weights $\alpha_{1}-\alpha_{7}$.
+In the inequality constraints (\ref{eq:inequality-constraint}) 
+$p_{l}^{min}$ and $p_{l}^{max}$ are, respectively, the lower and upper limits for the $l$th element $p_{l}$ of the parameter vector $\mathbf{p}$ (eq. \ref{eq:p-vector}). 
+These limits are defined by the interpreter 
 based on both the horizontal extent of the magnetic anomaly and the knowledge about the 
 source.
 On the discrete mapping of the goal function $\Gamma (\mathbf{p})$ 
@@ -103,7 +120,7 @@ where
 \mathbf{I}_{L} \otimes 
 \begin{bmatrix}
 \left( \mathbf{I}_{V} - \mathbf{D}_{V}^\mathsf{T} \right) & \mathbf{0}_{V \times 2} \\
-\end{bmatrix}_{(L-1)V \times M} \quad ,
+\end{bmatrix}_{(LV \times M)} \quad ,
 \label{eq:S1-matrix}
 \end{equation}
 $\mathbf{I}_{L}$ is the identity matrix of order $L$, ``$\otimes$" denotes the Kronecker product \cite[][ p. 243]{horn_johnson1991}, $\mathbf{0}_{V \times 2}$ is a $V \times 2$ matrix with null elements, 
@@ -357,7 +374,7 @@ $\hat{p}_{l}$ of the new estimated parameter vector $\hat{\mathbf{p}}_{(k+1)}$ a
 \end{equation}
 
 
-\subsubsection{Considerations about the weights $\alpha_{1}-\alpha_{7}$}
+\subsubsection{Choice of weights $\alpha_{1}-\alpha_{7}$}
 
 Attributing values to the weights $ \alpha_{\ell} $ (eq. \ref{eq:gamma}) is an important feature of our method. 
 However, there is no analytical rule to define them and their values can be dependent on the particular characteristics of the type of geological setting where the method is being applied \cite{silva-2001}. To overcome this problem, we normalize the $ \alpha_{\ell} $ 
