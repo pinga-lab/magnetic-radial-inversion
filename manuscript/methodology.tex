@@ -233,12 +233,12 @@ and
 \begin{equation}
 \mathbf{R}_{4} = 
 \begin{bmatrix}
-\mathbf{I}_{V} & \mathbf{0}_{V \times (M-V-2)} \\
+\mathbf{I}_{V} & \mathbf{0}_{V \times (M-V)} \\
 \end{bmatrix}_{V\times M},
 \label{eq:R4-matrix}
 \end{equation}
 where $\mathbf{I}_{V}$ is the identity matrix of order $V$ and 
-$\mathbf{0}_{V \times (M-V-2)}$ is a $V \times (M-V-2)$ matrix with null elements.
+$\mathbf{0}_{V \times (M-V)}$ is a $V \times (M-V)$ matrix with null elements.
 The gradient and Hessian of function $\varphi_{4}(\mathbf{p})$ (eq. \ref{eq:phi4}) are given by:
 \begin{equation}\label{eq:phi4_grad}
 \boldsymbol{\nabla}\varphi_{4}(\mathbf{p}) = 2 \mathbf{R}_{4}^{\mathsf{T}} 
@@ -289,7 +289,9 @@ and
 
 \subsubsection{Minimum Euclidean norm constraints}
 
-Two constraints use the zeroth-order Tikhonov regularization with the purpose of obtaining stable solutions without necessarily introducing significant a priori information about the source. 
+Two constraints use the zeroth-order Tikhonov regularization with the purpose of obtaining stable solutions without introducing prior information about the shape of the source. 
+However, these two constraints combined with the interpretation model impose 
+source compactness. 
 
 The \textit{Minimum Euclidean norm of the radii} imposes that 
 all estimated radii within each prism must be close to null values. This constraint was proposed by \cite{oliveirajr-etal2011} and \cite{oliveirajr-barbosa2013} and can be rewritten as follows
@@ -311,12 +313,16 @@ where
 and 
 \begin{equation}
 \mathbf{S}_{6} = 
+\mathbf{I}_{L} \otimes 
 \begin{bmatrix}
-\mathbf{I}_{V} & \mathbf{0}_{V \times 2} \\
-\mathbf{0}_{2 \times V} & \mathbf{I}_{2} \\
-\end{bmatrix}_{ (V+2)\times (V+2)} \quad .
+\mathbf{I}_{V}            & \mathbf{0}_{V \times 2} \\
+\mathbf{0}_{2 \times V} & \mathbf{0}_{2 \times 2} \\
+\end{bmatrix}_{(V+2) \times (V+2)} \quad ,
 \label{eq:S6-matrix}
 \end{equation}
+where $\mathbf{0}_{2 \times 2}$ is a $2 \times 2$ matrix with null elements,
+$\mathbf{0}_{V \times 2}$ is a $V \times 2$ matrix with null elements and
+$\mathbf{0}_{2 \times V}$ is a $2 \times V$ matrix with null elements.
 The gradient and Hessian of function $\varphi_{6}(\mathbf{p})$ (eq. \ref{eq:phi6}) are given by:
 \begin{equation}\label{eq:phi6_grad}
 \boldsymbol{\nabla}\varphi_{6}(\mathbf{p}) = 2 \mathbf{R}_{6}^{\mathsf{T}} \mathbf{R}_{6} \mathbf{p} \quad ,
@@ -326,7 +332,7 @@ and
 \mathbf{H}_{6}(\mathbf{p}) = 2 \mathbf{R}^{\mathsf{T}}_{6}\mathbf{R}_{6} \quad .
 \end{equation}
 
-The other constraint, the \textit{Minimum Euclidean norm of the prism thickness}, imposes that the thickness of all prisms must be close to zero. We present this constraint to introduce a priori information about the maximum depth extent of the source. It is given by
+The other constraint, the \textit{Minimum Euclidean norm of the prism thickness}, imposes that the thickness of all prisms must be close to zero. We present this constraint to introduce a priori information about the maximum depth extent of the source which in turn is dependent on the depth to the top of the shallowest prism $z_{0}$. It is given by
 \begin{equation}\label{eq:phi7}
 \begin{split}
 \varphi_{7}(\mathbf{p}) &= dz^2 \\
@@ -416,7 +422,9 @@ where $\mathbf{H}(\hat{\mathbf{p}}_{(k)})$ is the Hessian matrix of the goal fun
 \begin{equation}\label{eq:inequality-diag}
 t(\hat{p}_{l}) = \frac{(p_{l}^{max} - \hat{p}_{l})(\hat{p}_{l} - p_{l}^{min})}{p_{l}^{max} - p_{l}^{min}}, \quad l = 1, \dots, M \: ,
 \end{equation}
-with $p_{l}$ being the $l$th element of the estimated parameter vector $\hat{\mathbf{p}}_{(k)}$. In eq. \ref{eq:linear-system}, $\mathbf{D}_{(k)}$ is a diagonal matrix proposed by  \cite{marquardt_algorithm_1963} for scaling the parameter $\lambda_{(k)}$ at each iteration and improving the convergence of the algorithm. The element $ll$ of this diagonal matrix is given by
+with $p_{l}$ being the $l$th element of the estimated parameter vector $\hat{\mathbf{p}}_{(k)}$. 
+To prevent null values from occurring in any diagonal element of $\mathbf{T}(\hat{\mathbf{p}}_{(k)})$ (eq. \ref{eq:H-dagger}),  we follow \cite{barbosa-1999b} who added a small positive number (on the order of $10^{−2}$)  to each term of the numerator in eq. \ref{eq:inequality-diag}.
+In eq. \ref{eq:linear-system}, $\mathbf{Q}_{(k)}$ is a diagonal matrix proposed by  \cite{marquardt_algorithm_1963} for scaling the parameter $\lambda_{(k)}$ at each iteration and improving the convergence of the algorithm. The element $ll$ of this diagonal matrix is given by
 \begin{equation}\label{eq:Q-matrix}
 q_{ll} = \frac{1}{\sqrt{h^{\dagger}_{ll}}} \: ,
 \end{equation}
