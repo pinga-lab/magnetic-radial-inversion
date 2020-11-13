@@ -57,7 +57,7 @@ observed $\mathbf{d}^{o}$ and predicted $\mathbf{d}(\mathbf{p})$ data vector.
 
 The second term in the right side of eq. (\ref{eq:gamma}) represents the weighted sum of
 the seven constraint functions $\varphi_{\ell}(\mathbf{p}), \: \ell = 1, \dots, 7$ 
-described in the subsection (\label{sec:constraints}).
+described in the subsection \textit{Constraint functions} later in this article.
 In eq.  (\ref{eq:gamma}), $\alpha_{\ell}$ is a positive number representing the weight of the $\ell$th constraint function $\varphi_{\ell}(\mathbf{p})$ 
 selected according to a criterion described in the subsection on choosing
 the weights $\alpha_{1}-\alpha_{7}$.
@@ -210,23 +210,22 @@ and
 
 \subsubsection{Equality constraints}
 
-This group is formed by two constraints that were proposed by \cite{oliveirajr-etal2011} and \cite{oliveirajr-barbosa2013} by following the same approach proposed \cite{barbosa-etal1997} and 
-\cite{barbosa-1999a}. They introduce a priori information about the shallowest prism and are  suitable for outcropping sources.
+This group is formed by two constraints that were proposed by \cite{oliveirajr-etal2011} and \cite{oliveirajr-barbosa2013} by following the same approach proposed \cite{barbosa-etal1997} and \cite{barbosa-1999a}. 
+They introduce a priori information about the shallowest prism and are  suitable for outcropping sources.
 
-The \textit{source’s outcrop constraint} imposes that the horizontal cross-section of the shallowest prism 
-must be close to known outcropping boundary of the geologic source. Mathematically, this constraint is given by
+The \textit{source’s outcrop constraint} imposes that the horizontal cross-section of the shallowest prism must be close to known outcropping boundary of the geologic source.
+The horizontal cross-section of the known outcropping boundary separating the geologic  source from the host rock is described by the radii $\tilde{r}_{1}^{0} \dots \tilde{r}_{V}^{0}$. Mathematically, this constraint is given by
 \begin{equation}\label{eq:phi4}
 \begin{split}
-\varphi_{4}(\mathbf{p}) &= \left[\left(x_{0}^{1} - x_{0}^{0}\right)^2 + \left(y_{0}^{1} - y_{0}^{0}\right)^2 + \sum\limits^{V}_{j=1}\left(r^{1}_{j}-r^{0}_{j}\right)^2\right] \\
+\varphi_{4}(\mathbf{p}) &= \left[ \sum\limits^{V}_{j=1}\left(r^{1}_{j}-r^{0}_{j}\right)^2\right] \\
 &= \left(\mathbf{R}_{4} \mathbf{p} - \mathbf{a} \right)^{\mathsf{T}} 
 \left(\mathbf{R}_{4} \mathbf{p} - \mathbf{a} \right)
 \end{split} \quad ,
 \end{equation}
-where $\mathbf{a}$ is a $V+2 \times 1$ vector containing the radii and the horizontal Cartesian coordinates of the 
-polygon defining the outcropping boundary
+where $\mathbf{a}$ is a $V \times 1$ vector containing the radii of the polygon defining the outcropping boundary
 \begin{equation}
 \mathbf{a} = \left[ \begin{array}{@{}*{12}{c}@{}}
-\tilde{r}_{1}^{0} & \dots & \tilde{r}_{V}^{0} & \tilde{x}_{0}^{0} & \tilde{y}_{0}^{0} \\
+\tilde{r}_{1}^{0} & \dots & \tilde{r}_{V}^{0}  \\
 \end{array} \right]^{\mathsf{T}} \: ,
 \label{eq:a-vector}
 \end{equation}
@@ -234,13 +233,13 @@ and
 \begin{equation}
 \mathbf{R}_{4} = 
 \begin{bmatrix}
-\mathbf{I}_{V+2} & \mathbf{0}_{(V+2) \times (M-V-2)} \\
-\end{bmatrix}_{(V+2)\times M},
+\mathbf{I}_{V} & \mathbf{0}_{V \times (M-V-2)} \\
+\end{bmatrix}_{V\times M},
 \label{eq:R4-matrix}
 \end{equation}
-where $\mathbf{I}_{V+2}$ is the identity matrix of order $V+2$ and 
-$\mathbf{0}_{(V+2) \times (M-V-2)}$ is a $(V+2) \times (M-V-2)$ matrix 
-with null elements. The gradient and Hessian of function $\varphi_{4}(\mathbf{p})$ (eq. \ref{eq:phi4}) are given by:
+where $\mathbf{I}_{V}$ is the identity matrix of order $V$ and 
+$\mathbf{0}_{V \times (M-V-2)}$ is a $V \times (M-V-2)$ matrix with null elements.
+The gradient and Hessian of function $\varphi_{4}(\mathbf{p})$ (eq. \ref{eq:phi4}) are given by:
 \begin{equation}\label{eq:phi4_grad}
 \boldsymbol{\nabla}\varphi_{4}(\mathbf{p}) = 2 \mathbf{R}_{4}^{\mathsf{T}} 
 \left(\mathbf{R}_{4} \mathbf{p} - \mathbf{a} \right) \quad ,
@@ -251,10 +250,12 @@ and
 \end{equation}
 
 The \textit{source's horizontal location constraint} imposes that the horizontal Cartesian coordinates of the origin within 
-the shallowest prism must be as close as possible to a known outcropping point. This constraint is given by
+the shallowest prism must be as close as possible to a known outcropping point given by the horizontal Cartesian coordinates $(\tilde{x}_{0}^{0}, \: \tilde{y}_{0}^{0})$. 
+This constraint is given by
 \begin{equation}\label{eq:phi5}
 \begin{split}
-\varphi_{5}(\mathbf{p}) &= \left[\left(x_{0}^{1} - x_{0}^{0}\right)^2 + \left(y_{0}^{1} - y_0^0\right)^2\right] \\
+\varphi_{5}(\mathbf{p}) &= \left[\left(x_{0}^{1} - \tilde{x}_{0}^{0}\right)^2 
++ \left(y_{0}^{1} - \tilde{y}_{0}^{0}\right)^2\right] \\
 &= \left(\mathbf{R}_{5} \mathbf{p} - \mathbf{b} \right)^{\mathsf{T}}
 \left(\mathbf{R}_{5} \mathbf{p} - \mathbf{b}\right)
 \end{split} \quad ,
