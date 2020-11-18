@@ -58,9 +58,9 @@ observed $\mathbf{d}^{o}$ and predicted $\mathbf{d}(\mathbf{p})$ data vector.
 The second term in the right side of eq. (\ref{eq:gamma}) represents the weighted sum of
 the seven constraint functions $\varphi_{\ell}(\mathbf{p}), \: \ell = 1, \dots, 7$ 
 described in the subsection \textit{Constraint functions} later in this article.
-In eq.  (\ref{eq:gamma}), $\alpha_{\ell}$ is a positive number representing the weight of the $\ell$th constraint function $\varphi_{\ell}(\mathbf{p})$ 
-selected according to a criterion described in the subsection on choosing
-the weights $\alpha_{1}-\alpha_{7}$.
+In eq.  (\ref{eq:gamma}), $\alpha_{\ell}$ is a positive number representing 
+the weight of the $\ell$th constraint function $\varphi_{\ell}(\mathbf{p})$.
+These weights $\alpha_{\ell}$ will be rescaled and selected according to a criterion described in the subsection \textit{Computational procedures} later in this article.
 In the inequality constraints (\ref{eq:inequality-constraint}) 
 $p_{l}^{min}$ and $p_{l}^{max}$ are, respectively, the lower and upper limits for the $l$th element $p_{l}$ of the parameter vector $\mathbf{p}$ (eq. \ref{eq:p-vector}). 
 These limits are defined by the interpreter 
@@ -358,24 +358,64 @@ and
 
 \subsection{Computational procedures}
 
-To estimate the parameter vector $\mathbf{p}$ (eq. \ref{eq:p-vector}) that minimizes 
-the goal function $\Gamma(\mathbf{p})$ (eq. \ref{eq:gamma}) 
+The computational procedures of our method require ....
+
+\subsubsection{Initial guess and inequality constraints}
+
+Estimating, from the total-field anomaly, the parameter vector $\mathbf{p}$ (eq. \ref{eq:p-vector}) that minimizes the goal function $\Gamma(\mathbf{p})$ (eq. \ref{eq:gamma}) 
 for a given pair of total-magnetization intensity $m_{0}$ and depth to the top of the 
-shallowest prism $z_{0}$, 
-subject to the inequality constraint (eq. \ref{eq:inequality-constraint}), we use the Levenberg-Marquardt method \cite[e.g., ][ p. 240]{aster-etal2019}. 
-This is an iterative gradient-based method that, at each iteration $k$, updates the estimate parameter vector $\hat{\mathbf{p}}_{(k)}$ (where the superscript hat ``~$\hat{}$~" denotes estimated) 
-to obtain a new estimated parameter vector $\hat{\mathbf{p}}_{(k+1)}$.
-We compute this update by following the same strategy of \cite{barbosa-1999b}, \cite{oliveirajr-etal2011} and \cite{oliveirajr-barbosa2013} to incorporate the inequality constraint (eq. \ref{eq:inequality-constraint}). This strategy consists in transforming each element $\hat{p}_{l}$ of the estimated parameter vector 
-$\hat{\mathbf{p}}_{(k)}$ into the element $\hat{p}^{\dagger}_{l}$ of a new vector $\hat{\mathbf{p}}^{\dagger}_{(k)}$ as follows:
+shallowest prism $z_{0}$, subject to the inequality constraint 
+(eq. \ref{eq:inequality-constraint}) is a nonlinear inverse problem 
+which requires an initial guess. 
+
+The initial guess of the 3D source shape is a simple cylinder with radius and horizontal Cartesian coordinates of its center were taken after computing the reduction-to-the-pole of the observed total-field anomaly (RTP anomaly).
+We start by computing the RTP anomaly, which in turn has three purposes.
+The first one is verify if the used total-magnetization direction is valid.
+The second purpose is define the upper and lower limits of the inequality constraints 
+(eq. \ref{eq:inequality-constraint}).
+Finally, the third purpose of the RTP anomaly is define the radius and horizontal Cartesian coordinates of the center of the a cylindrical body used as an initial guess.
+
+If the source has a uniform magnetization direction, the RTP anomaly is predominantly positive and decays to zero close to its horizontal boundaries \cite{reis-etal2020}. 
+In this case, the declination and inclination are close to the ones used to obtain the RTP anomaly.
+The upper and lower limits in the inequality constraints (eq. \ref{eq:inequality-constraint}) depend on the parameter. 
+If the parameters are the radii of the vertices of all prisms 
+($r^{k}_{j}$, $j=1,\dots , V$, $k=1,\dots ,L$, the lower limit is close to zero and the upper limit is approximately defined by the radius of a circular area encompassing the region where the RTP anomaly has its maximum and decays to zero.
+If the parameters are the horizontal coordinates ($x_{0}^{k}$ and $y_{0}^{k}$, $k=1,\dots ,L$) of the origins $O^{k}$, $k=1,\dots ,L$, the upper and lower limits are 
+the uppermost and lowermost $x-$ and $y-$ coordinates of a circular area encompassing the region where the RTP anomaly has its maximum and decays to zero.
+If the parameters are the thickness $dz$ of all stacked prisms, we set a large value 
+(e.g., $1$ km) to the upper limit and a value close to zero to the lower limit .
+
+The radius and the horizontal Cartesian coordinates of the center of the cylinder-like initial guess are defined, respectively, by the radius and the $x-$ and $y-$ coordinates of the center of a circular area encompassing the region where the RTP anomaly has  
+its maximum and decays to its maximum gradient. 
+This definition does not require a high accuracy. 
+After defining by the RTP anomaly the radius and the horizontal Cartesian coordinates of the center of the cylinder-like initial guess, we set a guess to the thickness 
+of this cylinder to generate a bottom depth greater than that we expect for the true source. 
+Next, we run a forward modelling of the total-field anomaly aiming at adjusting the cylinder volume of the initial guess and finding the ranges of the total-magnetization intensity $m_{0}$ and to the depth to the top of source $z_{0}$ which yield a preliminary fit of the observed data.
+
+Note that, this first step, to adjust the initial guess and to set the range of $m_{0}$ and  $z_{0}$, is carried out before performing the inversion. 
+In this step, we just perform a magnetic forward modelling by using the observed total-field anomaly only. 
+Hence, no inversion is required.
+
+\subsubsection{Optimization algorithm}
+
+Here, we use the Levenberg-Marquardt algorithm \cite[e.g., ][ p. 240]{aster-etal2019} to solve the nonlinear inverse problem given by eqs. \ref{eq:gamma} and 
+\ref{eq:inequality-constraint}.
+The Levenberg-Marquardt algorithm is an iterative gradient-based method that, at each iteration $\kappa$, updates the estimate parameter vector $\hat{\mathbf{p}}_{(\kappa)}$ (where the superscript hat ``~$\hat{}$~" denotes estimated) to obtain a new estimated parameter vector $\hat{\mathbf{p}}_{(\kappa + 1)}$.
+We compute this update by following the same strategy of \cite{barbosa-1999b}, \cite{oliveirajr-etal2011} and \cite{oliveirajr-barbosa2013} to incorporate the inequality constraint (eq. \ref{eq:inequality-constraint}). 
+This strategy consists in transforming each element $\hat{p}_{l}$ of the estimated parameter vector $\hat{\mathbf{p}}_{(\kappa)} \equiv \hat{p}_{l} \in (p_{l}^{min}, p_{l}^{max}) $ 
+into the element $\hat{p}^{\dagger}_{l}$ of a new vector 
+$\hat{\mathbf{p}}^{\dagger}_{(\kappa)} \equiv \hat{p}^{\dagger}_{l} \in (- \infty, + \infty)$ 
+as follows:
 \begin{equation}\label{eq:inequality-function}
 \hat{p}^{\dagger}_{l} = -\ln\left(\frac{p_{l}^{max} - \hat{p}_{l}}{\hat{p}_{l} - p_{l}^{min}}\right) \: ,
 \end{equation}
 where $p_{l}^{min}$ and $p_{l}^{max}$ are defined in the inequality constraint 
 (eq. \ref{eq:inequality-constraint}).
 Then, we compute a correction $\boldsymbol{\Delta}\hat{\mathbf{p}}^{\dagger}_{(k)}$ and a new vector 
-$\hat{\mathbf{p}}^{\dagger}_{(k+1)} = \hat{\mathbf{p}}^{\dagger}_{(k)} + \boldsymbol{\Delta}\hat{\mathbf{p}}^{\dagger}_{(k)}$.
-Finally, we transform each element $\hat{p}^{\dagger}_{l}$ of $\hat{\mathbf{p}}^{\dagger}_{(k+1)}$ into the element 
-$\hat{p}_{l}$ of the new estimated parameter vector $\hat{\mathbf{p}}_{(k+1)}$ as follows:
+$\hat{\mathbf{p}}^{\dagger}_{(\kappa+1)} = \hat{\mathbf{p}}^{\dagger}_{(\kappa)} + \boldsymbol{\Delta}\hat{\mathbf{p}}^{\dagger}_{(\kappa)}$.
+Finally, we transform each element $\hat{p}^{\dagger}_{l}$ of 
+$\hat{\mathbf{p}}^{\dagger}_{(\kappa+1)}$ into the element 
+$\hat{p}_{l}$ of the new estimated parameter vector $\hat{\mathbf{p}}_{(\kappa+1)}$ as follows:
 \begin{equation}\label{eq:inv-inequality-function}
 \hat{p}_{l} = p_{l}^{min} + \left(\frac{p_{l}^{max} - p_{l}^{min}}{ 1 + e^{-\hat{p}^{\dagger}_{l}} }\right) \: .
 \end{equation}
@@ -384,13 +424,15 @@ $\hat{p}_{l}$ of the new estimated parameter vector $\hat{\mathbf{p}}_{(k+1)}$ a
 \subsubsection{Choice of weights $\alpha_{1}-\alpha_{7}$}
 
 Attributing values to the weights $ \alpha_{\ell} $ (eq. \ref{eq:gamma}) is an important feature of our method. 
-However, there is no analytical rule to define them and their values can be dependent on the particular characteristics of the type of geological setting where the method is being applied \cite{silva-2001}. To overcome this problem, we normalize the $ \alpha_{\ell} $ 
+However, there is no analytical rule to define them and their values can be dependent on the particular characteristics of the type of geological setting where the method is being applied \cite{silva-2001}. 
+To overcome this problem, we normalize the $ \alpha_{\ell} $ 
 values as follows:
 \begin{equation}\label{eq:alphas}
-\alpha_{\ell} = \tilde{\alpha}_\ell\frac{E_\phi}{E_\ell}, \quad \ell = 1,\dots, 7,
+\alpha_{\ell} = \tilde{\alpha}_\ell \frac{E_\phi}{E_\ell}, \quad \ell = 1,\dots, 7,
 \end{equation}
 where $\tilde{\alpha}_\ell$ is a positive scalar and $ E_\phi/E_\ell $ is a normalizing
-factor. In this equation, $ E_\ell $ represents the 
+factor allowing the $\tilde{\alpha}_\ell$ to be independent of the physical units used.
+In this equation, $ E_\ell $ represents the 
 trace of the Hessian matrix $\mathbf{H}_{\ell}$ (eqs \ref{eq:phi1_hessian}, 
 \ref{eq:phi2_hessian}, \ref{eq:phi3_hessian}, \ref{eq:phi4_hessian}, \ref{eq:phi5_hessian}, 
 \ref{eq:phi6_hessian}, and \ref{eq:phi7_hessian}) of the $\ell$th constraining function 
@@ -403,38 +445,62 @@ for the parameter vector $ \mathbf{p} $ (eq. \ref{eq:p-vector}) at the beginning
 
 \subsubsection{Inversion algorithm}
 
-At each iteration $k$ of our algorithm for minimizing the 
+At each iteration $\kappa$ of our algorithm for minimizing the 
 goal function $\Gamma(\mathbf{p})$ (eq. \ref{eq:gamma}), 
-the correction $\boldsymbol{\Delta}\hat{\mathbf{p}}^{\dagger}_{(k)}$ is 
-computed by solving the following linear system:
+the correction $\boldsymbol{\Delta}\hat{\mathbf{p}}^{\dagger}_{(\kappa)}$ is 
+computed by solving the following linear system through XXXXXXX:
 \begin{equation}\label{eq:linear-system}
-\mathbf{Q}_{(k)} \left[\mathbf{Q}_{(k)} \mathbf{H}^{\dagger}(\hat{\mathbf{p}}_{(k)}) \mathbf{Q}_{(k)} + \lambda_{(k)} \mathbf{I}_{M} \right] \mathbf{Q}_{(k)} \boldsymbol{\Delta} \hat{\mathbf{p}}^{\dagger}_{(k)} = -\boldsymbol{\nabla}\Gamma(\hat{\mathbf{p}}_{(k)}) \: ,
+\mathbf{Q}_{(\kappa)}^{-1} \left[\mathbf{Q}_{(k)} \mathbf{H}^{\dagger}(\hat{\mathbf{p}}_{(\kappa)}) \mathbf{Q}_{(\kappa)} + \lambda_{(\kappa)} \mathbf{I}_{M} \right] 
+\mathbf{Q}_{(\kappa)}^{-1} \boldsymbol{\Delta} \hat{\mathbf{p}}^{\dagger}_{(\kappa)} 
+= -\boldsymbol{\nabla}\Gamma(\hat{\mathbf{p}}_{(\kappa)}) \: ,
 \end{equation}
-where $\lambda_{(k)}$ is a positive scalar (known as Marquardt parameter) which is adjusted at each iteration and 
+where $\lambda_{(\kappa)}$ is a positive scalar (known as Marquardt parameter) which is adjusted at each iteration and 
 is associated with the Levenberg-Marquardt method \cite[e.g., ][ p. 240]{silva-2001,aster-etal2019},
-$\mathbf{I}_{M}$ is the identity matrix with order $M$, $\boldsymbol{\nabla}\Gamma(\hat{\mathbf{p}}_{(k)})$
+$\mathbf{I}_{M}$ is the identity matrix with order $M$, $\boldsymbol{\nabla}\Gamma(\hat{\mathbf{p}}_{(\kappa)})$
 is the gradient of the 
-goal function (eq. \ref{eq:gamma_gradient}) and $\mathbf{H}^{\dagger}(\hat{\mathbf{p}}_{(k)})$ is a matrix given by
+goal function (eq. \ref{eq:gamma_gradient}) and $\mathbf{H}^{\dagger}(\hat{\mathbf{p}}_{(\kappa)})$ is a matrix given by
 \begin{equation}\label{eq:H-dagger}
-\mathbf{H}^{\dagger}(\hat{\mathbf{p}}_{(k)}) = \mathbf{H}(\hat{\mathbf{p}}_{(k)})\mathbf{T}(\hat{\mathbf{p}}_{(k)}),
+\mathbf{H}^{\dagger}(\hat{\mathbf{p}}_{(\kappa)}) = \mathbf{H}(\hat{\mathbf{p}}_{(\kappa)})\mathbf{T}(\hat{\mathbf{p}}_{(\kappa)}),
 \end{equation}
-where $\mathbf{H}(\hat{\mathbf{p}}_{(k)})$ is the Hessian matrix of the goal function (eq. \ref{eq:gamma_hessian}) and $\mathbf{T}(\hat{\mathbf{p}}_{(k)})$ is a diagonal matrix whose element $ll$ is given by
+where $\mathbf{H}(\hat{\mathbf{p}}_{(\kappa)})$ is the Hessian matrix of the goal function (eq. \ref{eq:gamma_hessian}) and $\mathbf{T}(\hat{\mathbf{p}}_{(\kappa)})$ is a diagonal matrix whose element $ll$ is given by
 \begin{equation}\label{eq:inequality-diag}
 t(\hat{p}_{l}) = \frac{(p_{l}^{max} - \hat{p}_{l})(\hat{p}_{l} - p_{l}^{min})}{p_{l}^{max} - p_{l}^{min}}, \quad l = 1, \dots, M \: ,
 \end{equation}
-with $p_{l}$ being the $l$th element of the estimated parameter vector $\hat{\mathbf{p}}_{(k)}$. 
-To prevent null values from occurring in any diagonal element of $\mathbf{T}(\hat{\mathbf{p}}_{(k)})$ (eq. \ref{eq:H-dagger}),  we follow \cite{barbosa-1999b} who added a small positive number (on the order of $10^{−2}$)  to each term of the numerator in eq. \ref{eq:inequality-diag}.
-In eq. \ref{eq:linear-system}, $\mathbf{Q}_{(k)}$ is a diagonal matrix proposed by  \cite{marquardt_algorithm_1963} for scaling the parameter $\lambda_{(k)}$ at each iteration and improving the convergence of the algorithm. The element $ll$ of this diagonal matrix is given by
+with $p_{l}$ being the $l$th element of the estimated parameter vector $\hat{\mathbf{p}}_{(\kappa)}$. 
+To prevent null values from occurring in any diagonal element of $\mathbf{T}(\hat{\mathbf{p}}_{(\kappa)})$ (eq. \ref{eq:H-dagger}),  we follow \cite{barbosa-1999b} who added a small positive number (on the order of $10^{−2}$)  to each term of the numerator in eq. \ref{eq:inequality-diag}.
+In eq. \ref{eq:linear-system}, $\mathbf{Q}_{(\kappa)}$ is a diagonal matrix proposed by  \cite{marquardt_algorithm_1963} for scaling the parameter $\lambda_{(\kappa)}$ at each iteration and improving the convergence of the algorithm. 
+The element $ll$ of this diagonal matrix $\mathbf{Q}_{(\kappa)}$  is given by
 \begin{equation}\label{eq:Q-matrix}
 q_{ll} = \frac{1}{\sqrt{h^{\dagger}_{ll}}} \: ,
 \end{equation}
-where $h^{\dagger}_{ll}$ is the element $ll$ of the matrix $\mathbf{H}^{\dagger}(\hat{\mathbf{p}}_{(k)})$ (eq. \ref{eq:H-dagger}). 
+where $h^{\dagger}_{ll}$ is the element $ll$ of the matrix $\mathbf{H}^{\dagger}(\hat{\mathbf{p}}_{(\kappa)})$ (eq. \ref{eq:H-dagger}). 
 
+After estimating $\boldsymbol{\Delta} \hat{\mathbf{p}}^{\dagger}_{(\kappa)}$ at the 
+$\kappa$th iteration by solving the linear system given in eq. \ref{eq:linear-system}, we update $\hat{\mathbf{p}}^{\dagger}_{(\kappa + 1)}$, i.e.:
+\begin{equation}\label{eq:p-k1-dagger}
+\hat{\mathbf{p}}^{\dagger}_{(\kappa + 1)} =
+\hat{\mathbf{p}}^{\dagger}_{(\kappa)} +
+\boldsymbol{\Delta} \hat{\mathbf{p}}^{\dagger}_{(\kappa)}.
+\end{equation}
+Next, we update the constrained parameter vector  $\hat{\mathbf{p}}_{(\kappa + 1)}$ 
+by using eq. \ref{eq:inv-inequality-function}.
+Finaly, we stop the iterative process by evaluating the invariance of the 
+goal function (eq. \ref{eq:gamma}) along the iterations.
+Specifically, we check if the inequality
+\begin{equation}\label{eq:stop-criterion}
+ \Bigg| \frac{\Gamma (\hat{\mathbf{p}}_{(\kappa +1)})  -  
+ \Gamma (\hat{\mathbf{p}}_{(\kappa)})}
+ {\Gamma (\hat{\mathbf{p}}_{(\kappa)})}} 
+ \Bigg|  \le \tau
+\end{equation}
+holds.  In eq. \ref{eq:stop-criterion}, $\tau$ is a threshold value on the order of $10^{-3}$
+to $10^{-4}$. 
 
 \subsubsection{Practical considerations}
 
 Our algorithm depends on several variables that significantly impact the estimated models 
-and cannot be automatically set without the interpreter’s judgment. They are the $\tilde{\alpha}_1 - \tilde{\alpha}_7$ (eq. \ref{eq:alphas}). 
+and cannot be automatically set without the interpreter’s judgment. They are the 
+$\tilde{\alpha}_1 - \tilde{\alpha}_7$ (eq. \ref{eq:alphas}). 
 Based on our practical experience, we suggest some 
 empirical procedures for setting these parameters.
 
@@ -450,7 +516,7 @@ A high value privileges a vertical estimated body, whereas a small value
 tends to generate an inclined estimated body.
 
 In comparison to $\tilde{\alpha}_1$, $\tilde{\alpha}_2$ and $\tilde{\alpha}_3$,
-the other parameters usually have smaller values varying from $10^{-7}$ to $10^{-5}$.
+the other parameters usually have smaller values varying from $10^{-8}$ to $10^{-4}$.
 The parameters $\tilde{\alpha}_4$ and $\tilde{\alpha}_5$ are used when a priori
 information about the source is available at the study area.
 The parameter $\tilde{\alpha}_6$ has a purely mathematical meaning and it is 
@@ -465,10 +531,5 @@ $\tilde{\alpha}_1 = 10^{-4}$, $\tilde{\alpha}_2 = 10^{-4}$, $\tilde{\alpha}_3 = 
 $\tilde{\alpha}_4 = 0$, $\tilde{\alpha}_5 = 0$, $\tilde{\alpha}_6 = 10^{-7}$, 
 $\tilde{\alpha}_7 = 10^{-5}$ and change them to refine the results.
 
-Another important aspect of our method is the initial approximation $\hat{\mathbf{p}}_{(0)}$. 
-We set the same constant radii for all prisms, simulating a cylindrical source located below 
-the positive and negative parts of the observed anomaly.
-Also, we set the same constant thickness $dz$ for all prisms with the purpose 
-of generating a bottom depth greater than that we expect for the true source.
-Finally, we adjust the parameters of the initial approximation $\hat{\mathbf{p}}_{(0)}$ 
-in order to obtain a preliminary fit of the observed data.
+
+
