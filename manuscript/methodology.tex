@@ -467,7 +467,7 @@ where $\mathbf{H}(\hat{\mathbf{p}}_{(\kappa)})$ is the Hessian matrix of the goa
 t(\hat{p}_{l}) = \frac{(p_{l}^{max} - \hat{p}_{l})(\hat{p}_{l} - p_{l}^{min})}{p_{l}^{max} - p_{l}^{min}}, \quad l = 1, \dots, M \: ,
 \end{equation}
 with $p_{l}$ being the $l$th element of the estimated parameter vector $\hat{\mathbf{p}}_{(\kappa)}$. 
-To prevent null values from occurring in any diagonal element of $\mathbf{T}(\hat{\mathbf{p}}_{(\kappa)})$ (eq. \ref{eq:H-dagger}),  we follow \cite{barbosa-1999b} who added a small positive number (on the order of $10^{−2}$)  to each term of the numerator in eq. \ref{eq:inequality-diag}.
+To prevent null values from occurring in any diagonal element of $\mathbf{T}(\hat{\mathbf{p}}_{(\kappa)})$ (eq. \ref{eq:H-dagger}),  we follow \cite{barbosa-1999b} who added a small positive number (on the order of $10^{-2}$)  to each term of the numerator in eq. \ref{eq:inequality-diag}.
 In eq. \ref{eq:linear-system}, $\mathbf{Q}_{(\kappa)}$ is a diagonal matrix proposed by  \cite{marquardt_algorithm_1963} for scaling the parameter $\lambda_{(\kappa)}$ at each iteration and improving the convergence of the algorithm. 
 The element $ll$ of this diagonal matrix $\mathbf{Q}_{(\kappa)}$  is given by
 \begin{equation}\label{eq:Q-matrix}
@@ -488,10 +488,10 @@ Finaly, we stop the iterative process by evaluating the invariance of the
 goal function (eq. \ref{eq:gamma}) along the iterations.
 Specifically, we check if the inequality
 \begin{equation}\label{eq:stop-criterion}
- \Bigg| \frac{\Gamma (\hat{\mathbf{p}}_{(\kappa +1)})  -  
+ \left| \frac{\Gamma (\hat{\mathbf{p}}_{(\kappa +1)})  -  
  \Gamma (\hat{\mathbf{p}}_{(\kappa)})}
- {\Gamma (\hat{\mathbf{p}}_{(\kappa)})}} 
- \Bigg|  \le \tau
+ {\Gamma (\hat{\mathbf{p}}_{(\kappa)})} 
+ \right|  \le \tau
 \end{equation}
 holds.  In eq. \ref{eq:stop-criterion}, $\tau$ is a threshold value on the order of $10^{-3}$
 to $10^{-4}$. 
