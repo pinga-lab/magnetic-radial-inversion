@@ -41,9 +41,45 @@
 \begin{figure}
 	\centering
 	\includegraphics[width=\linewidth]{figures/simple_results.png}
-	\caption{Application to the simple model data. (a) Residuals between the  noise-corrupted data (Fig. \ref{fig:simple_model}a) and the predicted data (not shown) produced by the estimated model (red prisms shown in the panels c and d). The inset in (a) shows the histogram of the residuals and the Gaussian curve (dashed line) has mean and standard deviation equal to $\mu = -0.04$ nT and $\sigma=7.21$ nT, respectively. (b) Perspective views of the initial approximation (red prisms) and the true model (blue prisms). (c) and (d) Comparison between the estimated source (red prisms) and the true model (blue prisms) in perspective views.}
+	\caption{Simple model data. (a) Residuals between the  noise-corrupted data (Fig. \ref{fig:simple_model}a) and the predicted data (not shown) produced by the estimated model (red prisms shown in the panels c and d). The inset in (a) shows the histogram of the residuals and the Gaussian curve (dashed line) has mean and standard deviation equal to $\mu = -0.04$ nT and $\sigma=7.21$ nT, respectively. (b) Perspective views of the initial approximation (red prisms) and the true model (blue prisms). (c) and (d) Comparison between the estimated source (red prisms) and the true model (blue prisms) in perspective views.}
 	\label{fig:simple_results}
 \end{figure}
+
+% Application to synthetic data - dipping model
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{figures/inclined_model_data.png}
+    \caption{Dipping model simulation. (a) Noise-corrupted total-field anomaly produced by the dipping model (blue prisms shown in the panels c and d). The black dots represent the observation points. The connected red dots represent the horizontal projection 
+   	of the initial approximation $\hat{\mathbf{p}}_{(0)}$ 
+   	(red prisms in Fig. XXXXX. (b) Vertical coordinates of the observations simulating an airborne survey. (c) and (d) Perspective views of the dipping model represented by the blue prisms.
+}
+    \label{fig:dipping_model}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{figures/inclined_rtp.png}
+    \caption{Dipping model simulation. (a) RTP anomaly of the total-field anomaly shown in 
+	Fig. \ref{fig:dipping_model}a. 
+	(b)Discrete mapping of the goal function (eq. \ref{eq:gamma}) produced by the estimates   	       obtained considering a grid of 6 $\times$ 6 tentative values of 
+	   depth to the top $z_0$ and total-magnetization intensity $m_0$. 
+	   The red triangle  and white diamond pinpoint, respectively, the true and retrieved 	   
+	   values of $m_0$  and $z_0$.     
+}
+    \label{fig:dipping_rtp}
+\end{figure}
+
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{figures/inclined-l2-solution.png}
+    \caption{Dipping model simulation. (a) Residuals between the  noise-corrupted data (Fig. \ref{fig:dipping_model}a) and the predicted data (not shown) produced by the estimated model (red prisms shown in the panels c and d). The inset in (a) shows the histogram of the residuals and the Gaussian curve (dashed line) has mean and standard deviation equal 
+    to $\mu = 1.3$ nT and $\sigma=5.6$ nT, respectively. (b) Perspective views of the initial approximation (red prisms) and the true model (blue prisms). (c) and (d) Comparison between the estimated source (red prisms) and the true model (blue prisms) in perspective views.     
+}
+    \label{fig:dipping_results}
+\end{figure}
+
 
 % Application to synthetic data - complex model
 
