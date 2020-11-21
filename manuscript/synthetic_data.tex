@@ -48,7 +48,7 @@ The simulated magnetic data are contaminated with a pseudorandom Gaussian noise 
 We simulated airborne magnetic survey whose flight heights ranging from 0 to 720 m
 (Fig. \ref{fig:dipping_model}b) and resulting in a total of 1,694 measurements.
 The simulated dipping source has total-magnetization direction with inclination 
-$ -50^\circ $, declination $ 9^\circ $ and intensity $ m_0 = 9 $ A/m.
+$ -50^\circ $, declination $ 9^\circ $ and intensity $ m_0 = 12 $ A/m.
 The main geomagnetic field direction  has inclination of  $ -21.5^\circ $ and  declination of $ -18.7^\circ $.
 To set up the simulated dipping source (blue prisms in Figs \ref{fig:dipping_model}c and d),
 we used $L=8$ prisms, all of them with the same number of vertices $ V = 20 $ and thickness 
@@ -91,6 +91,23 @@ retrieved the shape of the  simulated dipping source (blue prisms) reasonably, a
 the retrieved depth to the bottom of 3,453.0 m was deeper than the true one.
 The retrieved deep-bottomed dipping source is because that the depth to the top 
 of estimated body has been deeper than the true one.
+
+
+\subsection{Dipping model in the presence of a regional field test}
+
+We analyze the ability of the proposed method to retrieve the geometry of the source
+in a real world scenario, where the observed total-field anomaly is produced not only by 
+the magnetized source but also by  a regional field. 
+Here, the magnetized source to be retrieved has the same shape (blue prisms in Figs \ref{fig:dipping_model}c and d) and magnetization direction of the previous test. 
+In this test, the noise-corrupted total-field anomaly to be inverted 
+(Fig. \ref{fig:dipping_regional_model}a) is obtained by adding 
+a  simulated regional field (Fig. \ref{fig:dipping_regional_model}b), represented by a first-order polynomial, 
+to  a simulated residual field (Fig. \ref{fig:dipping_model}a) due to outcropping low-angle dipping volcanic duct (blue prisms in Figs \ref{fig:dipping_model}c and d). 
+
+To remove the regional field from the original data (Fig. \ref{fig:dipping_regional_model}a),
+we perform a regional-residual separation by fitting a first-order polynomial to the original data using the least-squares method.
+Fig. \ref{fig:dipping_regional_model}c shows the residual total-field anomaly after subtracting from the original anomaly a regional total-field anomaly 
+(Fig. \ref{fig:dipping_regional_model}d) obtained by a least-squares polynomial fitting. 
 
 
 \subsection{Complex model test}
