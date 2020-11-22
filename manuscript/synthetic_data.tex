@@ -101,18 +101,47 @@ the magnetized source but also by  a regional field.
 Here, the magnetized source to be retrieved has the same shape (blue prisms in Figs \ref{fig:dipping_model}c and d) and magnetization direction of the previous test. 
 In this test, the noise-corrupted total-field anomaly to be inverted 
 (Fig. \ref{fig:dipping_regional_model}a) is obtained by adding 
-a  simulated regional field (Fig. \ref{fig:dipping_regional_model}b), represented by a first-order polynomial, 
+a  simulated regional field (Fig. \ref{fig:dipping_regional_model}b), 
+represented by a first-order polynomial, 
 to  a simulated residual field (Fig. \ref{fig:dipping_model}a) due to outcropping low-angle dipping volcanic duct (blue prisms in Figs \ref{fig:dipping_model}c and d). 
 
 To remove the regional field from the original data (Fig. \ref{fig:dipping_regional_model}a),
-we perform a regional-residual separation by fitting a first-order polynomial to the original data using the least-squares method.
+we perform a regional-residual separation by fitting a first-order polynomial 
+to the original data using the least-squares method.
 Fig. \ref{fig:dipping_regional_model}c shows the residual total-field anomaly after subtracting from the original anomaly a regional total-field anomaly 
 (Fig. \ref{fig:dipping_regional_model}d) obtained by a least-squares polynomial fitting. 
 
+We invert the anomaly over the area delimited by the magenta rectangle shown in Fig. \ref{fig:dipping_regional_model}c.
+This anomaly to be inverted is called residual total-field anomaly and it is shown in 
+Fig. \ref{fig:dipping_regional_rtp}a.
+Because we expect that this anomaly is due to the dipping model (blue prisms in Figs. \ref{fig:dipping_model}c and d), we calculate the 
+differences (Fig. \ref{fig:dipping_regional_rtp}b) between the total-field anomaly produced by the dipping model (Fig.  \ref{fig:dipping_model}a) and the residual total-field anomaly 
+(Fig. \ref{fig:dipping_regional_rtp}a) after a regional-residual separation using a least-squares polynomial fitting. 
+Note that over the source the differences are less than 0.8$\%$ of the amplitude of the data due to the dipping model.
+Fig. \ref{fig:dipping_regional_rtp}c shows the RTP anomaly of the residual total-field anomaly shown in \ref{fig:dipping_regional_rtp}a that is used to set up the 
+cylinder-like initial guess.
+We perform 36 inversions by seting the same control variables of the previous test.
+The 36 estimates yield the discrete mapping of the goal function (eq. \ref{eq:gamma}) 
+on the plane $z_0 \times m_0 $ shown in Fig. \ref{fig:dipping_regional_rtp}d.
+The smallest value of this goal function (white diamond) pinpoints 
+the optimal pair of $z_0$ and $m_0$.
+By comparing the retrieved values of $z_0$ and $m_0$ (white diamond)  and
+the true ones (red triangle), we can note an ambiguity involving these variables.
+In this test, the retrieved depth to the top of 40 m is deeper than the true one and the 
+retrieved total-magnetization intensity of 15 A/m is higher than the true one.
+
+Although there is an ambiguity involving $z_0$ and $m_0$, the small residuals (Fig. \ref{fig:regional-results}a) indicate a reasonable fit of the inverted total-field anomaly
+(Fig. \ref{fig:dipping_regional_rtp}a).
+In all 36 inversions, we used the same cylinder-like initial guess (red prisms in Fig. \ref{fig:regional-results}b).
+By assiging $z_0 = 40$ m and $m_0 = 15$ A/m (pinpointed as the white diamond in Fig. \ref{fig:dipping_regional_rtp}d), the estimated source (red prisms in Figs.\ref{fig:regional-results}c and d) recovers the shape of the  simulated dipping source 
+(blue prisms in Figs.\ref{fig:regional-results}b-d) reasonably.
 
 \subsection{Complex model test}
 
-We have simulated a complex inclined body (blue prisms in Figs \ref{fig:complex_model} and \ref{fig:complex_result}) inspired by an alkaline vertical dipping intrusion. The simulated intrusion extends from $z_0=130$ m to $5270$ m along depth and violates most of the constraints described in subsection \ref{sec:constraints}. It is formed by $ L = 10 $ prisms, all of them with the same number of vertices $ V = 30 $ of thickness $ dz = 600 $ m. The horizontal coordinates of the origins $ O^k $ vary linearly from $ (x_0^0, y_0^0) = (-250, 750) $ m, at the shallowest prism, to $ (x_L^0, y_L^0) = (250, -750) $ m resulting a dip in the direction NW-SE, at the deepest prism. The displacements of the horizontal coordinates of the origins $O_k$ resulted in a simulated source dipping to northwest (blue prisms in Figs \ref{fig:complex_model} and \ref{fig:complex_result}). The radii $ r^k_j, k = 1, \dots, L$, $j = 1,\dots, V$, defining the vertices vary from $ 240 $ m to $ 1\,540 $ m and also differ from each other within the same prism. All prisms have a constant total magnetization with inclination $ -50^\circ $, declination $ 9^\circ $ and intensity $ m_0 = 12 $ A/m. We are simulating an alkaline vertical dipping intrusion. We have calculated the total-field anomaly produced by this complex model, in an area of $ 100 $ km$^2 $, by simulating an airborne survey composed of 18 north-south flight lines distributed from $ -5\,000 $ m to $ 5\,000 $ m along the y axis and a single east-west tie line approximately located at $ x = 0 $ m. The data points are located on the undulated surface shown in Fig. \ref{fig:complex_model}a. Notice that both flight and tie lines are not perfectly straight. To compute the synthetic total-field anomaly, we consider a constant main field with inclination $ -21.5^\circ $ and declination $ -18.7^\circ $, which is significantly different from the total-magnetization direction of the complex model. Finally, we have
+We have simulated a complex high-angle dipping intrusion (blue prisms in Figs \ref{fig:complex_model} and \ref{fig:complex_result}) inspired by an alkaline vertical dipping intrusion. 
+The simulated intrusion extends from $z_0=130$ m to $6,130$ m along depth and violates most of the constraints described in subsection \ref{sec:constraints}. 
+It is formed by $ L = 10 $ prisms, all of them with the same number of vertices $ V = 30 $ of thickness $ dz = 600 $ m. 
+The horizontal coordinates of the origins $ O^k $ vary linearly from $ (x_0^0, y_0^0) = (-250, 250) $ m, at the shallowest prism, to $ (x_L^0, y_L^0) = (250, -750) $ m resulting a dip in the direction NW-SE, at the deepest prism. The displacements of the horizontal coordinates of the origins $O_k$ resulted in a simulated source dipping to northwest (blue prisms in Figs \ref{fig:complex_model} and \ref{fig:complex_result}). The radii $ r^k_j, k = 1, \dots, L$, $j = 1,\dots, V$, defining the vertices vary from $ 240 $ m to $ 1\,540 $ m and also differ from each other within the same prism. All prisms have a constant total magnetization with inclination $ -50^\circ $, declination $ 9^\circ $ and intensity $ m_0 = 12 $ A/m. We are simulating an alkaline vertical dipping intrusion. We have calculated the total-field anomaly produced by this complex model, in an area of $ 100 $ km$^2 $, by simulating an airborne survey composed of 18 north-south flight lines distributed from $ -5\,000 $ m to $ 5\,000 $ m along the y axis and a single east-west tie line approximately located at $ x = 0 $ m. The data points are located on the undulated surface shown in Fig. \ref{fig:complex_model}a. Notice that both flight and tie lines are not perfectly straight. To compute the synthetic total-field anomaly, we consider a constant main field with inclination $ -21.5^\circ $ and declination $ -18.7^\circ $, which is significantly different from the total-magnetization direction of the complex model. Finally, we have
 contaminated the synthetic total-field anomaly with a pseudorandom Gaussian noise having mean and standard deviation equal to $0$ nT and $5$ nT, respectively (Fig. \ref{fig:complex_model}a).
 
 We have inverted the noise-corrupted total-field anomaly (Fig. \ref{fig:complex_model}a) produced by the complex model by using 36 different pairs of depth to the top $ z_0 $ and total-magnetization intensity $ m_0 $ (Fig. \ref{fig:complex_map}). Differently from the previous simulation with a simple model, the present generated grid of $ m_0 $ and $ z_0 $ does not contain the true ones (represented by the red triangle in Fig. \ref{fig:complex_map}). All models were generated by using the true direction of the main geomagnetic field (i.e., inclination $ -21.5^\circ $ and declination $ -18.7^\circ $), the same interpretation model formed by $ L = 8 $ prisms, each one with $ V = 20 $ vertices, and the same weights for the constraining functions: $\tilde{\alpha}_1 = 10^{-5}$, $\tilde{\alpha}_2 = 10^{-4}$, $\tilde{\alpha}_3 = 10^{-4}$, $\tilde{\alpha}_4 = 0$, $\tilde{\alpha}_5 = 0$, $\tilde{\alpha}_6 = 10^{-7}$, and $\tilde{\alpha}_7 = 10^{-5}$. 

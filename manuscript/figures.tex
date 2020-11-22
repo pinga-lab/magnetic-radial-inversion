@@ -41,7 +41,7 @@
 \begin{figure}
 	\centering
 	\includegraphics[width=\linewidth]{figures/simple_results.png}
-	\caption{Simple model data. (a) Residuals between the  noise-corrupted data (Fig. \ref{fig:simple_model}a) and the predicted data (not shown) produced by the estimated model (red prisms shown in the panels c and d). The inset in (a) shows the histogram of the residuals and the Gaussian curve (dashed line) has mean and standard deviation equal to $\mu = -0.04$ nT and $\sigma=7.21$ nT, respectively. (b) Perspective views of the initial approximation (red prisms) and the true model (blue prisms). (c) and (d) Comparison between the estimated source (red prisms) and the true model (blue prisms) in perspective views.}
+	\caption{Simple model simulation. (a) Residuals between the  noise-corrupted data (Fig. \ref{fig:simple_model}a) and the predicted data (not shown) produced by the estimated model (red prisms shown in the panels c and d). The inset in (a) shows the histogram of the residuals and the Gaussian curve (dashed line) has mean and standard deviation equal to $\mu = -0.04$ nT and $\sigma=7.21$ nT, respectively. (b) Perspective views of the initial approximation (red prisms) and the true model (blue prisms). (c) and (d) Comparison between the estimated source (red prisms) and the true model (blue prisms) in perspective views.}
 	\label{fig:simple_results}
 \end{figure}
 
@@ -141,22 +141,24 @@ regional total-field anomaly (shown in d) obtained by a least-squares polynomial
     \label{fig:complex_model}
 \end{figure}
 
-%\begin{figure}
-%	\centering
-%	\includegraphics[scale=.75]{figures/complex_gamma.png}
-%	\caption{Application to the complex model data. 
-%	Discrete mapping of the goal function $\Gamma(\mathbf{p})$ (eq. \ref{eq:gamma}) on the plane $ m_0 \times z_0 $ produced by estimated models with different depths-to-the-top ($ z_0 $) and 
-%	total-magnetization intensities ($ m_0 $). 
-%	The red triangle represents the $m_0$ and $z_0$ of the true source. 
-%	The white diamond indicates the pair ($ m_0, z_0 $) that produces the smallest 
-%	value of $\Gamma (\mathbf{p})$.}
-%	\label{fig:complex_map}
-%\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{figures/complex_rtp.png}
+    \caption{Complex model simulation. (a) RTP anomaly of the total-field anomaly shown in 
+	Fig. \ref{fig:complex_model}a. 
+	The red circle and the blue polygon represent the horizontal projections of the 	   initial approximation $\hat{\mathbf{p}}_{(0)}$ and  the simulated dipping source, respectively.
+	(b)Discrete mapping of the goal function (eq. \ref{eq:gamma}) produced by the estimates   	       obtained considering a grid of 6 $\times$ 6 tentative values of 
+	   depth to the top $z_0$ and total-magnetization intensity $m_0$. 
+	   The red triangle  and white diamond pinpoint, respectively, the true and retrieved 	   
+	   values of $m_0$  and $z_0$.     
+}
+    \label{fig:complex_rtp}
+\end{figure}
 
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{figures/complex_results.png}
-    \caption{Application to complex model data. (a) Residuals between the noise-corrupted data (Fig. \ref{fig:complex_model}a) and the predicted data (not shown) produced by the estimated model (red prisms in the c and d panels). This model was obtained with 
+    \caption{Complex model simulation. (a) Residuals between the noise-corrupted data (Fig. \ref{fig:complex_model}a) and the predicted data (not shown) produced by the estimated model (red prisms in the c and d panels). This model was obtained with 
     the values of $ m_0 $ and $ z_0 $ represented by the white diamond in Fig. \ref{fig:complex_map}. The inset in (a) shows the histogram of the residuals and the fitted Gaussian curve (dashed line) with mean and standard deviation equal to $\mu = 0.07$ nT and $\sigma=6.75$ nT, respectively. (b) Perspective view of the initial approximation (red prisms) and the true model (blue prisms). (c) and (d) Comparison between the estimated source (red prisms) and the true model (blue prisms) in perspective views. 
 }
     \label{fig:complex_result}
