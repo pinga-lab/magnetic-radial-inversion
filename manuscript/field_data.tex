@@ -4,20 +4,20 @@ We have applied our method to interpret airborne magnetic data provided by
 Geological Survey of Brazil (CPRM) over the Anit{\'a}polis complex, 
 in southern Brazil. 
 The airborne survey was flown with north-south and east-west lines spaced by $500$ m and $10\,000$ m from each other, respectively. 
-The total-field anomaly data were corrected from daytime variation and 
-from the main geomagnetic field using the IGRF. 
+The total-field anomaly data (Fig. \ref{fig:real_data}a) were corrected from diurnal correction and from the main geomagnetic field using the IGRF. 
 The inclination, declination and intensity of the main geomanetic field at the study area, 
 for the period of the survey, are $-37.05^{\circ}$, $-18.17^{\circ}$ and 
 $\approx 22 \, 768 $ nT, respectively.
-The residual total-field anomaly shown in Fig. \ref{fig:real_data}a was obtained by 
-removing a second-order polynomial from the original data (not shown). 
-Figs \ref{fig:real_data}b and \ref{fig:real_data}c show the geometric height
-the observed data and the topography of the study area, respectively. 
-For convenience, we have subtracted $ 800 $ m from their values.
+Fig. \ref{fig:real_data}b shows a regional field obtained by fitting, in the least-squares sense, a first-order polynomial to the original data (Fig. \ref{fig:real_data}a).
+Figs \ref{fig:real_data}c and \ref{fig:real_data}d show the geometric height
+We have subtracted 800 m from their values and after the invertion the estimated model is corrected.  
 
+After removing a first-order polynomial (Fig. \ref{fig:real_data}b) from the original data  
+(Fig. \ref{fig:real_data}a) using a least-squares polynomial fitting, we obtain the residual total-field anomaly shown in Fig. \ref{fig:anitapolis_rtp}a.
 The Anit{\'a}polis alkaline-carbonatitic complex forms a circular concentric body 
 ($\approx 6$ km$^{2}$ in area) containing magnetite as part of its mineralogical 
-composition. It intruded into the Late Proterozoic leucogranites of the Dom Feliciano 
+composition. 
+It intruded into the Late Proterozoic leucogranites of the Dom Feliciano 
 mobile belt in the Early Cretaceous ($132$ Ma), apparently concomitant with the 
 voluminous flood tholeiitic basalts of the Serra Geral Formation ($133$-$130$ Ma) 
 at the southern side of the Paran{\'a} Basin \citep{gibson-1999, scheibe-etal2005}.
@@ -27,14 +27,16 @@ of the Anit{\'a}polis alkaline-carbonatitic complex.
 \citet{horbach-marimon1980} affirmed that the Anit{\'a}polis complex is controlled by 
 a large N30W lineament. 
 \citet{scheibe-etal2005} considered that it is roughly emplaced along the E-W Rio 
-Uruguay Lineament. According to \citet{riccomini-etal2005}, the Anit{\'a}polis 
+Uruguay Lineament. 
+According to \citet{riccomini-etal2005}, the Anit{\'a}polis 
 complex does not show a clear structural control. 
 
-We set the total-magnetization direction of the interpretation model with
-inclination $ I=-21^\circ $ and declination $ D=-11^\circ $. These values were estimated 
-by \cite{reis-seg-2019} for the study area by using a method based on the 
-equivalent-layer technique \cite[]{dampney1969,emilia1973}. We have verified this estimated 
-direction using the reduction to the pole technique (not shown). 
+By using the methodology of \cite{reis-etal2020}, we set the total-magnetization direction of the interpretation model with inclination $ I=-21^\circ $ and declination $ D=-11^\circ $. These values were estimated by \cite{reis-seg-2019}. 
+We have accepted this estimated magnetization direction because the calculated RTP anomaly 
+(Fig. \ref{fig:anitapolis_rtp}b) of the residual total-field anomaly 
+(Fig. \ref{fig:anitapolis_rtp}a) is predominantly positive and decays to zero toward
+the borders of the study area \citep{reis-etal2020, reis-seg-2019}.
+
 This total-magnetization direction indicates the presence of remanent magnetization.
 Laboratory measurements on rock samples obtained at the Jacupiranga complex,
 another alkaline complex located northward of the study area, 
@@ -46,23 +48,25 @@ for the total-magnetization intensity $m_{0}$ in the Anit{\'a}polis complex.
 
 We used an interpretation model formed by $L = 6$ prisms, each one with 
 $V = 20$ vertices defining their horizontal cross-sections.
-We inverted the observed total-field anomaly (Fig. \ref{fig:real_data}a) for each 
-pair of $m_0$ and $z_0$ shown in Fig. \ref{fig:real_map}, resulting in $100$ estimated 
+We inverted the residual total-field anomaly (Fig. \ref{fig:anitapolis_rtp}a) for each 
+pair of $m_0$ and $z_0$ shown in Fig. \ref{fig:anitapolis_rtp}c, resulting in $100$ estimated 
 models. 
 For all models, we set the same initial approximation $\hat{\mathbf{p}}_{(0)}$ 
 (red prisms in Figs \ref{fig:real_result2}b and \ref{fig:real_result}b) 
-with origin 
-at $(x_0^k, y_0^k) = (6921, 688)$ km, constant radii $r_j^k = 700$ m for 
+with origin at $(x_0^k, y_0^k) = (6\,921, 688)$ km, constant radii $r_j^k = 700$ m for 
 all vertices forming all prisms and the same constant thickness $dz = 900$ m.
-We also set the same weights which were used in the synthetic tests, i.e., $\tilde{\alpha}_1 = 10^{-4}$, 
+We also set the same weights which were used in the synthetic tests, i.e., 
+$\tilde{\alpha}_1 = 10^{-4}$, 
 $\tilde{\alpha}_2 = 10^{-3}$, 
-$\tilde{\alpha}_3 = 10^{-4}$, $\tilde{\alpha}_4 = 0$, $\tilde{\alpha}_5 = 0$, 
-$\tilde{\alpha}_6 = 10^{-8}$, and $\tilde{\alpha}_7 = 10^{-5}$ (eq. \ref{eq:alphas}). 
-
-Fig. \ref{fig:real_map} shows that there is a region containing 
+$\tilde{\alpha}_3 = 10^{-4}$, 
+$\tilde{\alpha}_4 = 0$, 
+$\tilde{\alpha}_5 = 0$, 
+$\tilde{\alpha}_6 = 10^{-8}$, and 
+$\tilde{\alpha}_7 = 10^{-5}$ (eq. \ref{eq:alphas}). 
+Fig. \ref{fig:anitapolis_rtp}c shows that there is a region (dark blue region) containing 
 candidate solutions producing small values of the goal function 
 $\Gamma(\mathbf{p})$ (eq. \ref{eq:gamma}), with different values of $m_0$ and $z_0$.
-The pink diamond in Fig. \ref{fig:real_map} represents the 
+The magenta diamond in Fig. \ref{fig:anitapolis_rtp}c represents the 
 non-outcropping estimated model shown in Fig. \ref{fig:real_result2}. 
 This model produces not only the smallest value for $ \Gamma(\mathbf{p}) $ (eq. \ref{eq:gamma}), but also reasonable data fit (Fig. \ref{fig:real_result2}a). 
 It has a volume $ 9.96 $ km$ ^3 $, total thickness of $ 4\,596.55 $ m 
@@ -76,7 +80,7 @@ complex \cite[]{gibson-1999}.
 Besides, its total-magnetization intensity $m_0 = 14$ A/m is within the range found by 
 \citet{valdivia-2009} for intrusions located at the Jacupiranga complex.
 
-The white diamond in Fig. \ref{fig:real_map} represents the alternative 
+The white diamond in Fig. \ref{fig:anitapolis_rtp}c represents the alternative 
 model show in Fig. \ref{fig:real_result}. This model is similar to that shown in 
 Fig. \ref{fig:real_result2}. It has a volume $ 9.57 $ km$ ^3 $, total thickness 
 $ 4\,419.34 $ m ($ dz = 736.56 $), depth-to-the-top $z_0 = 0$ m and 
@@ -84,7 +88,7 @@ total-magnetization intensity $m_0 = 14$ A/m.
 In comparison with the non-outcropping model shown in Fig. \ref{fig:real_result2}, the 
 alternative model shown in Fig. \ref{fig:real_result} has very similar geometry,
 but it outcrops.
-Both estimated models show a nearly N30W elongated body with accentuated dip 
+Both estimated models show a nearly N30W elongated body with high dip 
 along depth (Figs \ref{fig:real_result2} and \ref{fig:real_result}), 
 which coincides with the topographic low observed in Fig \ref{fig:real_data}c. 
 Hence, these estimates agree with the interpretation proposed by 

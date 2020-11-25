@@ -171,41 +171,48 @@ The inset shows the histogram of the residuals and the Gaussian curve (dashed li
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{figures/field_data_alt_topo.png}
-    \caption{(a) Residual total-field anomaly (in nT) over the  
-    Anit{\'a}polis complex in southern Brazil. The horizontal UTM 
-    coordinates are referred to the central meridian $ 51^\circ $ W. (b) Geometric 
-    height of the observation points and (c) topography of the study area.
-    Both of them are referred to the WGS84 ellipsoid. For convenience, we have 
-    subtracted $ 800 $ m from their values. 
-    The black dots represent the observation points. 
-    The connected red dots represent the horizontal projection of the 
-    initial approximation $\hat{\mathbf{p}}_{(0)}$ 
-    (red prisms in Figs \ref{fig:real_result2}b and \ref{fig:real_result}b).}
+    \caption{Application to field data.  (a) Observed total-field anomaly over the  
+    Anit{\'a}polis alkaline-carbonatitic complex in southern Brazil. The horizontal UTM 
+    coordinates are referred to the central meridian $ 51^\circ $ W. 
+    The black dots represent the observation points.
+    (b) Regional field using least-squares first-order polynomial fitting. 
+    (c) Geometric height of the observation points. (d) Topography of the study area.
+    Both of them are referred to the WGS84 ellipsoid. We have subtracted 
+    $ 800 $ m from their values. 
+    The magenta rectangle delimits the data to be inverted.
+    }
     \label{fig:real_data}
 \end{figure}
 
-%\begin{figure}
-%	\centering
-%	\includegraphics[scale=.75]{figures/real_gamma.png}
-%	\caption{Application to the field data over the Anit{\'a}polis complex in southern Brazil. 
-%	Discrete mapping of the goal function $\Gamma(\mathbf{p})$ (eq. \ref{eq:gamma})  
-%	produced by estimated models with different depths-to-the-top ($ z_0 $) and 
-%	total-magnetization intensities ($ m_0 $).
-%	The pink diamond represents the estimated model that produces the smallest value of $ \Gamma(\mathbf{p})$.
-%	The white diamond represents an alternative model whose depth to the top is $z_0=0$ indicating a possible outcropping not corroborated by the literature.}
-%	\label{fig:real_map}
-%\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{figures/anitapolis_rtp.png}
+    \caption{Application to field data over the Anit{\'a}polis complex, Brazil. (a) Residual total-field anomaly to be inverted over the area delimited by the  magenta rectangle in Fig. \ref{fig:real_data}. The red circle represents the horizontal projections 	of the initial approximation 
+    $\hat{\mathbf{p}}_{(0)}$.
+    (b) RTP anomaly of the  residual total-field anomaly shown in a. 
+(c) Discrete mapping of the goal function ($ \Gamma(\mathbf{p})$, eq. \ref{eq:gamma}) produced by the estimates  obtained considering a grid of 6 $\times$ 6 tentative values of 
+	   depth to the top $z_0$ and total-magnetization intensity $m_0$. 
+	   The white and magenta diamonds pinpoint, respectively, two pairs of $m_0$  and $z_0$
+	   whose goal functions are close to each other. The magenta diamond pinpoints the estimated model that produces the smallest value of $\Gamma(\mathbf{p})$.
+The white diamond pinpoints an alternative model whose depth to the top is $z_0=0$ indicating a possible outcropping not corroborated by the literature.	 
+}
+    \label{fig:anitapolis_rtp}
+\end{figure}
+
+
 
 \begin{figure}
 	\centering
 	\includegraphics[width=\linewidth]{figures/real_results_magenta_diamond.png}
 	\caption{Application to the field data over the Anit{\'a}polis complex, Brazil.
-	The non-outcropping estimated model producing the smallest goal function value, 
-	represented by the pink diamond in Fig. \ref{fig:real_map}.
-	(a) Residuals between the observed data (Fig. \ref{fig:real_data}a) and the 
+	The non-outcropping estimated model producing the smallest goal function 
+	($ \Gamma(\mathbf{p})$, eq. \ref{eq:gamma})	represented by the magenta diamond 
+	in Fig. \ref{fig:anitapolis_rtp}c.
+	(a) Residuals between the observed data (Fig. \ref{fig:anitapolis_rtp}a) and the 
 	predicted data (not shown) produced by the estimated model. 
 	The inset shows the histogram of the residuals and the fitted normal 
-	Gaussian curve (dashed line) with mean $\mu = -2.53$ nT and standard deviation $\sigma = 22.70$ nT.
+	Gaussian curve (dashed line) with mean $\mu = -2.53$ nT and 
+	standard deviation $\sigma = 22.70$ nT.
 	The light-gray polygons represent the horizontal projection of the estimated 
 	model onto the residual map. 
 	(b) Perspective view of the initial approximation (red prisms). 
@@ -217,12 +224,12 @@ The inset shows the histogram of the residuals and the Gaussian curve (dashed li
     \centering
     \includegraphics[width=\linewidth]{figures/real_results_white_diamond.png}
     \caption{Application to the field data over the Anit{\'a}polis complex, Brazil.
-    Outcropping estimated model 
-    represented by the white diamond in Fig. \ref{fig:real_map}. 
-    (a) Residuals between the observed data (Fig. \ref{fig:real_data}a) and the 
+    Outcropping estimated model  represented by the white diamond in in Fig.    		   \ref{fig:anitapolis_rtp}c. 
+    (a) Residuals between the observed data (Fig. \ref{fig:anitapolis_rtp}a and the 
     predicted data (not shown) produced by the estimated model. 
     The inset shows the histogram of the residuals and the fitted normal 
-    Gaussian curve (dashed line) with mean $\mu = -2.68$ and standard deviation  $\sigma = 22.52$.
+    Gaussian curve (dashed line) with mean $\mu = -2.68$ and standard deviation  
+    $\sigma = 22.52$.
     The light-gray polygons represent the horizontal projection of the estimated 
     model onto the residual map. 
     (b) Perspective view of the initial approximation (red prisms). 
