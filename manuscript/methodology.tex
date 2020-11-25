@@ -358,7 +358,9 @@ and
 
 \subsection{Computational procedures}
 
-The computational procedures of our method require ....
+The computational procedures of our method require the definition of:
+(1) the initial guess, (2) the upper and lower limits in the inequality constraints (eq. \ref{eq:inequality-constraint}), (3) the nonlinear inverse algorithm, and 
+(4) the weights $ \alpha_{\ell} $ (eq. \ref{eq:gamma}).
 
 \subsubsection{Initial guess and inequality constraints}
 
@@ -368,18 +370,18 @@ shallowest prism $z_{0}$, subject to the inequality constraint
 (eq. \ref{eq:inequality-constraint}) is a nonlinear inverse problem 
 which requires an initial guess. 
 
-The initial guess of the 3D source shape is a simple cylinder with radius and horizontal Cartesian coordinates of its center were taken after computing the reduction-to-the-pole of the observed total-field anomaly (RTP anomaly).
+The initial guess of the 3D source shape is a simple cylinder whose radius and horizontal Cartesian coordinates of its center were taken after computing the reduction-to-the-pole of the observed total-field anomaly (RTP anomaly).
 We start by computing the RTP anomaly, which in turn has three purposes.
 The first one is verify if the used total-magnetization direction is valid.
 The second purpose is define the upper and lower limits of the inequality constraints 
 (eq. \ref{eq:inequality-constraint}).
 Finally, the third purpose of the RTP anomaly is define the radius and horizontal Cartesian coordinates of the center of the a cylindrical body used as an initial guess.
 
-If the source has a uniform magnetization direction, the RTP anomaly is predominantly positive and decays to zero close to its horizontal boundaries \cite{reis-etal2020}. 
+If the source has a uniform magnetization direction, the RTP anomaly is predominantly positive and decays to zero close to its horizontal boundaries \cite[]{reis-etal2020}. 
 In this case, the declination and inclination are close to the ones used to obtain the RTP anomaly.
 The upper and lower limits in the inequality constraints (eq. \ref{eq:inequality-constraint}) depend on the parameter. 
 If the parameters are the radii of the vertices of all prisms 
-($r^{k}_{j}$, $j=1,\dots , V$, $k=1,\dots ,L$, the lower limit is close to zero and the upper limit is approximately defined by the radius of a circular area encompassing the region where the RTP anomaly has its maximum and decays to zero.
+($r^{k}_{j}$, $j=1,\dots , V$, $k=1,\dots ,L$), the lower limit is close to zero and the upper limit is approximately defined by the radius of a circular area encompassing the region where the RTP anomaly has its maximum and decays to zero.
 If the parameters are the horizontal coordinates ($x_{0}^{k}$ and $y_{0}^{k}$, $k=1,\dots ,L$) of the origins $O^{k}$, $k=1,\dots ,L$, the upper and lower limits are 
 the uppermost and lowermost $x-$ and $y-$ coordinates of a circular area encompassing the region where the RTP anomaly has its maximum and decays to zero.
 If the parameters are the thickness $dz$ of all stacked prisms, we set a large value 
@@ -393,8 +395,9 @@ of this cylinder to generate a bottom depth greater than that we expect for the 
 Next, we run a forward modelling of the total-field anomaly aiming at adjusting the cylinder volume of the initial guess and finding the ranges of the total-magnetization intensity $m_{0}$ and to the depth to the top of source $z_{0}$ which yield a preliminary fit of the observed data.
 
 Note that, this first step, to adjust the initial guess and to set the range of $m_{0}$ and  $z_{0}$, is carried out before performing the inversion. 
-In this step, we just perform a magnetic forward modelling by using the observed total-field anomaly only. 
-Hence, no inversion is required.
+In this step, we just perform a magnetic forward modelling by using the observed total-field anomaly only. Hence, no inversion is required. 
+Moreover, the cylinder-like initial guess  can produce an inaccurate magnetic-data fitting.
+
 
 \subsubsection{Inversion algorithm}
 
@@ -419,7 +422,7 @@ At each iteration $\kappa$ of our algorithm for minimizing the goal function $\G
 (eq. \ref{eq:inequality-constraint}),  the correction 
 $\boldsymbol{\Delta}\hat{\mathbf{p}}^{\dagger}_{(\kappa)}  \equiv 
 \Delta \hat{p}^{\dagger}_{l} \in (- \infty, + \infty)$ 
-is computed by solving the following linear system through LU decomposition:
+is computed by solving the following linear system through LU decomposition with partial pivoting and row interchanges:
 \begin{equation}\label{eq:linear-system}
 \mathbf{Q}_{(\kappa)}^{-1} \left[\mathbf{Q}_{(k)} \mathbf{H}^{\dagger}(\hat{\mathbf{p}}_{(\kappa)}) \mathbf{Q}_{(\kappa)} + \lambda_{(\kappa)} \mathbf{I}_{M} \right] 
 \mathbf{Q}_{(\kappa)}^{-1} \boldsymbol{\Delta} \hat{\mathbf{p}}^{\dagger}_{(\kappa)} 
@@ -478,8 +481,8 @@ Usually. the inversion algorithm converges at 8-12 iterations
 \subsubsection{Choice of weights $\alpha_{1}-\alpha_{7}$}
 
 Attributing values to the weights $ \alpha_{\ell} $ (eq. \ref{eq:gamma}) is an important feature of our method. 
-However, there is no analytical rule to define them and their values can be dependent on the particular characteristics of the type of geological setting where the method is being applied \cite{silva-2001}. 
-To overcome this problem, we normalize the $ \alpha_{\ell} $ 
+However, there is no analytical rule to define them and their values can be dependent on the particular characteristics of the type of geological setting where the method is being applied \cite[]{silva-2001}. 
+To make these weights comparable to each other, we normalize the $ \alpha_{\ell} $ 
 values as follows:
 \begin{equation}\label{eq:alphas}
 \alpha_{\ell} = \tilde{\alpha}_\ell \frac{E_\phi}{E_\ell}, \quad \ell = 1,\dots, 7,
@@ -493,9 +496,12 @@ trace of the Hessian matrix $\mathbf{H}_{\ell}$ (eqs \ref{eq:phi1_hessian},
 $\varphi_{\ell}(\mathbf{p})$ (eqs \ref{eq:phi1}, \ref{eq:phi2}, \ref{eq:phi3}, 
 \ref{eq:phi4}, \ref{eq:phi5}, \ref{eq:phi6}, and \ref{eq:phi7}). 
 The constant $E_\phi$ is the trace of the Hessian matrix 
-$\mathbf{H}_{\phi}(\mathbf{p}_{0})$ (eq. \ref{eq:phi_hessian}) of the misfit function 
+$\mathbf{H}_{\phi}(\hat{\mathbf{p}}_{(0)})$ (eq. \ref{eq:phi_hessian}) of the misfit function 
 $\phi(\mathbf{p})$ (eq. \ref{eq:misfit}) computed with the initial approximation $\hat{\mathbf{p}}_{(0)}$ 
-for the parameter vector $ \mathbf{p} $ (eq. \ref{eq:p-vector}) at the beginning of the inversion algorithm. According to this empirical strategy, the weights $ \alpha_{\ell} $ are defined using the positive scalars $\tilde{\alpha}_\ell$ (eq. \ref{eq:alphas}), which are less dependent on the particular characteristics of the interpretation geological setting.
+for the parameter vector $ \mathbf{p} $ (eq. \ref{eq:p-vector}) at the beginning of the inversion algorithm. According to this empirical strategy, the weights $ \alpha_{\ell} $ 
+(eq. \ref{eq:gamma}) are redefined using the positive scalars $\tilde{\alpha}_\ell$ 
+(eq. \ref{eq:alphas}), which are independent of the physical units and less dependent 
+on the particular characteristics of the interpretation geological setting.
 
 
 \subsubsection{Practical considerations}
