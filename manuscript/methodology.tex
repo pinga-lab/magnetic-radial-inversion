@@ -476,12 +476,24 @@ Specifically, we check if the inequality
 holds.  
 In eq. \ref{eq:stop-criterion}, $\tau$ is a threshold value on the order of $10^{-3}$
 to $10^{-4}$. 
-Usually. the inversion algorithm converges at 8-12 iterations
+In the evaluation of the goal function (eq. \ref{eq:gamma}), we have computed the constraint functions 
+($\varphi_{\ell}(\mathbf{p}), \: \ell = 1, \dots, 7$) by using the expressions which are written 
+by the sum of terms. 
+Usually, the inversion algorithm converges at 8-12 iterations. 
 
 \subsubsection{Choice of weights $\alpha_{1}-\alpha_{7}$}
 
 Attributing values to the weights $ \alpha_{\ell} $ (eq. \ref{eq:gamma}) is an important feature of our method. 
 However, there is no analytical rule to define them and their values can be dependent on the particular characteristics of the type of geological setting where the method is being applied \cite[]{silva-2001}. 
+
+At this point, we draw attention that the weights $ \alpha_{\ell}$ (eq. \ref{eq:gamma}) is a dimensional 
+quantity. 
+Note that the units of the data-misfit function (eq. \ref{eq:misfit}) and the constraint functions 
+(eqs. \ref{eq:phi1}-\ref{eq:phi7}) are $nT^{2}$ and $m^{2}$, respectively.
+Because we set the unit of the goal function (eq. \ref{eq:gamma}) as $nT^{2}$, the unit of the weights 
+$ \alpha_{\ell} $ (eq. \ref{eq:gamma}) is $nT^{2}.m^{-2}$.
+
+The physical dimensional of the weights $ \alpha_{\ell}$ makes the solution of the inverse problem variable. 
 To make these weights comparable to each other, we normalize the $ \alpha_{\ell} $ 
 values as follows:
 \begin{equation}\label{eq:alphas}
@@ -498,7 +510,12 @@ $\varphi_{\ell}(\mathbf{p})$ (eqs \ref{eq:phi1}, \ref{eq:phi2}, \ref{eq:phi3},
 The constant $E_\phi$ is the trace of the Hessian matrix 
 $\mathbf{H}_{\phi}(\hat{\mathbf{p}}_{(0)})$ (eq. \ref{eq:phi_hessian}) of the misfit function 
 $\phi(\mathbf{p})$ (eq. \ref{eq:misfit}) computed with the initial approximation $\hat{\mathbf{p}}_{(0)}$ 
-for the parameter vector $ \mathbf{p} $ (eq. \ref{eq:p-vector}) at the beginning of the inversion algorithm. According to this empirical strategy, the weights $ \alpha_{\ell} $ 
+for the parameter vector $ \mathbf{p} $ (eq. \ref{eq:p-vector}) at the beginning of the inversion algorithm. 
+Note that the trace of the Hessian matrix $\mathbf{H}_{\ell}$ is dimensionless and 
+the trace of the Hessian matrix $\mathbf{H}_{\phi}(\hat{\mathbf{p}}_{(0)})$ has unit of $nT^{2}.m^{-2}$.
+Thus, the positive scalars $\tilde{\alpha}_\ell$  in eq. \ref{eq:alphas} are dimensionless quantities.
+
+According to this empirical strategy, the weights $ \alpha_{\ell} $ 
 (eq. \ref{eq:gamma}) are redefined using the positive scalars $\tilde{\alpha}_\ell$ 
 (eq. \ref{eq:alphas}), which are independent of the physical units and less dependent 
 on the particular characteristics of the interpretation geological setting.
@@ -515,7 +532,7 @@ The parameters $\tilde{\alpha}_1$ and $\tilde{\alpha}_2$ impose prior informatio
 shape of the horizontal cross-section of the prisms. 
 The first one forces all prisms to have a circular horizontal cross-section, while 
 the second forces all prisms to have a similar horizontal cross-section.
-Generally, their values vary from $10^{-5}$ to $10^{-3}$ and differs from
+Generally, their values vary from $10^{-5}$ to $10^{-3}$ and differ from
 each other by one order of magnitude, at most.
 The parameter $\tilde{\alpha}_3$ also varies from $10^{-5}$ to $10^{-3}$ and 
 controls the relative position of adjacent prisms forming the model.
@@ -537,5 +554,6 @@ A general rule is starting with values
 $\tilde{\alpha}_1 = 10^{-4}$, $\tilde{\alpha}_2 = 10^{-4}$, $\tilde{\alpha}_3 = 10^{-4}$,
 $\tilde{\alpha}_4 = 0$, $\tilde{\alpha}_5 = 0$, $\tilde{\alpha}_6 = 10^{-7}$, 
 $\tilde{\alpha}_7 = 10^{-5}$ and change them to refine the results.
-
+Finally, we stress that $\tilde{\alpha}_1 - \tilde{\alpha}_7$ (eq. \ref{eq:alphas})
+do not change along the iterations.
 
