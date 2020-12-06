@@ -24,12 +24,12 @@ Some examples of this linear inversion are presented by \cite{cribb-1976}, \cite
 Different approaches have improved this linear inversion to obtain focused images of the subsurface. 
 For example, \cite{portniaguine_focusing_1999} and \cite{portniaguine_3d_2002} introduced the minimum gradient support functional, similar to the one proposed by
 \cite{last-1983} that minimizes the volumes of the sources in a gravity data inversion. 
-By inverting magnetic anomaly and any component of the total anomalous field, this functional estimates a magnetization distribution  that generates a non blurry (focused) 3-D image of  the geologic bodies in the subsurface.
-\cite{barbosa_interactive_2006} presented a method for inverting interfering magnetic anomalies produced by multiple sources by combining  features of the forward modeling (the interactivity) and traditional inversion (the automatic data fitting). Other studies introduced strategies to constraint the nonuniqueness and delineate the source \cite[]{tontini,pilkington_3d_2009,shamsipour_3d_2011,cella_inversion_2012,abedi-2015}. 
-Some of these methods allowed remanent magnetization \cite[e.g., ][]{pignatelli-2006}. 
+By inverting magnetic anomaly and any component of the total anomalous field, this functional estimates a magnetization distribution that generates a non blurry (focused) 3-D image of the geologic bodies in the subsurface.
+\cite{barbosa_interactive_2006} presented a method for inverting interfering magnetic anomalies produced by multiple sources by combining features of the forward modeling (the interactivity) and traditional inversion (the automatic data fitting). Other studies introduced strategies to constraint the nonuniqueness and delineate the source \cite[]{tontini,pilkington_3d_2009,shamsipour_3d_2011,cella_inversion_2012,abedi-2015}. 
+Some of these methods allowed remnant magnetization \cite[e.g., ][]{pignatelli-2006}. 
 In this case, the parameters to be estimated are the total-magnetization intensities 
 of the prisms. 
-In all these methods, and thus, the geometries of the magnetic sources are indirectly retrived by interpreting the estimated total-magnetization intensity 
+In all these methods, and thus, the geometries of the magnetic sources are indirectly retrieved by interpreting the estimated total-magnetization intensity 
 distribution. 
 Theoretically, these inversion methods are capable of recovering the geometry of complex 
 sources. However, they require a plethora of a priori information to overcome 
@@ -58,12 +58,12 @@ right prisms with polygonal horizontal cross-sections and the same number of ver
 For convenience, all prisms have the same thickness and total-magnetization 
 intensity.
 Differently from \cite{oliveirajr-etal2011} and \cite{oliveirajr-barbosa2013}, 
-our method estimates not only the horizontal Cartesian coordinates of the origins and the radii of the vertices describing the horizontal cross-sections of all prisms, but also the thickness of all prisms comprising the interpretation model. Additionally, we perform a numerical analysis to investigate the sensitivity of our method to the key inversion parameters, namely, the total magnetization intensity and the depth to the top 
+our method estimates not only the horizontal Cartesian coordinates of the origins and the radii of the vertices describing the horizontal cross-sections of all prisms but also the thickness of all prisms comprising the interpretation model. Additionally, we perform a numerical analysis to investigate the sensitivity of our method to the key inversion parameters, namely, the total magnetization intensity and the depth to the top 
 of the shallowest prism. 
 We perform a series of inversion runs using different combinations of these two parameters' values and compute a goal function associated with each of the trial solutions.
 Among the estimated models, those producing the 
 lowest values of goal function form the set of candidate models.
-To obtain a stable solutions, we use the same set of regularizing functions proposed by 
+To obtain stable solutions, we use the same set of regularizing functions proposed by 
 \cite{oliveirajr-etal2011} and also propose a new one for constraining the 
 thickness of the prisms. 
 Like \cite{oliveirajr-etal2011} and \cite{oliveirajr-barbosa2013}, we refer to the proposed method as \textit{radial inversion} because our method estimates the radii of the vertices describing the horizontal cross-sections of all prisms.
