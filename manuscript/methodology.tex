@@ -2,7 +2,7 @@
 
 \subsection{Forward problem}
 
-Let $\mathbf{d}^{o}$ be the observed data vector, whose $i$th element $d^{o}_{i}$, $i = 1, \dots, N$, is the total-field anomaly produced by a 3-D source (Fig. \ref{fig:obs}a) at the point $(x_{i}, y_{i}, z_{i})$ of a Cartesian coordinate  system with $x$, $y$ and $z$ axes pointing to north, east and down, respectively. We assume that the direction of the total magnetization vector of the source is constant and known. We approximate the volume of the source by a set of $L$ vertically juxtaposed 3-D prisms (Fig. \ref{fig:obs}b) by following the same approach of \cite{oliveirajr-etal2011} and \cite{oliveirajr-barbosa2013}. The depth to the top of the shallowest prism is defined by $z_{0}$ and $m_{0}$ is the constant total-magnetization  intensity of all prisms. The horizontal cross-section of each prism (Fig. \ref{fig:prism_parameters}) 
+Let $\mathbf{d}^{o}$ be the observed data vector, whose $i$th element $d^{o}_{i}$, $i = 1, \dots, N$, is the total-field anomaly produced by a 3-D source (Fig. \ref{fig:obs}a) at the point $(x_{i}, y_{i}, z_{i})$ of a Cartesian coordinate system with $x$, $y$ and $z$ axes pointing to north, east and down, respectively. We assume that the direction of the total magnetization vector of the source is constant and known. We approximate the volume of the source by a set of $L$ vertically juxtaposed 3-D prisms (Fig. \ref{fig:obs}b) by following the same approach of \cite{oliveirajr-etal2011} and \cite{oliveirajr-barbosa2013}. The depth to the top of the shallowest prism is defined by $z_{0}$ and $m_{0}$ is the constant total-magnetization intensity of all prisms. The horizontal cross-section of each prism (Fig. \ref{fig:prism_parameters}) 
 is described by a polygon with a fixed number $V$ of vertices equally spaced from $0^{\circ}$ to $360^{\circ}$, which are described in polar coordinates referred to an internal origin $O^{k}$. The radii of the vertices ($r^{k}_{j}$, $j=1,\dots , V$, $k=1,\dots ,L$), the horizontal coordinates ($x_{0}^{k}$ and $y_{0}^{k}$, $k=1,\dots ,L$) of the origins $O^{k}$, $k=1,\dots ,L$, and the thickness $dz$ of the $L$ vertically stacked prisms (Fig. \ref{fig:obs}b) are arranged in a $M \times 1$ parameter vector $\mathbf{p}$, $M = L (V + 2) + 1$, given by
 \begin{equation}
 \mathbf{p} = \left[ \begin{array}{@{}*{12}{c}@{}}
@@ -58,7 +58,7 @@ observed $\mathbf{d}^{o}$ and predicted $\mathbf{d}(\mathbf{p})$ data vector.
 The second term in the right side of eq. (\ref{eq:gamma}) represents the weighted sum of
 the seven constraint functions $\varphi_{\ell}(\mathbf{p}), \: \ell = 1, \dots, 7$ 
 described in the subsection \textit{Constraint functions} later in this article.
-In eq.  (\ref{eq:gamma}), $\alpha_{\ell}$ is a positive number representing 
+In eq. (\ref{eq:gamma}), $\alpha_{\ell}$ is a positive number representing 
 the weight of the $\ell$th constraint function $\varphi_{\ell}(\mathbf{p})$.
 These weights $\alpha_{\ell}$ will be rescaled and selected according to a criterion described in the subsection \textit{Computational procedures} later in this article.
 In the inequality constraints (\ref{eq:inequality-constraint}) 
@@ -87,7 +87,7 @@ and
 where the gradient vector and the Hessian matrix of the misfit function 
 $\phi(\mathbf{p})$ (eq. \ref{eq:gamma}) are respectively given by:
 \begin{equation}\label{eq:phi_gradient}
-\boldsymbol{\nabla} \phi(\mathbf{p}) =  - \frac{2}{N}\mathbf{G}(\mathbf{p})^{\mathsf{T}}[\mathbf{d}^o - \mathbf{d}(\mathbf{p})]
+\boldsymbol{\nabla} \phi(\mathbf{p}) = - \frac{2}{N}\mathbf{G}(\mathbf{p})^{\mathsf{T}}[\mathbf{d}^o - \mathbf{d}(\mathbf{p})]
 \end{equation} 
 and 
 \begin{equation}\label{eq:phi_hessian}
@@ -101,7 +101,7 @@ the parameter vector $\mathbf{p}$ (eq. \ref{eq:p-vector}). Details about the con
 
 \subsection{Constraint functions}\label{sec:constraints}
 
-To explain the constraint functions $\varphi_{\ell}(\mathbf{p})$ (eq. \ref{eq:gamma}), $\ell = 1, \dots, 7$, used here to obtain stable solutions and introduce prior information about the magnetic source, we have organized  them into the following three groups.
+To explain the constraint functions $\varphi_{\ell}(\mathbf{p})$ (eq. \ref{eq:gamma}), $\ell = 1, \dots, 7$, used here to obtain stable solutions and introduce prior information about the magnetic source, we have organized them into the following three groups.
 
 \subsubsection{Smoothness constraints}
 
@@ -211,10 +211,10 @@ and
 \subsubsection{Equality constraints}
 
 This group is formed by two constraints that were proposed by \cite{oliveirajr-etal2011} and \cite{oliveirajr-barbosa2013} by following the same approach proposed \cite{barbosa-etal1997} and \cite{barbosa-1999a}. 
-They introduce a priori information about the shallowest prism and are  suitable for outcropping sources.
+They introduce a priori information about the shallowest prism and are suitable for outcropping sources.
 
 The \textit{source’s outcrop constraint} imposes that the horizontal cross-section of the shallowest prism must be close to known outcropping boundary of the geologic source.
-The horizontal cross-section of the known outcropping boundary separating the geologic  source from the host rock is described by the radii $\tilde{r}_{1}^{0} \dots \tilde{r}_{V}^{0}$. Mathematically, this constraint is given by
+The horizontal cross-section of the known outcropping boundary separating the geologic source from the host rock is described by the radii $\tilde{r}_{1}^{0} \dots \tilde{r}_{V}^{0}$. Mathematically, this constraint is given by
 \begin{equation}\label{eq:phi4}
 \begin{split}
 \varphi_{4}(\mathbf{p}) &= \left[ \sum\limits^{V}_{j=1}\left(r^{1}_{j}-r^{0}_{j}\right)^2\right] \\
@@ -225,7 +225,7 @@ The horizontal cross-section of the known outcropping boundary separating the ge
 where $\mathbf{a}$ is a $V \times 1$ vector containing the radii of the polygon defining the outcropping boundary
 \begin{equation}
 \mathbf{a} = \left[ \begin{array}{@{}*{12}{c}@{}}
-\tilde{r}_{1}^{0} & \dots & \tilde{r}_{V}^{0}  \\
+\tilde{r}_{1}^{0} & \dots & \tilde{r}_{V}^{0} \\
 \end{array} \right]^{\mathsf{T}} \: ,
 \label{eq:a-vector}
 \end{equation}
@@ -315,7 +315,7 @@ and
 \mathbf{S}_{6} = 
 \mathbf{I}_{L} \otimes 
 \begin{bmatrix}
-\mathbf{I}_{V}            & \mathbf{0}_{V \times 2} \\
+\mathbf{I}_{V}      & \mathbf{0}_{V \times 2} \\
 \mathbf{0}_{2 \times V} & \mathbf{0}_{2 \times 2} \\
 \end{bmatrix}_{(V+2) \times (V+2)} \quad ,
 \label{eq:S6-matrix}
@@ -387,16 +387,16 @@ the uppermost and lowermost $x-$ and $y-$ coordinates of a circular area encompa
 If the parameters are the thickness $dz$ of all stacked prisms, we set a large value 
 (e.g., $1$ km) to the upper limit and a value close to zero to the lower limit .
 
-The radius and the horizontal Cartesian coordinates of the center of the cylinder-like initial guess are defined, respectively, by the radius and the $x-$ and $y-$ coordinates of the center of a circular area encompassing the region where the RTP anomaly has  
+The radius and the horizontal Cartesian coordinates of the center of the cylinder-like initial guess are defined, respectively, by the radius and the $x-$ and $y-$ coordinates of the center of a circular area encompassing the region where the RTP anomaly has 
 its maximum and decays to its maximum gradient. 
 This definition does not require a high accuracy. 
 After defining by the RTP anomaly the radius and the horizontal Cartesian coordinates of the center of the cylinder-like initial guess, we set a guess to the thickness 
 of this cylinder to generate a bottom depth greater than that we expect for the true source. 
-Next, we run a forward modelling of the total-field anomaly aiming at adjusting the cylinder volume of the initial guess and finding the ranges of the total-magnetization intensity $m_{0}$ and to the depth to the top of source $z_{0}$ which yield a preliminary fit of the observed data.
+Next, we run a forward modeling of the total-field anomaly aiming at adjusting the cylinder volume of the initial guess and finding the ranges of the total-magnetization intensity $m_{0}$ and to the depth to the top of source $z_{0}$ which yield a preliminary fit of the observed data.
 
-Note that, this first step, to adjust the initial guess and to set the range of $m_{0}$ and  $z_{0}$, is carried out before performing the inversion. 
-In this step, we just perform a magnetic forward modelling by using the observed total-field anomaly only. Hence, no inversion is required. 
-Moreover, the cylinder-like initial guess  can produce an inaccurate magnetic-data fitting.
+Note that, this first step, to adjust the initial guess and to set the range of $m_{0}$ and $z_{0}$, is carried out before performing the inversion. 
+In this step, we just perform a magnetic forward modeling by using the observed total-field anomaly only. Hence, no inversion is required. 
+Moreover, the cylinder-like initial guess can produce an inaccurate magnetic-data fitting.
 
 
 \subsubsection{Inversion algorithm}
@@ -405,7 +405,7 @@ Here, we use the Levenberg-Marquardt algorithm \cite[e.g., ][ p. 240]{aster-etal
 The Levenberg-Marquardt algorithm is an iterative gradient-based method that, at each iteration $\kappa$, updates the estimate parameter vector $\hat{\mathbf{p}}_{(\kappa)}$ (where the superscript hat ``~$\hat{}$~" denotes estimated) to obtain a new estimated parameter vector $\hat{\mathbf{p}}_{(\kappa + 1)}$.
 We compute this update by following the same strategy of \cite{barbosa-1999b}, \cite{oliveirajr-etal2011} and \cite{oliveirajr-barbosa2013} to incorporate the inequality constraint (eq. \ref{eq:inequality-constraint}). 
 This strategy consists in transforming each element $\hat{p}_{l}$ of the estimated parameter vector $\hat{\mathbf{p}}_{(\kappa)} \equiv \hat{p}_{l} \in (p_{l}^{min}, p_{l}^{max}) $ 
-into the element $\hat{p}^{\dagger}_{l}$ of an  unconstrained  vector 
+into the element $\hat{p}^{\dagger}_{l}$ of an unconstrained vector 
 $\hat{\mathbf{p}}^{\dagger}_{(\kappa)} \equiv \hat{p}^{\dagger}_{l} \in (- \infty, + \infty)$ 
 as follows:
 \begin{equation}\label{eq:inequality-function}
@@ -419,8 +419,8 @@ The inverse transformation of each element $\hat{p}^{\dagger}_{l} \in (- \infty,
 \end{equation}
 
 At each iteration $\kappa$ of our algorithm for minimizing the goal function $\Gamma(\mathbf{p})$ (eq. \ref{eq:gamma}) subject to the inequality constraint
-(eq. \ref{eq:inequality-constraint}),  the correction 
-$\boldsymbol{\Delta}\hat{\mathbf{p}}^{\dagger}_{(\kappa)}  \equiv 
+(eq. \ref{eq:inequality-constraint}), the correction 
+$\boldsymbol{\Delta}\hat{\mathbf{p}}^{\dagger}_{(\kappa)} \equiv 
 \Delta \hat{p}^{\dagger}_{l} \in (- \infty, + \infty)$ 
 is computed by solving the following linear system through LU decomposition with partial pivoting and row interchanges:
 \begin{equation}\label{eq:linear-system}
@@ -441,14 +441,14 @@ where $\mathbf{H}(\hat{\mathbf{p}}_{(\kappa)})$ is the Hessian matrix of the goa
 t_{ll} = \frac{(p_{l}^{max} - \hat{p}_{l})(\hat{p}_{l} - p_{l}^{min})}{p_{l}^{max} - p_{l}^{min}}, \quad l = 1, \dots, M \: ,
 \end{equation}
 with $\hat{p}_{l}$ being the $l$th element of the estimated parameter vector 
-$\hat{\mathbf{p}}_{(\kappa)} \equiv  \hat{p}_{l}  \in (p_{l}^{min}, p_{l}^{max})$. 
+$\hat{\mathbf{p}}_{(\kappa)} \equiv \hat{p}_{l} \in (p_{l}^{min}, p_{l}^{max})$. 
 To prevent null values from occurring in any diagonal element of 
 $\mathbf{T}(\hat{\mathbf{p}}_{(\kappa)})$ 
-(eqs. \ref{eq:H-dagger} and \ref{eq:inequality-diag}),  
-we follow \cite{barbosa-1999b} who added a small positive number (on the order of $10^{-2}$)  
+(eqs. \ref{eq:H-dagger} and \ref{eq:inequality-diag}), 
+we follow \cite{barbosa-1999b} who added a small positive number (on the order of $10^{-2}$) 
 to each term of the numerator in eq. \ref{eq:inequality-diag}.
-In eq. \ref{eq:linear-system}, $\mathbf{Q}_{(\kappa)}$ is a diagonal matrix proposed by  \cite{marquardt_algorithm_1963} for scaling the parameter $\lambda_{(\kappa)}$ at each iteration and improving the convergence of the algorithm. 
-The element $ll$ of this diagonal matrix $\mathbf{Q}_{(\kappa)}$  is given by
+In eq. \ref{eq:linear-system}, $\mathbf{Q}_{(\kappa)}$ is a diagonal matrix proposed by \cite{marquardt_algorithm_1963} for scaling the parameter $\lambda_{(\kappa)}$ at each iteration and improving the convergence of the algorithm. 
+The element $ll$ of this diagonal matrix $\mathbf{Q}_{(\kappa)}$ is given by
 \begin{equation}\label{eq:Q-matrix}
 q_{ll} = \frac{1}{\sqrt{h^{\dagger}_{ll}}} \: ,
 \end{equation}
@@ -462,18 +462,18 @@ $\kappa$th iteration by solving the linear system given in eq. \ref{eq:linear-sy
 \hat{\mathbf{p}}^{\dagger}_{(\kappa)} +
 \boldsymbol{\Delta} \hat{\mathbf{p}}^{\dagger}_{(\kappa)}.
 \end{equation}
-Next, we update the constrained parameter vector  $\hat{\mathbf{p}}_{(\kappa + 1)}$ 
+Next, we update the constrained parameter vector $\hat{\mathbf{p}}_{(\kappa + 1)}$ 
 by using eq. \ref{eq:inv-inequality-function}.
-Finaly, we stop the iterative process by evaluating the invariance of the 
+Finally, we stop the iterative process by evaluating the invariance of the 
 goal function (eq. \ref{eq:gamma}) along the iterations.
 Specifically, we check if the inequality
 \begin{equation}\label{eq:stop-criterion}
- \left| \frac{\Gamma (\hat{\mathbf{p}}_{(\kappa +1)})  -  
+ \left| \frac{\Gamma (\hat{\mathbf{p}}_{(\kappa +1)}) - 
  \Gamma (\hat{\mathbf{p}}_{(\kappa)})}
  {\Gamma (\hat{\mathbf{p}}_{(\kappa)})} 
- \right|  \le \tau
+ \right| \le \tau
 \end{equation}
-holds.  
+holds. 
 In eq. \ref{eq:stop-criterion}, $\tau$ is a threshold value on the order of $10^{-3}$
 to $10^{-4}$. 
 In the evaluation of the goal function (eq. \ref{eq:gamma}), we have computed the constraint functions 
@@ -513,7 +513,7 @@ $\phi(\mathbf{p})$ (eq. \ref{eq:misfit}) computed with the initial approximation
 for the parameter vector $ \mathbf{p} $ (eq. \ref{eq:p-vector}) at the beginning of the inversion algorithm. 
 Note that the trace of the Hessian matrix $\mathbf{H}_{\ell}$ is dimensionless and 
 the trace of the Hessian matrix $\mathbf{H}_{\phi}(\hat{\mathbf{p}}_{(0)})$ has unit of $nT^{2}.m^{-2}$.
-Thus, the positive scalars $\tilde{\alpha}_\ell$  in eq. \ref{eq:alphas} are dimensionless quantities.
+Thus, the positive scalars $\tilde{\alpha}_\ell$ in eq. \ref{eq:alphas} are dimensionless quantities.
 
 According to this empirical strategy, the weights $ \alpha_{\ell} $ 
 (eq. \ref{eq:gamma}) are redefined using the positive scalars $\tilde{\alpha}_\ell$ 
@@ -524,7 +524,7 @@ on the particular characteristics of the interpretation geological setting.
 \subsubsection{Practical considerations}
 
 Our algorithm depends on several control variables that significantly impact the estimated models and cannot be automatically set without the interpreter’s judgment. 
-They are the  $\tilde{\alpha}_1 - \tilde{\alpha}_7$ (eq. \ref{eq:alphas}). 
+They are the $\tilde{\alpha}_1 - \tilde{\alpha}_7$ (eq. \ref{eq:alphas}). 
 Based on our practical experience, we suggest some 
 empirical procedures for setting these parameters.
 
