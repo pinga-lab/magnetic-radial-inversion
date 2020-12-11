@@ -2128,12 +2128,12 @@ def plot_complex_model_data(x, y, obs, alt, initial, model,
     plt.xlabel('$y$(km)', fontsize=14)
     plt.ylabel('$x$(km)', fontsize=14)
     clb = plt.colorbar(pad=0.01, aspect=20, shrink=1)
-    clb.ax.set_title('nT', pad=-315)
+    clb.ax.set_title('nT', pad=-315, fontsize=14)
     mpl.polygon(initial, '.-r', xy2ne=True)
     mpl.m2km()
     clb.ax.tick_params(labelsize=13)
     plt.plot(y, x, 'k.', markersize=.25)
-    plt.text(-5500, 3800, '(a)', fontsize= 15)
+    plt.text(np.min(y)-1200, np.max(x), '(a)', fontsize= 20)
 
     # plot elevation
     ax=plt.subplot(2,2,2)
@@ -2142,41 +2142,41 @@ def plot_complex_model_data(x, y, obs, alt, initial, model,
     plt.xlabel('$y$(km)', fontsize=14)
     plt.ylabel('$x$(km)', fontsize=14)
     clb = plt.colorbar(pad=0.01, aspect=20, shrink=1)
-    clb.ax.set_title('m', pad=-315)
+    clb.ax.set_title('m', pad=-315, fontsize=14)
     mpl.m2km()
     clb.ax.tick_params(labelsize=13)
     plt.plot(y, x, 'ko', markersize=.25)
-    plt.text(-5500, 3800, '(b)', fontsize= 15)
+    plt.text(np.min(y)-1200, np.max(x), '(b)', fontsize= 20)
 
     # true model
     ax = plt.subplot(2,2,3, projection='3d')
-    ax.add_collection3d(Poly3DCollection(verts_true, alpha=0.3, 
+    ax.add_collection3d(Poly3DCollection(verts_true, alpha=1, 
     facecolor='b', linewidths=0.5, edgecolors='k'))
 
     ax.set_xlim(-2.5, 2.5, 100)
     ax.set_ylim(-2.5, 2.5, 100)
     ax.set_zlim(7, -0.2, 100)
-    ax.tick_params(labelsize= 10)
-    ax.set_ylabel('y (km)', fontsize= 14)
-    ax.set_xlabel('x (km)', fontsize= 14)
-    ax.set_zlabel('z (km)', fontsize= 14)
-    ax.view_init(0, 45)
-    ax.text2D(-0.1, 0.07, '(c)', fontsize= 15)
+    ax.tick_params(labelsize= 14)
+    ax.set_ylabel('y (km)', fontsize= 14, labelpad=10)
+    ax.set_xlabel('x (km)', fontsize= 14, labelpad=10)
+    ax.set_zlabel('z (km)', fontsize= 14, labelpad=2)
+    ax.view_init(10, 55)
+    ax.text2D(-0.115, 0.07, '(c)', fontsize= 20)
 
     # true model
     ax = plt.subplot(2,2,4, projection='3d')
-    ax.add_collection3d(Poly3DCollection(verts_true, alpha=0.3, 
+    ax.add_collection3d(Poly3DCollection(verts_true, alpha=1, 
     facecolor='b', linewidths=0.5, edgecolors='k'))
 
     ax.set_xlim(-2.5, 2.5, 100)
     ax.set_ylim(-2.5, 2.5, 100)
     ax.set_zlim(7, -0.2, 100)
-    ax.tick_params(labelsize= 10)
-    ax.set_ylabel('y (km)', fontsize= 14)
-    ax.set_xlabel('x (km)', fontsize= 14)
-    ax.set_zlabel('z (km)', fontsize= 14)
-    ax.view_init(20, 135)
-    ax.text2D(-0.1, 0.07, '(d)', fontsize= 15)
+    ax.tick_params(labelsize= 14)
+    ax.set_ylabel('y (km)', fontsize= 14, labelpad=10)
+    ax.set_xlabel('x (km)', fontsize= 14, labelpad=10)
+    ax.set_zlabel('z (km)', fontsize= 14, labelpad=2)
+    ax.view_init(20, 145)
+    ax.text2D(-0.116, 0.07, '(d)', fontsize= 20)
 
     plt.tight_layout()
 
@@ -2488,7 +2488,7 @@ def plot_solution(xp, yp, zp,
     plt.ylabel('$x$(km)', fontsize=14, labelpad=0)
     plt.ylim(ymax=np.max(x))
     clb = plt.colorbar(pad=0.01, aspect=20, shrink=1)
-    clb.ax.set_title('nT', pad=-255, fontsize=14)
+    clb.ax.set_title('nT', pad=-265, fontsize=14)
     clb.ax.tick_params(labelsize=14)
 
     # horizontal projection of the prisms
@@ -2504,7 +2504,209 @@ def plot_solution(xp, yp, zp,
     mean = np.mean(residuals)
     std = np.std(residuals)
     nbins=30
-    n, bins, patches = plt.hist(residuals, bins=nbins, density=True, facecolor='blue')
+    n, bins, patches = plt.hist(residuals, bins=nbins, range=(-25,25), density=True, facecolor='blue')
+    plt.tick_params(labelsize=14)
+    props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+    inset.text(
+        insetposition[0], insetposition[1],
+        '$\mu $ = {:.1f}\n$\sigma $ = {:.1f}'.format(mean, std),
+        transform=inset.transAxes, fontsize=10,
+        va='top', ha='left', bbox=props
+        )
+    gauss = sp.norm.pdf(bins, mean, std)
+    plt.plot(bins, gauss, 'k--', linewidth=1., label='Gaussian')
+
+    ax.text(np.min(y)-1.2, np.max(x), '(a)', fontsize=20)
+
+    # initial approximate
+    ax = plt.subplot(2,2,2, projection='3d')
+
+    # plot sides
+    ax.add_collection3d(Poly3DCollection(verts_initial, alpha=0.3, 
+     facecolor='r', linewidths=0.5, edgecolors='k'))
+    if model == []:
+        pass
+    elif inter == True:
+        ax.add_collection3d(Poly3DCollection(verts_true[:-V/2-2], alpha=0.3, 
+        facecolor='b', linewidths=0.5, edgecolors='k'))
+        ax.add_collection3d(Poly3DCollection(verts_true[-V/2-2:], alpha=1., 
+        facecolor='y', linewidths=0.5, edgecolors='k'))
+    else:
+        ax.add_collection3d(Poly3DCollection(verts_true, alpha=0.3, 
+        facecolor='b', linewidths=0.5, edgecolors='k'))
+
+    ax.set_ylim(area[0], area[1], 100)
+    ax.set_xlim(area[2], area[3], 100)
+    ax.set_zlim(initial[-1].z2/1000. + 0.2, -0.1, 100)
+    ax.tick_params(labelsize=14, pad=0)
+    ax.set_ylabel('x (km)', fontsize=14, labelpad=10)
+    ax.set_xlabel('y (km)', fontsize=14, labelpad=10)
+    ax.set_zlabel('z (km)', fontsize=14, labelpad=2)
+    ax.set_yticks(np.arange(area[0], area[1], 2))
+    ax.set_xticks(np.arange(area[2], area[3], 2))
+    ax.view_init(angles[0], angles[1])
+    ax.text2D(-0.1, 0.09, '(b)', fontsize=20)
+
+    # inverse model view 1
+    ax = plt.subplot(2,2,3, projection='3d')
+
+    # plot sides
+    ax.add_collection3d(Poly3DCollection(verts, alpha=0.3, 
+     facecolor='r', linewidths=0.5, edgecolors='k'))
+    if model == []:
+        pass
+    elif inter == True:
+        ax.add_collection3d(Poly3DCollection(verts_true[:-V/2-2], alpha=0.3, 
+        facecolor='b', linewidths=0.5, edgecolors='k'))
+        ax.add_collection3d(Poly3DCollection(verts_true[-V/2-2:], alpha=1.,
+        facecolor='y', linewidths=0.5, edgecolors='k'))
+    else:
+        ax.add_collection3d(Poly3DCollection(verts_true, alpha=0.3, 
+        facecolor='b', linewidths=0.5, edgecolors='k'))
+
+    ax.set_ylim(area[0], area[1], 100)
+    ax.set_xlim(area[2], area[3], 100)
+    ax.set_zlim(zb-0.5, -0.2, 100)
+    ax.tick_params(labelsize=14, pad=0)
+    ax.set_ylabel('x (km)', fontsize=14, labelpad=10)
+    ax.set_xlabel('y (km)', fontsize=14, labelpad=10)
+    ax.set_zlabel('z (km)', fontsize=14, labelpad=2)
+    ax.set_yticks(np.arange(area[0], area[1], 2))
+    ax.set_xticks(np.arange(area[2], area[3], 2))
+    ax.view_init(angles[2], angles[3])
+    ax.text2D(-0.115, 0.09, '(c)', fontsize=20)
+
+    # inverse model view 2
+    ax = plt.subplot(2,2,4, projection='3d')
+
+    # plot sides
+    ax.add_collection3d(Poly3DCollection(verts, alpha=0.3, 
+     facecolor='r', linewidths=0.5, edgecolors='k'))
+    if model == []:
+        pass
+    elif inter == True:
+        ax.add_collection3d(Poly3DCollection(verts_true[:-V/2-2], alpha=0.3, 
+        facecolor='b', linewidths=0.5, edgecolors='k'))
+        ax.add_collection3d(Poly3DCollection(verts_true[-V/2-2:], alpha=1., 
+        facecolor='y', linewidths=0.5, edgecolors='k'))
+    else:
+        ax.add_collection3d(Poly3DCollection(verts_true, alpha=0.3, 
+        facecolor='b', linewidths=0.5, edgecolors='k'))
+
+    ax.set_ylim(area[0], area[1], 100)
+    ax.set_xlim(area[2], area[3], 100)
+    ax.set_zlim(zb-0.5, -0.2, 100)
+    ax.tick_params(labelsize=14)
+    ax.set_ylabel('x (km)', fontsize=14, labelpad=10)
+    ax.set_xlabel('y (km)', fontsize=14, labelpad=10)
+    ax.set_zlabel('z (km)', fontsize=14, labelpad=2)
+    ax.set_yticks(np.arange(area[0], area[1], 2))
+    ax.set_xticks(np.arange(area[2], area[3], 2))
+    ax.view_init(angles[4], angles[5])
+    ax.text2D(-0.1, 0.09, '(d)', fontsize=20)
+
+    if filename == '':
+        pass
+    else:
+        plt.savefig(filename, dpi=dpi)
+    return plt.show()
+
+def plot_field_solution(xp, yp, zp,
+    residuals, solution, initial,
+    figsize, dpi=300, insetposition=(0.5, 0.95),
+    angles=[], area=[], model=[],
+    filename='', inter=False):
+    '''
+    Returns a plot of the resdiuals, initial approximate
+    and two perspective views of the solution for the
+    complex model
+    
+    input
+    xp, yp, zp: 1D array - Cartesian coordinates of the residuals
+    residuals: 1D array - residuals between observed and predicted data
+    solution: list - list of a fatiando.mesher.PolygonalPrism
+                    of the estimated model
+    initial: list - list of a fatiando.mesher.PolygonalPrism
+                    of the initial approximate
+    figsize: tuple - size of the figure
+    dpi: integer - resolution of the figure
+    insetposition: tuple - position of the inset histogram
+    angles: list - list of perspective angles of the 3D plots,
+                    default: [10, 50, 10, 50, 20, 160]
+    area: list - list of minimum and maximum values for the
+                    Cartesian coord. of the 3D plots
+                    [xmin, xmax, ymin, ymax]
+    model: list - list of a fatiando.mesher.PolygonalPrism
+                    of the true model or a second solution,
+                    default: []
+    filename: string - directory and filename of the figure
+    inter: boolean - presence of an interfering body
+
+    output
+    fig: figure - plot of the result
+    '''
+   # converting coordinates
+    x=xp/1000.
+    y=yp/1000.
+
+    verts = plot_prisms(solution, scale=0.001)
+    verts_initial = plot_prisms(initial, scale=0.001)
+
+    if area != []:
+        pass
+    else:
+        area = [np.min(x), np.max(x), np.min(y),
+        np.max(y)]
+
+    if angles != []:
+        pass
+    else:
+        angles = [10, 50, 10, 50, 20, 160]
+
+    if model != []:
+        verts_true = plot_prisms(model, scale=0.001)
+        V = model[0].x.size
+        if inter == False:
+            if model[-1].z2 >= solution[-1].z2:
+                zb = model[-1].z2/1000. + 0.5
+            else:
+                zb = solution[-1].z2/1000. + 0.5
+        elif inter == True:
+            if model[-2].z2 >= solution[-1].z2:
+                zb = model[-2].z2/1000. + 0.5
+            else:
+                zb = solution[-1].z2/1000. + 0.5
+    else:
+        zb = solution[-1].z2/1000. + 0.5
+
+    plt.figure(figsize=figsize)
+
+    # residual data and histogram
+    ax=plt.subplot(2,2,1)
+    plt.tricontourf(y, x, residuals, 20,
+                    cmap='RdBu_r', vmin=-np.max(residuals),
+                    vmax=np.max(residuals)).ax.tick_params(labelsize=14)
+    plt.xlabel('$y$(km)', fontsize=14, labelpad=0)
+    plt.ylabel('$x$(km)', fontsize=14, labelpad=0)
+    plt.ylim(ymax=np.max(x))
+    clb = plt.colorbar(pad=0.01, aspect=20, shrink=1)
+    clb.ax.set_title('nT', pad=-265, fontsize=14)
+    clb.ax.tick_params(labelsize=14)
+
+    # horizontal projection of the prisms
+    for s in solution:
+        s.x *= 0.001
+        s.y *= 0.001
+        s.z1 *= 0.001
+        s.z2 *= 0.001
+        mpl.polygon(s, fill='k', alpha=0.1, linealpha=0.1, xy2ne=True)
+
+    # histogram inset
+    inset = inset_axes(ax, width="40%", height="30%", loc=1, borderpad=0.5)
+    mean = np.mean(residuals)
+    std = np.std(residuals)
+    nbins=30
+    n, bins, patches = plt.hist(residuals, bins=nbins, range=(-100,100), density=True, facecolor='blue')
     plt.tick_params(labelsize=14)
     props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
     inset.text(
@@ -2535,17 +2737,17 @@ def plot_solution(xp, yp, zp,
         ax.add_collection3d(Poly3DCollection(verts_true, alpha=0.3, 
         facecolor='b', linewidths=0.5, edgecolors='k'))
 
-    ax.set_ylim(area[0], area[1], 100)
-    ax.set_xlim(area[2], area[3], 100)
+    ax.set_ylim(area[0]+3, area[1]+1, 100)
+    ax.set_xlim(area[2]+1, area[3]-1, 100)
     ax.set_zlim(initial[-1].z2/1000. + 1, -0.5, 100)
-    ax.tick_params(labelsize=14, pad=-2)
-    ax.set_ylabel('x (km)', fontsize=14, labelpad=0)
-    ax.set_xlabel('y (km)', fontsize=14, labelpad=0)
-    ax.set_zlabel('z (km)', fontsize=14, labelpad=0)
-    ax.set_yticks(np.arange(area[0], area[1], 2))
-    ax.set_xticks(np.arange(area[2], area[3], 2))
+    ax.tick_params(labelsize=14)
+    ax.set_ylabel('x (km)', fontsize=14, labelpad=10)
+    ax.set_xlabel('y (km)', fontsize=14, labelpad=10)
+    ax.set_zlabel('z (km)', fontsize=14, labelpad=2)
+    ax.set_yticks(np.arange(area[0]+3, area[1]+1, 3))
+    ax.set_xticks(np.arange(area[2]+1, area[3]-1, 3))
     ax.view_init(angles[0], angles[1])
-    ax.text2D(-0.1, 0.09, '(b)', fontsize=20)
+    ax.text2D(-0.1, 0.105, '(b)', fontsize=20)
 
     # inverse model view 1
     ax = plt.subplot(2,2,3, projection='3d')
@@ -2566,13 +2768,13 @@ def plot_solution(xp, yp, zp,
 
     ax.set_ylim(area[0], area[1], 100)
     ax.set_xlim(area[2], area[3], 100)
-    ax.set_zlim(zb, -0.5, 100)
-    ax.tick_params(labelsize=14, pad=-2)
-    ax.set_ylabel('x (km)', fontsize=14, labelpad=0)
-    ax.set_xlabel('y (km)', fontsize=14, labelpad=0)
-    ax.set_zlabel('z (km)', fontsize=14, labelpad=0)
-    ax.set_yticks(np.arange(area[0], area[1], 2))
-    ax.set_xticks(np.arange(area[2], area[3], 2))
+    ax.set_zlim(zb, -0.1, 100)
+    ax.tick_params(labelsize=14)
+    ax.set_ylabel('x (km)', fontsize=14, labelpad=10)
+    ax.set_xlabel('y (km)', fontsize=14, labelpad=10)
+    ax.set_zlabel('z (km)', fontsize=14, labelpad=2)
+    ax.set_yticks(np.arange(area[0], area[1], 3))
+    ax.set_xticks(np.arange(area[2], area[3], 3))
     ax.view_init(angles[2], angles[3])
     ax.text2D(-0.11, 0.09, '(c)', fontsize=20)
 
@@ -2595,13 +2797,13 @@ def plot_solution(xp, yp, zp,
 
     ax.set_ylim(area[0], area[1], 100)
     ax.set_xlim(area[2], area[3], 100)
-    ax.set_zlim(zb, -0.5, 100)
-    ax.tick_params(labelsize=14, pad=-2)
-    ax.set_ylabel('x (km)', fontsize=14, labelpad=0)
-    ax.set_xlabel('y (km)', fontsize=14, labelpad=0)
-    ax.set_zlabel('z (km)', fontsize=14, labelpad=0)
-    ax.set_yticks(np.arange(area[0], area[1], 2))
-    ax.set_xticks(np.arange(area[2], area[3], 2))
+    ax.set_zlim(zb, -0.1, 100)
+    ax.tick_params(labelsize=14, pad=5)
+    ax.set_ylabel('x (km)', fontsize=14, labelpad=10)
+    ax.set_xlabel('y (km)', fontsize=14, labelpad=10)
+    ax.set_zlabel('z (km)', fontsize=14, labelpad=2)
+    ax.set_yticks(np.arange(area[0], area[1], 3))
+    ax.set_xticks(np.arange(area[2], area[3], 3))
     ax.view_init(angles[4], angles[5])
     ax.text2D(-0.1, 0.09, '(d)', fontsize=20)
 

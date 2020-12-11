@@ -117,12 +117,21 @@ The first constraint of this group is the \textit{smoothness constraint on the a
 where
 \begin{equation}
 \mathbf{R}_{1} = 
+\begin{bmatrix}
+\mathbf{S}_{1} &
+\mathbf{0}_{LV \times 1} \\
+\end{bmatrix}_{LV \times M} \quad ,
+\label{eq:R1-matrix}
+\end{equation}
+\begin{equation}
+\mathbf{S}_{1} = 
 \mathbf{I}_{L} \otimes 
 \begin{bmatrix}
 \left( \mathbf{I}_{V} - \mathbf{D}_{V}^\mathsf{T} \right) & \mathbf{0}_{V \times 2} \\
-\end{bmatrix}_{(LV \times M)} \quad ,
+\end{bmatrix}_{V \times (V+2)} \quad ,
 \label{eq:S1-matrix}
 \end{equation}
+$ \mathbf{0}_{LV \times 1} $ is an $ LV \times 1 $ vector with null elements,
 $\mathbf{I}_{L}$ is the identity matrix of order $L$, ``$\otimes$" denotes the Kronecker product \cite[][ p. 243]{horn_johnson1991}, $\mathbf{0}_{V \times 2}$ is a $V \times 2$ matrix with null elements, 
 $\mathbf{I}_{V}$ is the identity matrix of order $V$ and $\mathbf{D}_{V}^\mathsf{T}$ is the upshift permutation matrix of order $V$ \cite[][ p. 20]{golub-vanloan2013}. The gradient and Hessian of function $\varphi_{1}(\mathbf{p})$ (eq. \ref{eq:phi1}) are given by:
 \begin{equation}\label{eq:phi1_grad}
