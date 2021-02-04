@@ -2,7 +2,7 @@
 
 \subsection{Forward problem}
 
-Let $\mathbf{d}^{o}$ be the observed data vector, whose $i$th element $d^{o}_{i}$, $i = 1, \dots, N$, is the total-field anomaly produced by a 3-D source (Fig. \ref{fig:obs}a) at the point $(x_{i}, y_{i}, z_{i})$ of a Cartesian coordinate system with $x$, $y$ and $z$ axes pointing to north, east and down, respectively. We assume that the direction of the total magnetization vector of the source is constant and known. We approximate the volume of the source by a set of $L$ vertically juxtaposed 3-D prisms (Fig. \ref{fig:obs}b) by following the same approach of \cite{oliveirajr-etal2011} and \cite{oliveirajr-barbosa2013}. The depth to the top of the shallowest prism is defined by $z_{0}$ and $m_{0}$ is the constant total-magnetization intensity of all prisms. The horizontal cross-section of each prism (Fig. \ref{fig:prism_parameters}) 
+Let $\mathbf{d}^{o}$ be the observed data vector, whose $i$th element $d^{o}_{i}$, $i = 1, \dots, N$, is the total-field anomaly produced by a 3-D source (Fig. \ref{fig:obs}a) at the point $(x_{i}, y_{i}, z_{i})$ of a Cartesian coordinate system with $x$-, $y$- and $z$- axes pointing to north, east and down, respectively. We assume that the direction of the total magnetization vector of the source is constant and known. We approximate the volume of the source by a set of $L$ vertically juxtaposed 3-D prisms (Fig. \ref{fig:obs}b) by following the same approach of \cite{oliveirajr-etal2011} and \cite{oliveirajr-barbosa2013}. The depth to the top of the shallowest prism is defined by $z_{0}$ and $m_{0}$ is the constant total-magnetization intensity of all prisms. The horizontal cross-section of each prism (Fig. \ref{fig:prism_parameters}) 
 is described by a polygon with a fixed number $V$ of vertices equally spaced from $0^{\circ}$ to $360^{\circ}$, which are described in polar coordinates referred to an internal origin $O^{k}$. The radii of the vertices ($r^{k}_{j}$, $j=1,\dots , V$, $k=1,\dots ,L$), the horizontal coordinates ($x_{0}^{k}$ and $y_{0}^{k}$, $k=1,\dots ,L$) of the origins $O^{k}$, $k=1,\dots ,L$, and the thickness $dz$ of the $L$ vertically stacked prisms (Fig. \ref{fig:obs}b) are arranged in a $M \times 1$ parameter vector $\mathbf{p}$, $M = L (V + 2) + 1$, given by
 \begin{equation}
 \mathbf{p} = \left[ \begin{array}{@{}*{12}{c}@{}}
@@ -500,15 +500,15 @@ terms instead of those defined by sparse matrices.
 Attributing values to the weights $ \alpha_{\ell} $ (eq. \ref{eq:gamma}) is an important feature of our method. 
 However, there is no analytical rule to define them and their values can be dependent on the particular characteristics of the type of geological setting where the method is being applied \cite[]{silva-2001}. 
 
-At this point, we draw attention that the weights $ \alpha_{\ell}$ (eq. \ref{eq:gamma}) is a dimensional 
+At this point, we draw attention that the weights $ \alpha_{\ell}$ (eq. \ref{eq:gamma}) are a dimensional 
 quantity. 
 Note that the units of the data-misfit function (eq. \ref{eq:misfit}) and the constraint functions 
 (eqs. \ref{eq:phi1}, \ref{eq:phi2}, \ref{eq:phi3}, \ref{eq:phi4}, \ref{eq:phi5}, 
 \ref{eq:phi6} and \ref{eq:phi7}), are $nT^{2}$ and $m^{2}$, respectively.
 Because we set the unit of the goal function (eq. \ref{eq:gamma}) as $nT^{2}$, the unit of the weights 
-$ \alpha_{\ell} $ (eq. \ref{eq:gamma}) is $nT^{2}.m^{-2}$.
+$ \alpha_{\ell} $ (eq. \ref{eq:gamma}) is $nT^{2}m^{-2}$.
 
-The physical dimensional of the weights $ \alpha_{\ell}$ makes the solution of the inverse problem variable. 
+The physical dimensions of the weights $ \alpha_{\ell}$ makes assignment of their values problem dependent. 
 To make these weights comparable to each other, we normalize the $ \alpha_{\ell} $ 
 values as follows:
 \begin{equation}\label{eq:alphas}
@@ -531,8 +531,7 @@ the trace of the Hessian matrix $\mathbf{H}_{\phi}(\hat{\mathbf{p}}_{(0)})$ has 
 Thus, the positive scalars $\tilde{\alpha}_\ell$ in eq. \ref{eq:alphas} are dimensionless quantities.
 
 According to this empirical strategy, the weights $ \alpha_{\ell} $ 
-(eq. \ref{eq:gamma}) are redefined using the positive scalars $\tilde{\alpha}_\ell$ 
-(eq. \ref{eq:alphas}), which are independent of the physical units and less dependent 
+(eq. \ref{eq:gamma}) are redefined using eq. \ref{eq:alphas}, in which the weights $\tilde{\alpha}_\ell$ are positive scalars, of physical units and less dependent 
 on the particular characteristics of the interpretation geological setting.
 
 
