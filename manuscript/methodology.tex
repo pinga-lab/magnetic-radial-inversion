@@ -411,12 +411,13 @@ This definition does not require a high accuracy.
 After defining the radius and the horizontal Cartesian coordinates of the center 
 of the cylinder-like initial guess, we set its thickness to generate 
 a depth extent greater than that we expect for the true source. 
-Next, we run a forward modeling of the total-field anomaly aiming at adjusting the
-cylinder volume and defining ranges for its total-magnetization intensity $m_{0}$ 
-and depth to the top $z_{0}$ which yield a preliminary fit of the observed data.
+Next, we run a forward modeling of the total-field anomaly aiming at adjusting the cylinder parameters that are not defined by the RTP anomaly: the thickness $ dz $, the total-magnetization intensity $m_{0}$, and depth to the top $z_{0}$ which yield a preliminary fit of the observed data.
+This step does not require such rigor since $ dz $, $ m_0 $, and $ z_0 $ are ultimately defined at the final iteration of the inversion.
 Note that this forward modeling is carried out before performing the inversion 
 and the resulting cylinder-like body may produce an inaccurate data fitting.
-
+After that, the ranges for the total-magnetization intensity $m_{0}$ and depth to the top $z_{0}$ forming a grid of $m_0 \times z_0$ can be defined from the cylinder of the preliminary fit.
+All inversions will start with a vertical cylinder, nevertheless, their initial guesses will be different  because the total-magnetization intensity $m_{0}$ 
+and depth to the top $z_{0}$ will change for each point of the grid $m_0 \times z_0$.
 
 \subsubsection{Inversion algorithm}
 
