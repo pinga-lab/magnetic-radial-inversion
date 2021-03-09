@@ -2,8 +2,8 @@
 
 \subsection{Forward problem}
 
-Let $\mathbf{d}^{o}$ be the observed data vector, whose $i$th element $d^{o}_{i}$, $i = 1, \dots, N$, is the total-field anomaly produced by a 3-D source (Fig. \ref{fig:obs}a) at the point $(x_{i}, y_{i}, z_{i})$ of a Cartesian coordinate system with $x$-, $y$- and $z$- axes pointing to north, east and down, respectively. We assume that the direction of the total magnetization vector of the source is constant and known. We approximate the volume of the source by a set of $L$ vertically juxtaposed 3-D prisms (Fig. \ref{fig:obs}b) by following the same approach of \cite{oliveirajr-etal2011} and \cite{oliveirajr-barbosa2013}. The depth to the top of the shallowest prism is defined by $z_{0}$ and $m_{0}$ is the constant total-magnetization intensity of all prisms. The horizontal cross-section of each prism (Fig. \ref{fig:prism_parameters}) 
-is described by a polygon with a fixed number $V$ of vertices equally spaced from $0^{\circ}$ to $360^{\circ}$, which are described in polar coordinates referred to an internal origin $O^{k}$. The radii of the vertices ($r^{k}_{j}$, $j=1,\dots , V$, $k=1,\dots ,L$), the horizontal coordinates ($x_{0}^{k}$ and $y_{0}^{k}$, $k=1,\dots ,L$) of the origins $O^{k}$, $k=1,\dots ,L$, and the thickness $dz$ of the $L$ vertically stacked prisms (Fig. \ref{fig:obs}b) are arranged in a $M \times 1$ parameter vector $\mathbf{p}$, $M = L (V + 2) + 1$, given by
+Let $\mathbf{d}^{o}$ be the observed data vector, whose $i$th element $d^{o}_{i}$, $i = 1, \dots, N$, is the total-field anomaly produced by a 3-D source (Fig. \ref{fig:obs}(a)) at the point $(x_{i}, y_{i}, z_{i})$ of a Cartesian coordinate system with $x$-, $y$- and $z$- axes pointing to north, east and down, respectively. We assume that the direction of the total magnetization vector of the source is constant and known. We approximate the volume of the source by a set of $L$ vertically juxtaposed 3-D prisms (Fig. \ref{fig:obs}(b)) by following the same approach of \cite{oliveirajr-etal2011} and \cite{oliveirajr-barbosa2013}. The depth to the top of the shallowest prism is defined by $z_{0}$ and $m_{0}$ is the constant total-magnetization intensity of all prisms. The horizontal cross-section of each prism (Fig. \ref{fig:prism_parameters}) 
+is described by a polygon with a fixed number $V$ of vertices equally spaced from $0^{\circ}$ to $360^{\circ}$, which are described in polar coordinates referred to an internal origin $O^{k}$. The radii of the vertices ($r^{k}_{j}$, $j=1,\dots , V$, $k=1,\dots ,L$), the horizontal coordinates ($x_{0}^{k}$ and $y_{0}^{k}$, $k=1,\dots ,L$) of the origins $O^{k}$, $k=1,\dots ,L$, and the thickness $dz$ of the $L$ vertically stacked prisms (Fig. \ref{fig:obs}(b)) are arranged in a $M \times 1$ parameter vector $\mathbf{p}$, $M = L (V + 2) + 1$, given by
 \begin{equation}
 \mathbf{p} = \left[ \begin{array}{@{}*{12}{c}@{}}
 {\mathbf{r}^{1}}^{\mathsf{T}} & x_{0}^{1} & y_{0}^{1} & \dots & {\mathbf{r}^{L}}^{\mathsf{T}} & x_{0}^{L} & y_{0}^{L} & dz \\
@@ -58,10 +58,8 @@ $p_{l}^{min}$ and $p_{l}^{max}$ are, respectively, the lower and upper limits fo
 These limits are defined by the interpreter 
 based on both the horizontal extent of the magnetic anomaly and the knowledge about the 
 source.
-On the discrete mapping of the goal function $\Gamma (\mathbf{p})$ 
-(eq. \ref{eq:gamma}) obtained by using each previously defined pair $(m_{0}, z_{0})$, 
-we select the optimum values of $m_{0}$ and $z_{0}$ 
-as those producing the smallest value of the goal function $\Gamma (\mathbf{p})$.
+On the discrete mapping of the goal function $\Gamma (\mathbf{p}_f)$ 
+(eq. \ref{eq:gamma}), where $ \mathbf{p}_f $ is the estimated parameter vector at the final algorithm iteration, obtained by using each previously defined pair $(m_{0}, z_{0})$, we select the optimum values of $m_{0}$ and $z_{0}$ as those producing the smallest value of $\Gamma (\mathbf{p}_f)$.
 
 To solve our nonlinear inverse problem for each pair of total-magnetization 
 intensity $m_{0}$ and depth to the top of the shallowest prism $z_{0}$, 
@@ -97,7 +95,7 @@ To explain the constraint functions $\varphi_{\ell}(\mathbf{p})$ (eq. \ref{eq:ga
 
 \subsubsection{Smoothness constraints}
 
-This group is formed by variations of the first-order Tikhonov regularization \cite[][ p. 103]{aster-etal2019} that imposes smoothness on the radii $r_{j}^{k}$ and the Cartesian coordinates $x_{0}^{k}$ and $y_{0}^{k}$ of the origin $O^{k}$, $j = 1, \dots, V$, $k = 1, \dots, L$, defining the horizontal section of each prism (Fig.\ref{fig:obs}b).
+This group is formed by variations of the first-order Tikhonov regularization \cite[][ p. 103]{aster-etal2019} that imposes smoothness on the radii $r_{j}^{k}$ and the Cartesian coordinates $x_{0}^{k}$ and $y_{0}^{k}$ of the origin $O^{k}$, $j = 1, \dots, V$, $k = 1, \dots, L$, defining the horizontal section of each prism (Fig.\ref{fig:obs}(b)).
 They were proposed by \cite{oliveirajr-etal2011} and \cite{oliveirajr-barbosa2013} and play a very important role in introducing prior information about the shape of the source. 
 
 The first constraint of this group is the \textit{smoothness constraint on the adjacent radii defining the horizontal section of each prism}. This constraint imposes that adjacent radii $r_{j}^{k}$ and $r_{j+1}^{k}$ within each prism must be close to each other. It forces the estimated prism to be approximately cylindrical. Mathematically, the constraint is given by \begin{equation}\label{eq:phi1}
@@ -405,19 +403,22 @@ a value close to zero and a large value resulting in a
 bottom depth greater than that we expect for the true source. 
 
 To define the radius and the center of the cylinder-like initial guess, we 
-use the radius and the $x-$ and $y-$ coordinates of the center of the
-circular area encompassing the region where the RTP anomaly is positive.
-This definition does not require a high accuracy. 
+use the radius and the $x-$ and $y-$ coordinates of the center of the circular area encompassing the region where the RTP anomaly is positive.
+This definition does not require high accuracy. 
 After defining the radius and the horizontal Cartesian coordinates of the center 
-of the cylinder-like initial guess, we set its thickness to generate 
-a depth extent greater than that we expect for the true source. 
-Next, we run a forward modeling of the total-field anomaly aiming at adjusting the cylinder parameters that are not defined by the RTP anomaly: the thickness $ dz $, the total-magnetization intensity $m_{0}$, and depth to the top $z_{0}$ which yield a preliminary fit of the observed data.
-This step does not require such rigor since $ dz $, $ m_0 $, and $ z_0 $ are ultimately defined at the final iteration of the inversion.
+of the cylinder-like initial guess, we set the ranges of the depth to the top of the shallowest prism $ z_0 $ and the total-magnetization intensity $m_{0}$ based on prior information such as petrophysical studies.
+In practice, the range of $ z_0 $ usually starts at the topography ($ z_0=0 $) and the interpreter must choose the intervals of the range.
+Each pair of $ z_0 $ and $m_{0}$ within the grid formed by their ranges represents an independent inversion.
+We point out that, although the initial guess $ \mathbf{p}_0 $ does not change through the grid, the values of $ z_0 $ and $m_{0}$ does change.
+All of the cylinder-like initial guesses differ from each other by the vertical position and magnetization intensity.
+Based on the expected complexity of the magnetic source, the interpreter should set the number of prisms $ L $ and the number of the vertices $ V $ as small as possible.
+Next, we run forward modeling of the total-field anomaly aiming at adjusting the thickness $ dz $ that is not defined by the RTP anomaly.
+We set a thickness $ dz $ greater than the expected one and evaluate the goal function $ \Gamma(\mathbf{p}_0) $ for every initial guess $ \mathbf{p}_0 $ belonging to the grid.
+If the discrete map of the goal function $ \Gamma(\mathbf{p}_0) $ produces a minimum, the thickness $ dz $ is selected for the inversion.
+The minimum and maximum thickness bounds are defined as close to zero and greater than the $ dz $, respectively.
+This step does not require such rigor since $ dz $ is ultimately defined at the final iteration of the inversion.
 Note that this forward modeling is carried out before performing the inversion 
 and the resulting cylinder-like body may produce an inaccurate data fitting.
-After that, the ranges for the total-magnetization intensity $m_{0}$ and depth to the top $z_{0}$ forming a grid of $m_0 \times z_0$ can be defined from the cylinder of the preliminary fit.
-All inversions will start with a vertical cylinder, nevertheless, their initial guesses will be different  because the total-magnetization intensity $m_{0}$ 
-and depth to the top $z_{0}$ will change for each point of the grid $m_0 \times z_0$.
 
 \subsubsection{Inversion algorithm}
 
