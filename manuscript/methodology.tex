@@ -15,10 +15,10 @@ of the $k$th prism.
 Let $\mathbf{d} (\mathbf{p}, m_{0}, z_{0})$ be the predicted data vector, 
 whose $i$th element 
 \begin{equation}
-d_{i} (\mathbf{p}, m_{0}, z_{0}) \equiv m_{0} \: \sum\limits_{k=1}^{L} f_{i}^{k}(\mathbf{r}^{k}, x_{0}^{k}, y_{0}^{k}, dz, z_{0}), \quad i = 1, \dots, N \: ,
+d_{i} (\mathbf{p}, m_{0}, z_{0}) \equiv m_{0} \: \sum\limits_{k=1}^{L} f_{i}(\mathbf{r}^{k}, x_{0}^{k}, y_{0}^{k}, dz, z_{0}), \quad i = 1, \dots, N \: ,
 \label{eq:predicted-data-i}
 \end{equation}
-is the total-field anomaly produced by the ensemble of $L$ prisms at the $i$th observation point ($x_{i}, y_{i}, z_{i}$). In Eq. \ref{eq:predicted-data-i}, $f_{i}^{k}(\mathbf{r}^{k}, x_{0}^{k}, y_{0}^{k}, dz, z_{0})$ is the total-field anomaly produced, at the observation point ($x_{i}, y_{i}, z_{i}$), by the $k$th prism with unitary magnetization intensity and depth to the top $z_{1}^{k} = z_{0} + (k-1)dz$. We calculate $d_{i} (\mathbf{p}, m_{0}, z_{0})$ (Eq. \ref{eq:predicted-data-i}) by using the Python package Fatiando a Terra \cite[]{uieda-etal2013}, which implements the formulas proposed by \cite{plouff1976}.
+is the total-field anomaly produced by the ensemble of $L$ prisms at the $i$th observation point ($x_{i}, y_{i}, z_{i}$). In Eq. \ref{eq:predicted-data-i}, $f_{i}(\mathbf{r}^{k}, x_{0}^{k}, y_{0}^{k}, dz, z_{0})$ is the total-field anomaly produced, at the observation point ($x_{i}, y_{i}, z_{i}$), by the $k$th prism with unitary magnetization intensity and depth to the top $z_{1}^{k} = z_{0} + (k-1)dz$. We calculate $d_{i} (\mathbf{p}, m_{0}, z_{0})$ (Eq. \ref{eq:predicted-data-i}) by using the Python package Fatiando a Terra \cite[]{uieda-etal2013}, which implements the formulas proposed by \cite{plouff1976}.
 
 \subsection{Inverse problem for estimating $\mathbf{p}$}
 
@@ -73,7 +73,7 @@ estimated parameter vector.
 
 Since we are using a gradient-based method, we need to define the 
 gradient vector $\boldsymbol{\nabla}\Gamma(\mathbf{p})$ and Hessian matrix 
-$\mathbf{H}(\mathbf{p})$ of the goal function $\Gamma(\mathbf{p})$ 
+$\mathbf{H}(\mathbf{p})$ of the goal function $\Gamma(\mathbf{p}, m_{0}, z_{0})$ 
 (Eq. \ref{eq:gamma}), both of them computed with respect to the parameter vector
 $\mathbf{p}$. That is why we define them by omitting the parameters $m_{0}$ and
 $z_{0}$. They are given by:
@@ -98,8 +98,9 @@ and
 In Eqs \ref{eq:gamma_gradient} and \ref{eq:gamma_hessian}, the terms 
 $\boldsymbol{\nabla} \varphi_{\ell}(\mathbf{p})$ and $\mathbf{H}_{\ell}$, 
 $\ell = 1, \dots, 7$, are the gradient vectors and Hessian matrices of the constraint functions, respectively. In Eqs \ref{eq:phi_gradient} and \ref{eq:phi_hessian},
-$\mathbf{G}(\mathbf{p})$ is an $N \times M$ matrix whose element $ij$ is the derivative of the predicted data $d_{i}(\mathbf{p}, m_{0}, z_{0})$ (Eq. \ref{eq:predicted-data-i}) with respect to the $j$ element $p_{j}$ of 
-the parameter vector $\mathbf{p}$ (Eq. \ref{eq:p-vector}). Details about the constraint functions $\varphi_\ell(\mathbf{p})$, $\ell = 1, \dots, 7$, as well as the numerical procedure to solve this nonlinear inverse problem are given in the following sections.
+$\mathbf{G}(\mathbf{p})$ is an $N \times M$ matrix whose element $il$ is the derivative of the predicted data $d_{i}(\mathbf{p}, m_{0}, z_{0})$ (Eq. \ref{eq:predicted-data-i}) with respect to the $l$th element $p_{l}$ of 
+the parameter vector $\mathbf{p}$ (Eq. \ref{eq:p-vector}), $l = 1, \dots, M$.
+Details about the constraint functions $\varphi_\ell(\mathbf{p})$, $\ell = 1, \dots, 7$, as well as the numerical procedure to solve this nonlinear inverse problem are given in the following sections.
 
 \subsection{Constraint functions}\label{sec:constraints}
 
@@ -398,7 +399,8 @@ Finally, we describe how to set the weights $ \alpha_{\ell} $
 
 \subsubsection{Initial approximation $\hat{\mathbf{p}}_{(0)}$ and inequality constraints}
 
-Our initial approximation is a uniformly-magnetized cylinder-like body formed by 
+Our initial approximation $\hat{\mathbf{p}}_{(0)}$ is a uniformly-magnetized
+cylinder-like body formed by 
 $L$ prisms, all of them with the same number of vertices $V$. The radii of the
 vertices of all prisms ($r^{k}_{j}$, $j=1,\dots , V$, $k=1,\dots ,L$) have the 
 same constant value, so that the initial approximation approaches a vertical
@@ -499,9 +501,15 @@ $\phi (\hat{\mathbf{p}}_{(0)}, m_{0}, z_{0})$ associated with a satisfactory
 data fit, we redefine the initial approximation $\hat{\mathbf{p}}_{(0)}$ 
 and recompute the discrete map.
 
-\subsubsection{Inversion algorithm}
+\subsubsection{Inversion algorithm for estimating $\mathbf{p}$}
 
-We use the Levenberg-Marquardt algorithm \cite[e.g., ][ p. 240]{aster-etal2019} to solve the nonlinear inverse problem given by Eq. \ref{eq:gamma}.
+We use the Levenberg-Marquardt algorithm \cite[e.g., ][ p. 240]{aster-etal2019} 
+to solve the nonlinear inverse problem for estimating the
+parameter vector $\hat{\mathbf{p}}_{(f)}$ minimizing the goal function
+$\Gamma (\mathbf{p}, m_{0}, z_{0})$ (Eq. \ref{eq:gamma}),
+subject to the inequality constraints (Eq. \ref{eq:inequality-constraint}), 
+for given values of total-magnetization intensity $m_{0}$ and depth to the top
+of the shallowest prism $z_{0}$.
 The Levenberg-Marquardt algorithm is an iterative gradient-based method that, at each iteration $n$, updates the estimate parameter vector $\hat{\mathbf{p}}_{(n)}$ to obtain a new estimated parameter vector $\hat{\mathbf{p}}_{(n + 1)}$.
 We compute this update by following the same strategy of \cite{barbosa-1999b}, \cite{oliveirajr-etal2011} and \cite{oliveirajr-barbosa2013} to incorporate the inequality constraints (Eq. \ref{eq:inequality-constraint}). 
 This strategy consists in transforming each element $\hat{p}_{l} \in (p_{l}^{min}, p_{l}^{max})$ of the estimated parameter vector $\hat{\mathbf{p}}_{(n)}$ 
@@ -562,21 +570,27 @@ Finally, we stop the iterative process by evaluating the invariance of the
 goal function (Eq. \ref{eq:gamma}) along successive iterations.
 Specifically, we check if the inequality
 \begin{equation}\label{eq:stop-criterion}
- \left| \frac{\Gamma (\hat{\mathbf{p}}_{(n +1)}) - 
- \Gamma (\hat{\mathbf{p}}_{(n)})}
- {\Gamma (\hat{\mathbf{p}}_{(n)})} 
+ \left| \frac{\Gamma (\hat{\mathbf{p}}_{(n +1)}, m_{0}, z_{0}) - 
+ \Gamma (\hat{\mathbf{p}}_{(n)}, m_{0}, z_{0})}
+ {\Gamma (\hat{\mathbf{p}}_{(n)}, m_{0}, z_{0})} 
  \right| \le \tau
 \end{equation}
 holds, where $\tau$ is a threshold value on the order of $10^{-3}$ to $10^{-4}$. 
 Usually, the inversion algorithm converges at $8$-$12$ iterations.
-In the evaluation of the goal function (Eq. \ref{eq:gamma}), we compute the 
+The estimate $\hat{\mathbf{p}}_{(n+1)}$ that is obtained
+at the last iteration and satisfies the inequality constraint defined by
+Eq. \ref{eq:stop-criterion} is the estimated parameter vector
+$\hat{\mathbf{p}}_{(f)}$ minimizing the goal function
+$\Gamma (\mathbf{p}, m_{0}, z_{0})$ (Eq. \ref{eq:gamma}), for the given
+values of depth to the top $z_{0}$ and total-magnetization intensity $m_{0}$.
+In the evaluation of the goal function, we compute the 
 constraint functions $\varphi_{\ell}(\mathbf{p})$ (Eqs \ref{eq:phi1}, \ref{eq:phi2},
 \ref{eq:phi3}, \ref{eq:phi4}, \ref{eq:phi5}, \ref{eq:phi6} and \ref{eq:phi7}), 
 $\ell = 1, \dots, 7$, by using the expressions which are written as sum of 
 terms instead of those defined by sparse matrices.
 
 
-\subsubsection{Setting the weights $\alpha_{1}-\alpha_{7}$}
+\subsubsection{Choice of the weights $\alpha_{\ell}$}
 
 Attributing values to the weights $ \alpha_{\ell} $ (Eq. \ref{eq:gamma}) is an important feature of our method. 
 However, there is no analytical rule to define them and their values can be dependent on the particular characteristics of the type of geological setting where the method is being applied \cite[]{silva-2001}. 
@@ -588,8 +602,8 @@ Note that the units of the data-misfit function (Eq. \ref{eq:misfit}) and the co
 Because we set the unit of the goal function (Eq. \ref{eq:gamma}) as nT$^{2}$, the unit of the weights 
 $ \alpha_{\ell} $ (Eq. \ref{eq:gamma}) is nT$^{2}$m$^{-2}$.
 
-The physical dimensions of the weights $ \alpha_{\ell}$ cause the assignment of 
-their values to be problem dependent. 
+The physical dimensions of the weights $ \alpha_{\ell}$ makes assignment of 
+their values problem dependent. 
 To make these weights comparable to each other, we normalize the $ \alpha_{\ell} $ 
 values as follows:
 \begin{equation}\label{eq:alphas}
@@ -613,8 +627,8 @@ Thus, the positive scalars $\tilde{\alpha}_\ell$ in Eq. \ref{eq:alphas} are dime
 
 According to this empirical strategy, the weights $ \alpha_{\ell} $ 
 (Eq. \ref{eq:gamma}) are redefined using Eq. \ref{eq:alphas}, in which the weights
-$\tilde{\alpha}_\ell$ are positive scalars which have no physical units and, 
-consequently, are less dependent on the particular characteristics of the
+$\tilde{\alpha}_\ell$ are positive scalars, independent of physical units and 
+less dependent on the particular characteristics of the
 interpretation geological setting.
 
 %\subsubsection{Practical considerations}
@@ -645,12 +659,15 @@ used only to obtain stable solutions for the inverse problem.
 Its value is set to be as small as possible.
 The parameter $\tilde{\alpha}_7$ controls the total-vertical extension of the 
 the estimated body. 
-The greater its value, the shallower the estimated depth to the bottom of the source will be 
-and vice versa.
-A general rule is starting with values 
+The greater its value, the shallower the estimated depth to the bottom of the source
+will be and vice versa.
+
+If the data fitting is poor or if the estimated source shows unrealistic shape,
+the dimensionless weights $\tilde{\alpha}_{\ell}$ (Eq. \ref{eq:alphas}) must be
+fine-tuned
+to obtain a realistic solution. After tuning their values, they will be used in all
+inversions without changing along the iterations. 
+Educated guesses for the $\tilde{\alpha}_{\ell}$ values are 
 $\tilde{\alpha}_1 = 10^{-4}$, $\tilde{\alpha}_2 = 10^{-4}$, $\tilde{\alpha}_3 = 10^{-4}$,
 $\tilde{\alpha}_4 = 0$, $\tilde{\alpha}_5 = 0$, $\tilde{\alpha}_6 = 10^{-7}$, 
-$\tilde{\alpha}_7 = 10^{-5}$ and change them to refine the results.
-Finally, we stress that $\tilde{\alpha}_1 - \tilde{\alpha}_7$ (Eq. \ref{eq:alphas})
-do not change along the iterations.
-
+$\tilde{\alpha}_7 = 10^{-5}$.
