@@ -488,18 +488,17 @@ All values in this map are produced by using the same previously defined
 initial approximation $\hat{\mathbf{p}}_{(0)}$. The only differences are the 
 tentative values for $z_0$ and $m_0$. 
 The computation of this discrete map is carried out, before performing the 
-inversions, with the purpose of verifying if there is at least one point 
+inversions, with the purpose of verifying if there is at least one pair of $ m_0 $ and $ z_0 $ 
 associated with a data-misfit function $\phi (\hat{\mathbf{p}}_{(0)}, m_{0}, z_{0})$ 
-showing a relatively low value. In this case, there is at least one point on the
-discrete map where the corresponding initial approximation $\hat{\mathbf{p}}_{(0)}$
+showing a relatively low value. This means that the initial approximation $\hat{\mathbf{p}}_{(0)}$
 and tentative values for $m_{0}$ and $z_{0}$ produce a predicted data vector 
 $\mathbf{d}(\hat{\mathbf{p}}_{(0)}, m_{0}, z_{0})$ close to the observed 
 data vector $\mathbf{d}^{o}$.
 We stress that, at this step, we do not need a good data fit.
-If we cannot identify any point on the discrete map of the data-misfit function 
+However, if we cannot identify any point on the discrete map of the data-misfit function 
 $\phi (\hat{\mathbf{p}}_{(0)}, m_{0}, z_{0})$ associated with a satisfactory
-data fit, we redefine the initial approximation $\hat{\mathbf{p}}_{(0)}$ 
-and recompute the discrete map.
+data fit, the initial approximation $\hat{\mathbf{p}}_{(0)}$ 
+and the ranges of $ z_0 $ and $ m_0 $ should be redefined and then recompute the discrete map.
 
 \subsubsection{Inversion algorithm for estimating $\mathbf{p}$}
 
@@ -671,3 +670,5 @@ Educated guesses for the $\tilde{\alpha}_{\ell}$ values are
 $\tilde{\alpha}_1 = 10^{-4}$, $\tilde{\alpha}_2 = 10^{-4}$, $\tilde{\alpha}_3 = 10^{-4}$,
 $\tilde{\alpha}_4 = 0$, $\tilde{\alpha}_5 = 0$, $\tilde{\alpha}_6 = 10^{-7}$, 
 $\tilde{\alpha}_7 = 10^{-5}$.
+If the data fitting is poor or if the estimated source shows  unrealistic shape, $\tilde{\alpha}_1 \dots \tilde{\alpha}_7 $ must be fine-tuned to obtain a realistic solution. 
+After tuning the $\tilde{\alpha}_1 \dots \tilde{\alpha}_7 $ they will be used in all inversions without changing along the iterations.
