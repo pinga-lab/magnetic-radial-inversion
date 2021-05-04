@@ -2,7 +2,7 @@
 
 \subsection{Forward problem}
 
-Let $\mathbf{d}^{o}$ be the observed data vector, whose $i$th element $d^{o}_{i}$, $i = 1, \dots, N$, is the total-field anomaly produced by a 3-D source (Fig. \ref{fig:obs}a) at the point $(x_{i}, y_{i}, z_{i})$ of a Cartesian coordinate system with $x$, $y$ and $z$ axes pointing to north, east and down, respectively. We assume that the direction of the total magnetization vector of the source is constant and known. We approximate the volume of the source by a set of $L$ vertically juxtaposed 3-D prisms (Fig. \ref{fig:obs}b) by following the same approach of \cite{oliveirajr-etal2011} and \cite{oliveirajr-barbosa2013}. The depth to the top of the shallowest prism is defined by $z_{0}$ and $m_{0}$ is the constant total-magnetization intensity of all prisms. The horizontal cross-section of each prism (Fig. \ref{fig:prism_parameters}) 
+Let $\mathbf{d}^{o}$ be the observed data vector, whose $i$th element $d^{o}_{i}$, $i = 1, \dots, N$, is the total-field anomaly produced by a 3-D source (Fig. \ref{fig:obs}a) at the point $(x_{i}, y_{i}, z_{i})$ of a Cartesian coordinate system with $x$-, $y$- and $z$- axes pointing to north, east and down, respectively. We assume that the direction of the total magnetization vector of the source is constant and known. We approximate the volume of the source by a set of $L$ vertically juxtaposed 3-D prisms (Fig. \ref{fig:obs}b) by following the same approach of \cite{oliveirajr-etal2011} and \cite{oliveirajr-barbosa2013}. The depth to the top of the shallowest prism is defined by $z_{0}$ and $m_{0}$ is the constant total-magnetization intensity of all prisms. The horizontal cross-section of each prism (Fig. \ref{fig:prism_parameters}) 
 is described by a polygon with a fixed number $V$ of vertices equally spaced from $0^{\circ}$ to $360^{\circ}$, which are described in polar coordinates referred to an internal origin $O^{k}$. The radii of the vertices ($r^{k}_{j}$, $j=1,\dots , V$, $k=1,\dots ,L$), the horizontal coordinates ($x_{0}^{k}$ and $y_{0}^{k}$, $k=1,\dots ,L$) of the origins $O^{k}$, $k=1,\dots ,L$, and the thickness $dz$ of the $L$ vertically stacked prisms (Fig. \ref{fig:obs}b) are arranged in a $M \times 1$ parameter vector $\mathbf{p}$, $M = L (V + 2) + 1$, given by
 \begin{equation}
 \mathbf{p} = \left[ \begin{array}{@{}*{12}{c}@{}}
@@ -12,62 +12,71 @@ is described by a polygon with a fixed number $V$ of vertices equally spaced fro
 \end{equation}
 where ``$^{\mathsf{T}}$" denotes transposition and $\mathbf{r}^{k}$ is a $V \times 1$ vector containing the radii $r^{k}_{j}$ 
 of the $k$th prism.
-Let $\mathbf{d} (\mathbf{p})$ be the predicted data vector, whose $i$th element 
+Let $\mathbf{d} (\mathbf{p}, m_{0}, z_{0})$ be the predicted data vector, 
+whose $i$th element 
 \begin{equation}
-d_{i} (\mathbf{p}) \equiv m_{0} \: \sum\limits_{k=1}^{L} f_{i}^{k}(\mathbf{r}^{k}, x_{0}^{k}, y_{0}^{k}, dz, z_{1}^{k}), \quad i = 1, \dots, N \: ,
+d_{i} (\mathbf{p}, m_{0}, z_{0}) \equiv m_{0} \: \sum\limits_{k=1}^{L} f_{i}(\mathbf{r}^{k}, x_{0}^{k}, y_{0}^{k}, dz, z_{0}), \quad i = 1, \dots, N \: ,
 \label{eq:predicted-data-i}
 \end{equation}
-is the total-field anomaly produced by the ensemble of $L$ prisms at the $i$th observation point ($x_{i}, y_{i}, z_{i}$). In eq. \ref{eq:predicted-data-i}, $f_{i}^{k}(\mathbf{r}^{k}, x_{0}^{k}, y_{0}^{k}, dz, z_{1}^{k})$ is the total-field anomaly produced, at the observation point ($x_{i}, y_{i}, z_{i}$), by the $k$th prism with unitary magnetization intensity and depth to the top $z_{1}^{k} = z_{0} + (k-1)dz$. We calculate $d_{i} (\mathbf{p})$ (eq. \ref{eq:predicted-data-i}) by using the Python package Fatiando a Terra \cite[]{uieda-etal2013}, which implements the formulas proposed by \cite{plouff1976}.
+is the total-field anomaly produced by the ensemble of $L$ prisms at the $i$th observation point ($x_{i}, y_{i}, z_{i}$). In Eq. \ref{eq:predicted-data-i}, $f_{i}(\mathbf{r}^{k}, x_{0}^{k}, y_{0}^{k}, dz, z_{0})$ is the total-field anomaly produced, at the observation point ($x_{i}, y_{i}, z_{i}$), by the $k$th prism with unitary magnetization intensity and depth to the top $z_{1}^{k} = z_{0} + (k-1)dz$. We calculate $d_{i} (\mathbf{p}, m_{0}, z_{0})$ (Eq. \ref{eq:predicted-data-i}) by using the Python package Fatiando a Terra \cite[]{uieda-etal2013}, which implements the formulas proposed by \cite{plouff1976}.
 
+\subsection{Inverse problem for estimating $\mathbf{p}$}
 
-\subsection{Inverse problem formulation}
-
-%The total-magnetization of the source $m_{0}$ and depth to the top of the shallowest 
-%prism $z_{0}$ are hyperparameters of the inversion, i. e., they are not estimated during 
-%the inversion, but their value influences the final solution. 
-Given a set of tentative values for the total-magnetization intensity $m_{0}$ and 
-depth to the top of the shallowest prism $z_{0}$, we solve a constrained non-linear 
-problem to estimate the parameter vector $\mathbf{p}$ (eq. \ref{eq:p-vector}) 
-by minimizing the goal function
+Given the depth to the top of shallowest prism $z_{0}$ and the total-magnetization
+intensity $m_{0}$ of all prisms, we solve a constrained nonlinear problem to estimate the parameter vector $\mathbf{p}$ (Eq. \ref{eq:p-vector}) by minimizing 
+the goal function
 \begin{equation}
-\Gamma (\mathbf{p}) = \phi (\mathbf{p}) + \sum\limits^{7}_{\ell =1} \alpha_{\ell} \, \varphi_{\ell}(\mathbf{p}) \: ,
+\Gamma (\mathbf{p}, m_{0}, z_{0}) = \phi (\mathbf{p}, m_{0}, z_{0}) + 
+\sum\limits^{7}_{\ell =1} \alpha_{\ell} \, \varphi_{\ell}(\mathbf{p}) \: ,
 \label{eq:gamma}
 \end{equation}
-subject to
+subject to the inequality constraints
 \begin{equation}
-p_{l}^{min} < p_{l} < p_{l}^{max}, \quad l = 1, \dots, M \: ,
+p_{l}^{min} < p_{l} < p_{l}^{max}, \quad l = 1, \dots, M \: .
 \label{eq:inequality-constraint}
 \end{equation}
-where $\phi (\mathbf{p})$ is the data-misfit function given by
+The first term in the right side of Eq. \ref{eq:gamma} is the data-misfit 
+function given by
 \begin{equation}\label{eq:misfit}
-\phi (\mathbf{p}) = \frac{1}{N} \| \mathbf{d}^{o} - \mathbf{d}(\mathbf{p}) \|_{2}^{2} \: ,
+\phi (\mathbf{p}, m_{0}, z_{0}) = \frac{1}{N} \| \mathbf{d}^{o} - 
+\mathbf{d}(\mathbf{p}, m_{0}, z_{0}) \|_{2}^{2} \: ,
 \end{equation}
 which represents the normalized squared Euclidean norm of the difference between the 
-observed $\mathbf{d}^{o}$ and predicted $\mathbf{d}(\mathbf{p})$ data vector,
-whose $i$th element is the predicted data $d_{i} (\mathbf{p})$ 
-(eq. \ref{eq:predicted-data-i}).
-
-The second term in the right side of eq. (\ref{eq:gamma}) represents the weighted sum of
-the seven constraint functions $\varphi_{\ell}(\mathbf{p}), \: \ell = 1, \dots, 7$ 
-described in the subsection \textit{Constraint functions} later in this article.
-In eq. (\ref{eq:gamma}), $\alpha_{\ell}$ is a positive number representing 
+observed $\mathbf{d}^{o}$ and predicted $\mathbf{d}(\mathbf{p}, m_{0}, z_{0})$ data
+vector, whose $i$th element is the predicted data $d_{i} (\mathbf{p}, m_{0}, z_{0})$ 
+(Eq. \ref{eq:predicted-data-i}).
+The second term in the right side of Eq. \ref{eq:gamma} represents the 
+weighted sum of the seven constraint functions $\varphi_{\ell}(\mathbf{p}), \: 
+\ell = 1, \dots, 7$, described in the following section \textit{Constraint functions}.
+In Eq. \ref{eq:gamma}, $\alpha_{\ell}$ is a positive number representing 
 the weight of the $\ell$th constraint function $\varphi_{\ell}(\mathbf{p})$.
-These weights $\alpha_{\ell}$ will be rescaled and selected according to a criterion described in the subsection \textit{Computational procedures} later in this article.
-In the inequality constraints (eq. \ref{eq:inequality-constraint}) 
-$p_{l}^{min}$ and $p_{l}^{max}$ are, respectively, the lower and upper limits for the $l$th element $p_{l}$ of the parameter vector $\mathbf{p}$ (eq. \ref{eq:p-vector}). 
-These limits are defined by the interpreter 
-based on both the horizontal extent of the magnetic anomaly and the knowledge about the 
-source.
-On the discrete mapping of the goal function $\Gamma (\mathbf{p})$ 
-(eq. \ref{eq:gamma}) obtained by using each previously defined pair $(m_{0}, z_{0})$, 
-we select the optimum values of $m_{0}$ and $z_{0}$ 
-as those producing the smallest value of the goal function $\Gamma (\mathbf{p})$.
+In the inequality constraints (Eq. \ref{eq:inequality-constraint}), 
+$p_{l}^{min}$ and $p_{l}^{max}$ are, respectively, the lower and upper limits for 
+the $l$th element $p_{l}$ of the parameter vector $\mathbf{p}$ 
+(Eq. \ref{eq:p-vector}). 
+These limits are defined by the interpreter based on the knowledge about the 
+horizontal and total depth extensions of the magnetic source. 
+Details about how we set the weights $\alpha_{\ell}$ and the limits in the
+inequality constraints are presented in the section 
+\textit{Computational procedures} later in this article.
 
-To solve our nonlinear inverse problem for each pair of total-magnetization 
-intensity $m_{0}$ and depth to the top of the shallowest prism $z_{0}$, 
-we use a gradient-based method and, consequently, we need to define the gradient vector 
-$\boldsymbol{\nabla}\Gamma(\mathbf{p})$ and Hessian matrix $\mathbf{H}(\mathbf{p})$ of 
-the goal function $\Gamma(\mathbf{p})$ (eq. \ref{eq:gamma}):
+To solve our nonlinear inverse problem we use a gradient-based method and,
+consequently, we need to define an initial approximation $\hat{\mathbf{p}}_{(0)}$ 
+for the parameter vector $ \mathbf{p} $ (Eq. \ref{eq:p-vector}). 
+Then our method iteratively updates this initial approximation to obtain 
+an estimated parameter vector $\hat{\mathbf{p}}_{(f)}$ minimizing the goal function
+$\Gamma (\mathbf{p}, m_{0}, z_{0})$ (Eq. \ref{eq:gamma}),
+for given values of total-magnetization intensity $m_{0}$ and depth to the top
+of the shallowest prism $z_{0}$. 
+Here, we use the superscript hat ``~$\hat{}$~" to denote initial approximation or
+estimated parameter vector.
+
+Since we are using a gradient-based method, we need to define the 
+gradient vector $\boldsymbol{\nabla}\Gamma(\mathbf{p})$ and Hessian matrix 
+$\mathbf{H}(\mathbf{p})$ of the goal function $\Gamma(\mathbf{p}, m_{0}, z_{0})$ 
+(Eq. \ref{eq:gamma}), both of them computed with respect to the parameter vector
+$\mathbf{p}$. That is why we define them by omitting the parameters $m_{0}$ and
+$z_{0}$. They are given by:
 \begin{equation}\label{eq:gamma_gradient}
 \boldsymbol{\nabla}\Gamma (\mathbf{p}) = \boldsymbol{\nabla}\phi (\mathbf{p}) + 
 \sum\limits^{7}_{\ell =1} \alpha_{\ell} \, \boldsymbol{\nabla}\varphi_{\ell}(\mathbf{p})
@@ -77,23 +86,25 @@ and
 \mathbf{H} (\mathbf{p}) = \mathbf{H}_\phi (\mathbf{p}) + \sum\limits^{7}_{\ell =1} \alpha_{\ell} \, \mathbf{H}_\ell \: ,
 \end{equation}
 where the gradient vector and the Hessian matrix of the misfit function 
-$\phi(\mathbf{p})$ (eq. \ref{eq:gamma}) are respectively given by:
+$\phi(\mathbf{p})$ (Eq. \ref{eq:gamma}) are respectively given by:
 \begin{equation}\label{eq:phi_gradient}
-\boldsymbol{\nabla} \phi(\mathbf{p}) = - \frac{2}{N}\mathbf{G}(\mathbf{p})^{\mathsf{T}}[\mathbf{d}^o - \mathbf{d}(\mathbf{p})]
+\boldsymbol{\nabla} \phi(\mathbf{p}) = - \frac{2}{N}\mathbf{G}(\mathbf{p})^{\mathsf{T}}[\mathbf{d}^o - 
+\mathbf{d}(\mathbf{p}, m_{0}, z_{0})]
 \end{equation} 
 and 
 \begin{equation}\label{eq:phi_hessian}
 \mathbf{H}_{\phi}(\mathbf{p}) = \frac{2}{N}\mathbf{G}(\mathbf{p})^{\mathsf{T}}\mathbf{G}(\mathbf{p}) \: .
 \end{equation}
-In eqs. \ref{eq:gamma_gradient} and \ref{eq:gamma_hessian}, the terms 
+In Eqs \ref{eq:gamma_gradient} and \ref{eq:gamma_hessian}, the terms 
 $\boldsymbol{\nabla} \varphi_{\ell}(\mathbf{p})$ and $\mathbf{H}_{\ell}$, 
-$\ell = 1, \dots, 7$, are the gradient vectors and Hessian matrices of the constraint functions, respectively. In eqs. \ref{eq:phi_gradient} and \ref{eq:phi_hessian},
-$\mathbf{G}(\mathbf{p})$ is an $N \times M$ matrix whose element $ij$ is the derivative of the predicted data $d_{i}(\mathbf{p})$ (eq. \ref{eq:predicted-data-i}) with respect to the $j$ element $p_{j}$ of 
-the parameter vector $\mathbf{p}$ (eq. \ref{eq:p-vector}). Details about the constraint functions $\varphi_\ell(\mathbf{p})$, $\ell = 1, \dots, 7$, as well as the numerical procedure to solve this nonlinear inverse problem are given in the following sections.
+$\ell = 1, \dots, 7$, are the gradient vectors and Hessian matrices of the constraint functions, respectively. In Eqs \ref{eq:phi_gradient} and \ref{eq:phi_hessian},
+$\mathbf{G}(\mathbf{p})$ is an $N \times M$ matrix whose element $il$ is the derivative of the predicted data $d_{i}(\mathbf{p}, m_{0}, z_{0})$ (Eq. \ref{eq:predicted-data-i}) with respect to the $l$th element $p_{l}$ of 
+the parameter vector $\mathbf{p}$ (Eq. \ref{eq:p-vector}), $l = 1, \dots, M$.
+Details about the constraint functions $\varphi_\ell(\mathbf{p})$, $\ell = 1, \dots, 7$, as well as the numerical procedure to solve this nonlinear inverse problem are given in the following sections.
 
 \subsection{Constraint functions}\label{sec:constraints}
 
-To explain the constraint functions $\varphi_{\ell}(\mathbf{p})$ (eq. \ref{eq:gamma}), $\ell = 1, \dots, 7$, used here to obtain stable solutions and introduce prior information about the magnetic source, we have organized them into the following three groups.
+To explain the constraint functions $\varphi_{\ell}(\mathbf{p})$ (Eq. \ref{eq:gamma}), $\ell = 1, \dots, 7$, used here to obtain stable solutions and introduce prior information about the magnetic source, we have organized them into the following three groups.
 
 \subsubsection{Smoothness constraints}
 
@@ -125,7 +136,7 @@ where
 \end{equation}
 $ \mathbf{0}_{LV \times 1} $ is an $ LV \times 1 $ vector with null elements,
 $\mathbf{I}_{L}$ is the identity matrix of order $L$, ``$\otimes$" denotes the Kronecker product \cite[][ p. 243]{horn_johnson1991}, $\mathbf{0}_{V \times 2}$ is a $V \times 2$ matrix with null elements, 
-$\mathbf{I}_{V}$ is the identity matrix of order $V$ and $\mathbf{D}_{V}^\mathsf{T}$ is the upshift permutation matrix of order $V$ \cite[][ p. 20]{golub-vanloan2013}. The gradient and Hessian of function $\varphi_{1}(\mathbf{p})$ (eq. \ref{eq:phi1}) are given by:
+$\mathbf{I}_{V}$ is the identity matrix of order $V$ and $\mathbf{D}_{V}^\mathsf{T}$ is the upshift permutation matrix of order $V$ \cite[][ p. 20]{golub-vanloan2013}. The gradient and Hessian of function $\varphi_{1}(\mathbf{p})$ (Eq. \ref{eq:phi1}) are given by:
 \begin{equation}\label{eq:phi1_grad}
 \boldsymbol{\nabla}\varphi_{1}(\mathbf{p}) = 2 \mathbf{R}^\mathsf{T}_{1}\mathbf{R}_{1}\mathbf{p} \quad ,
 \end{equation}
@@ -161,7 +172,7 @@ where
 \end{equation}
 $\mathbf{0}_{(L-1)V \times 1}$ is an $(L-1)V \times 1$ vector with null elements,
 $\mathbf{0}_{(L-1) \times 1}$ is an $(L-1) \times 1$ vector with null elements and 
-$\mathbf{I}_{L-1}$ is the identity matrix of order $L-1$. The gradient and Hessian of function $\varphi_{2}(\mathbf{p})$ (eq. \ref{eq:phi2}) are given by:
+$\mathbf{I}_{L-1}$ is the identity matrix of order $L-1$. The gradient and Hessian of function $\varphi_{2}(\mathbf{p})$ (Eq. \ref{eq:phi2}) are given by:
 \begin{equation}\label{eq:phi2_grad}
 \boldsymbol{\nabla}\varphi_{2}(\mathbf{p}) = 2\mathbf{R}^\mathsf{T}_{2}\mathbf{R}_{2}\mathbf{p} \quad ,
 \end{equation}
@@ -200,7 +211,7 @@ where
 \end{equation}
 $\mathbf{0}_{(L-1)2 \times 1}$ is an $(L-1)2 \times 1$ vector with null elements,
 $\mathbf{0}_{2 \times V}$ is a $2 \times V$ matrix with null elements and 
-$\mathbf{I}_{2}$ is the identity matrix of order $2$. The gradient and Hessian of function $\varphi_{3}(\mathbf{p})$ (eq. \ref{eq:phi3}) are given by:
+$\mathbf{I}_{2}$ is the identity matrix of order $2$. The gradient and Hessian of function $\varphi_{3}(\mathbf{p})$ (Eq. \ref{eq:phi3}) are given by:
 \begin{equation}\label{eq:phi3_grad}
 \boldsymbol{\nabla}\varphi_{3}(\mathbf{p}) = 2 \mathbf{R}^{\mathsf{T}}_{3}\mathbf{R}_{3}\mathbf{p} \quad ,
 \end{equation}
@@ -209,7 +220,9 @@ and
 \mathbf{H}_{3}(\mathbf{p}) = 2 \mathbf{R}^{\mathsf{T}}_{3}\mathbf{R}_{3} \quad .
 \end{equation}
 
+
 \subsubsection{Equality constraints}
+
 
 This group is formed by two constraints that were proposed by \cite{oliveirajr-etal2011} and \cite{oliveirajr-barbosa2013} by following the same approach proposed \cite{barbosa-etal1997} and \cite{barbosa-1999a}. 
 They introduce a priori information about the shallowest prism and are suitable for outcropping sources.
@@ -240,7 +253,7 @@ and
 \end{equation}
 where $\mathbf{I}_{V}$ is the identity matrix of order $V$ and 
 $\mathbf{0}_{V \times (M-V)}$ is a $V \times (M-V)$ matrix with null elements.
-The gradient and Hessian of function $\varphi_{4}(\mathbf{p})$ (eq. \ref{eq:phi4}) are given by:
+The gradient and Hessian of function $\varphi_{4}(\mathbf{p})$ (Eq. \ref{eq:phi4}) are given by:
 \begin{equation}\label{eq:phi4_grad}
 \boldsymbol{\nabla}\varphi_{4}(\mathbf{p}) = 2 \mathbf{R}_{4}^{\mathsf{T}} 
 \left(\mathbf{R}_{4} \mathbf{p} - \mathbf{a} \right) \quad ,
@@ -278,7 +291,7 @@ and
 \end{equation}
 where $\mathbf{0}_{2 \times (M-V-2)}$ is a $2 \times (M-V-2)$ matrix 
 with null elements. 
-The gradient and Hessian of function $\varphi_{5}(\mathbf{p})$ (eq. \ref{eq:phi5}) are given by:
+The gradient and Hessian of function $\varphi_{5}(\mathbf{p})$ (Eq. \ref{eq:phi5}) are given by:
 \begin{equation}\label{eq:phi5_grad}
 \boldsymbol{\nabla}\varphi_{5}(\mathbf{p}) = 2\mathbf{R}_{5}^{\mathsf{T}}
 \left(\mathbf{R}_{5} \mathbf{p} - \mathbf{b}\right) \quad ,
@@ -324,7 +337,7 @@ and
 where $\mathbf{0}_{2 \times 2}$ is a $2 \times 2$ matrix with null elements,
 $\mathbf{0}_{V \times 2}$ is a $V \times 2$ matrix with null elements and
 $\mathbf{0}_{2 \times V}$ is a $2 \times V$ matrix with null elements.
-The gradient and Hessian of function $\varphi_{6}(\mathbf{p})$ (eq. \ref{eq:phi6}) are given by:
+The gradient and Hessian of function $\varphi_{6}(\mathbf{p})$ (Eq. \ref{eq:phi6}) are given by:
 \begin{equation}\label{eq:phi6_grad}
 \boldsymbol{\nabla}\varphi_{6}(\mathbf{p}) = 2 \mathbf{R}_{6}^{\mathsf{T}} \mathbf{R}_{6} \mathbf{p} \quad ,
 \end{equation}
@@ -348,7 +361,7 @@ where
 \mathbf{0}_{1 \times (M-1)} & 1 \\
 \end{bmatrix}_{ M \times M } \quad .
 \end{equation}
-The gradient and Hessian of function $\varphi_{7}(\mathbf{p})$ (eq. \ref{eq:phi7}) are given by:
+The gradient and Hessian of function $\varphi_{7}(\mathbf{p})$ (Eq. \ref{eq:phi7}) are given by:
 \begin{equation}\label{eq:phi7_grad}
 \boldsymbol{\nabla}\varphi_{7}(\mathbf{p}) = 2 \mathbf{R}_{7}^{\mathsf{T}} \mathbf{R}_{7} \mathbf{p} \quad ,
 \end{equation}
@@ -359,23 +372,47 @@ and
 
 \subsection{Computational procedures}
 
-The computational procedures of our method require the definition of:
-(1) the initial guess, (2) the upper and lower limits in the inequality constraints (eq. \ref{eq:inequality-constraint}), (3) the nonlinear inverse algorithm, and 
-(4) the weights $ \alpha_{\ell} $ (eq. \ref{eq:gamma}).
+In this section, we present the computational procedures 
+to solve the nonlinear inverse problem for estimating a parameter vector 
+$\hat{\mathbf{p}}_{(f)}$ that minimizes the goal function 
+$\Gamma(\mathbf{p}, m_{0}, z_{0})$ (Eq. \ref{eq:gamma}), subject to the inequality
+constraints (Eq. \ref{eq:inequality-constraint}), for previously defined values of
+depth to the top of the shallowest prism $z_{0}$ and total-magnetization intensity
+$m_{0}$. We use an iterative gradient-based algorithm for solving the nonlinear
+inverse problem.
 
-\subsubsection{Initial guess and inequality constraints}
+This section is divided into four parts. The first part describes how to define  
+the number of prisms $L$, the number of vertices $V$, total-magnetization 
+direction and thickness $dz$ of all prisms, the initial approximation
+$\hat{\mathbf{p}}_{(0)}$ for the parameter vector $ \mathbf{p} $ 
+(Eq. \ref{eq:p-vector}), as well as the upper and lower limits in the inequality
+constraints ($p_{l}^{min}$ and $p_{l}^{max}$ in Eq. \ref{eq:inequality-constraint}). 
+All these variables are previously defined by the interpreter and never updated
+in the nonlinear inverse problem.
+The second part of this section explains how we define different 
+tentative values for the depth to the top $z_{0}$ and total-magnetization
+intensity $m_{0}$, as well as how we choose their optimum values.
+In the third part we present the gradient-based algorithm for solving the nonlinear
+inverse problem for a given tentative pair ($m_{0}$, $z_{0}$). 
+Finally, we describe how to set the weights $ \alpha_{\ell} $ 
+(Eq. \ref{eq:gamma}) in the fourth part of this section.
 
-Estimating, from the total-field anomaly, the parameter vector $\mathbf{p}$ (eq. \ref{eq:p-vector}) that minimizes the goal function $\Gamma(\mathbf{p})$ (eq. \ref{eq:gamma}) 
-for a given pair of total-magnetization intensity $m_{0}$ and depth to the top of the 
-shallowest prism $z_{0}$, subject to the inequality constraint 
-(eq. \ref{eq:inequality-constraint}), is a nonlinear inverse problem 
-which requires an initial guess of the 3D source shape. 
-The initial guess is a simple cylinder whose radius and horizontal Cartesian coordinates of its center were taken after computing the reduction-to-the-pole of the observed total-field anomaly (RTP anomaly).
-We start by computing the RTP anomaly, which in turn has three purposes.
+\subsubsection{Initial approximation $\hat{\mathbf{p}}_{(0)}$ and inequality constraints}
+
+Our initial approximation $\hat{\mathbf{p}}_{(0)}$ is a uniformly-magnetized
+cylinder-like body formed by 
+$L$ prisms, all of them with the same number of vertices $V$. The radii of the
+vertices of all prisms ($r^{k}_{j}$, $j=1,\dots , V$, $k=1,\dots ,L$) have the 
+same constant value, so that the initial approximation approaches a vertical
+cylinder. 
+The number of prisms $L$ and vertices $V$ are set based on the expected complexity 
+of the magnetic source.
+We start by computing the RTP anomaly, which has three purposes.
 The first one is verifying if the used total-magnetization direction is valid.
-The second purpose is defining the upper and lower limits of the inequality constraints 
-(eq. \ref{eq:inequality-constraint}).
-Finally, the third purpose of the RTP anomaly is defining the radius and horizontal Cartesian coordinates of the center of the a cylindrical body used as initial guess.
+The second purpose is defining the upper and lower limits of the inequality
+constraints (Eq. \ref{eq:inequality-constraint}).
+Finally, the third purpose of the RTP anomaly is defining the radius and horizontal
+Cartesian coordinates of the center of the cylinder-like initial approximation.
 
 It is well known that if the source has a uniform magnetization direction, 
 the RTP anomaly is predominantly positive and decays to zero close to its 
@@ -386,129 +423,186 @@ of the source.
 Hence, the interpreter can validate the total-magnetization direction of the source 
 by verifying if the computed RTP anomaly shows predominantly positive values.
 
-By using the computed RTP anomaly, we define the upper and lower limits 
-($p_{l}^{min}$ and $p_{l}^{max}$) for each parameter $p_{l}$, $l = 1, \dots, M$, 
-in the inequality constraints (eq. \ref{eq:inequality-constraint}). 
-For the parameters representing the radii of the vertices of all prisms 
-($r^{k}_{j}$, $j=1,\dots , V$, $k=1,\dots ,L$), the lower limit $p_{l}^{min}$ 
-is close to zero and the upper limit $p_{l}^{max}$ is approximately defined by 
-the radius of a circular area encompassing the region where the RTP anomaly is 
-positive and decays to zero.
+By using the computed RTP anomaly, we also define the upper and lower limits 
+($p_{l}^{min}$ and $p_{l}^{max}$ in Eq. \ref{eq:inequality-constraint}) for 
+the parameters representing the radii $r^{k}_{j}$ of the vertices and the 
+horizontal coordinates $x_{0}^{k}$ and $y_{0}^{k}$ of the origins $O^{k}$
+of all prisms ($j=1,\dots , V$, $k=1,\dots ,L$). For the parameters representing
+the radii $r^{k}_{j}$, the lower limit $p_{l}^{min}$ is close to zero and the 
+upper limit $p_{l}^{max}$ is approximately defined by the radius of a circular area 
+encompassing the region where the RTP anomaly is positive and decays to zero.
 The lowermost and uppermost $x-$ and $y-$ coordinates of this circular area 
-are used to define, respectively, the limits $p_{l}^{min}$ and $p_{l}^{max}$
-for the parameters $p_{l}$ representing the horizontal coordinates
-($x_{0}^{k}$ and $y_{0}^{k}$, $k=1,\dots ,L$) of the origins $O^{k}$, 
-$k=1,\dots ,L$. 
-We set the lower and upper limits for the parameter $p_{l}$ 
-representing the thickness $dz$ of all prisms by using, respectively, 
-a value close to zero and a large value resulting in a 
-bottom depth greater than that we expect for the true source. 
+are used to define, respectively, the lower and upper limits for the 
+horizontal coordinates $x_{0}^{k}$ and $y_{0}^{k}$. 
 
-To define the radius and the center of the cylinder-like initial guess, we 
-use the radius and the $x-$ and $y-$ coordinates of the center of the
-circular area encompassing the region where the RTP anomaly is positive.
-This definition does not require a high accuracy. 
-After defining the radius and the horizontal Cartesian coordinates of the center 
-of the cylinder-like initial guess, we set its thickness to generate 
-a depth extent greater than that we expect for the true source. 
-Next, we run a forward modeling of the total-field anomaly aiming at adjusting the
-cylinder volume and defining ranges for its total-magnetization intensity $m_{0}$ 
-and depth to the top $z_{0}$ which yield a preliminary fit of the observed data.
-Note that this forward modeling is carried out before performing the inversion 
-and the resulting cylinder-like body may produce an inaccurate data fitting.
+Next, we set the same thickness $dz$ for all prisms so that the resulting 
+total thickness ($L \, dz$) is greater than that we expect for the true source.
+The lower and upper limits ($p_{l}^{min}$ and $p_{l}^{max}$ in 
+Eq. \ref{eq:inequality-constraint}) for the parameter $dz$ are set to be,
+respectively, a value close to zero and a large value resulting in a 
+total thickness ($L \, dz$) greater than that we expect for the true source.
+At this point, we have fully defined the vector $\hat{\mathbf{p}}_{(0)}$ 
+representing the cylinder-like initial approximation for the parameter 
+vector $ \mathbf{p} $ (Eq. \ref{eq:p-vector}).
 
+\subsubsection{Definition of optimum values for $m_{0}$ and $z_{0}$}
 
-\subsubsection{Inversion algorithm}
+After defining the initial approximation $\hat{\mathbf{p}}_{(0)}$, we need
+to set the depth to the top of the shallowest prism $z_0$ 
+and the total-magnetization intensity $m_0$ for all prisms.
+These two parameters are also previously defined by the interpreter and 
+remain fixed along the iterations of our gradient-based algorithm for solving the 
+nonlinear inverse problem. 
 
-Here, we use the Levenberg-Marquardt algorithm \cite[e.g., ][ p. 240]{aster-etal2019} to solve the nonlinear inverse problem given by eq. \ref{eq:gamma}.
-The Levenberg-Marquardt algorithm is an iterative gradient-based method that, at each iteration $\kappa$, updates the estimate parameter vector $\hat{\mathbf{p}}_{(\kappa)}$ (where the superscript hat ``~$\hat{}$~" denotes estimated) to obtain a new estimated parameter vector $\hat{\mathbf{p}}_{(\kappa + 1)}$.
-We compute this update by following the same strategy of \cite{barbosa-1999b}, \cite{oliveirajr-etal2011} and \cite{oliveirajr-barbosa2013} to incorporate the inequality constraint (eq. \ref{eq:inequality-constraint}). 
-This strategy consists in transforming each element $\hat{p}_{l} \in (p_{l}^{min}, p_{l}^{max})$ of the estimated parameter vector $\hat{\mathbf{p}}_{(\kappa)}$ 
+In the absence of a priori information, the finding of values close to the true ones
+for $z_0$ and $m_0$ is a very difficult task due to the inherent ambiguity
+in magnetic inversion. It is expected that estimated magnetic sources obtained by
+using different combinations of $z_0$ and $m_0$ may produce similar data fits.
+Because of that, we do not estimate their values in the nonlinear inverse problem.
+Instead, we set ranges of tentative values for them.
+For each tentative pair ($m_0$, $z_0$), we use the same previously defined 
+cylinder-like initial approximation $\hat{\mathbf{p}}_{(0)}$ to 
+obtain an independent estimated parameter vector $\hat{\mathbf{p}}_{(f)}$ 
+minimizing the goal function $\Gamma (\mathbf{p}, m_{0}, z_{0})$ 
+(Eq. \ref{eq:gamma}).
+Note that this approach results in a set of estimated magnetic sources with
+different depths to the top $z_0$, total-magnetization intensities $m_0$ and 
+geometries defined by different estimated parameter vectors $\hat{\mathbf{p}}_{(f)}$.
+Each estimated magnetic source results in a different value 
+$\Gamma (\hat{\mathbf{p}}_{(f)}, m_{0}, z_{0})$ for the goal function.
+On the discrete map of the goal function produced by the set of estimated magnetic
+sources, each one associated with a tentative pair ($m_0$, $z_0$), 
+we select the optimum values of $m_{0}$ and $z_{0}$ as those producing the smallest
+value of $\Gamma (\hat{\mathbf{p}}_{(f)}, m_{0}, z_{0})$. 
+We stress that all estimated parameter vectors $\hat{\mathbf{p}}_{(f)}$ are obtained
+by using the same values for the weights $\alpha_{\ell}$ (Eq. \ref{eq:gamma}).
+Details about how we set these weights are presented later, in the section
+\textit{Setting the weights $\alpha_{1}-\alpha_{7}$}.
+
+Usually, the range of $z_0$ includes the topography ($z_0 = 0$) and the range of 
+$m_0$ is based on a priori information such as petrophysical studies.
+In order to verify our initial approximation $\hat{\mathbf{p}}_{(0)}$ and the
+ranges of tentative values for $z_0$ and $m_0$, we compute a discrete map
+of the data-misfit function $\phi (\mathbf{p}, m_{0}, z_{0})$ (Eq. \ref{eq:misfit}).
+All values in this map are produced by using the same previously defined 
+initial approximation $\hat{\mathbf{p}}_{(0)}$. The only differences are the 
+tentative values for $z_0$ and $m_0$. 
+The computation of this discrete map is carried out, before performing the 
+inversions, with the purpose of verifying if there is at least one pair of $ m_0 $ and $ z_0 $ 
+associated with a data-misfit function $\phi (\hat{\mathbf{p}}_{(0)}, m_{0}, z_{0})$ 
+showing a relatively low value. This means that the initial approximation $\hat{\mathbf{p}}_{(0)}$
+and tentative values for $m_{0}$ and $z_{0}$ produce a predicted data vector 
+$\mathbf{d}(\hat{\mathbf{p}}_{(0)}, m_{0}, z_{0})$ close to the observed 
+data vector $\mathbf{d}^{o}$.
+We stress that, at this step, we do not need a good data fit.
+However, if we cannot identify any point on the discrete map of the data-misfit function 
+$\phi (\hat{\mathbf{p}}_{(0)}, m_{0}, z_{0})$ associated with a satisfactory
+data fit, the initial approximation $\hat{\mathbf{p}}_{(0)}$ 
+and the ranges of $ z_0 $ and $ m_0 $ should be redefined and then recompute the discrete map.
+
+\subsubsection{Inversion algorithm for estimating $\mathbf{p}$}
+
+We use the Levenberg-Marquardt algorithm \cite[e.g., ][ p. 240]{aster-etal2019} 
+to solve the nonlinear inverse problem for estimating the
+parameter vector $\hat{\mathbf{p}}_{(f)}$ minimizing the goal function
+$\Gamma (\mathbf{p}, m_{0}, z_{0})$ (Eq. \ref{eq:gamma}),
+subject to the inequality constraints (Eq. \ref{eq:inequality-constraint}), 
+for given values of total-magnetization intensity $m_{0}$ and depth to the top
+of the shallowest prism $z_{0}$.
+The Levenberg-Marquardt algorithm is an iterative gradient-based method that, at each iteration $n$, updates the estimate parameter vector $\hat{\mathbf{p}}_{(n)}$ to obtain a new estimated parameter vector $\hat{\mathbf{p}}_{(n + 1)}$.
+We compute this update by following the same strategy of \cite{barbosa-1999b}, \cite{oliveirajr-etal2011} and \cite{oliveirajr-barbosa2013} to incorporate the inequality constraints (Eq. \ref{eq:inequality-constraint}). 
+This strategy consists in transforming each element $\hat{p}_{l} \in (p_{l}^{min}, p_{l}^{max})$ of the estimated parameter vector $\hat{\mathbf{p}}_{(n)}$ 
 into the element $\hat{p}^{\dagger}_{l} \in (- \infty, + \infty)$ of an 
-unconstrained vector $\hat{\mathbf{p}}^{\dagger}_{(\kappa)}$ as follows:
+unconstrained vector $\hat{\mathbf{p}}^{\dagger}_{(n)}$ as follows:
 \begin{equation}\label{eq:inequality-function}
 \hat{p}^{\dagger}_{l} = -\ln\left(\frac{p_{l}^{max} - \hat{p}_{l}}{\hat{p}_{l} - p_{l}^{min}}\right) \: ,
 \end{equation}
-where $p_{l}^{min}$ and $p_{l}^{max}$ are defined in the inequality constraint 
-(eq. \ref{eq:inequality-constraint}).
+where $p_{l}^{min}$ and $p_{l}^{max}$ are defined in the inequality constraints 
+(Eq. \ref{eq:inequality-constraint}).
 The inverse transformation of each element $\hat{p}^{\dagger}_{l} \in (- \infty, + \infty)$ into the element $\hat{p}_{l} \in (p_{l}^{min}, p_{l}^{max})$ is the following:
 \begin{equation}\label{eq:inv-inequality-function}
 \hat{p}_{l} = p_{l}^{min} + \left(\frac{p_{l}^{max} - p_{l}^{min}}{ 1 + e^{-\hat{p}^{\dagger}_{l}} }\right) \: .
 \end{equation}
 
-At each iteration $\kappa$ of our algorithm, a correction 
-$\boldsymbol{\Delta}\hat{\mathbf{p}}^{\dagger}_{(\kappa)}$ for the
-unconstrained vector $\hat{\mathbf{p}}^{\dagger}_{(\kappa)}$
+At each iteration $n$ of our algorithm, a correction 
+$\boldsymbol{\Delta}\hat{\mathbf{p}}^{\dagger}_{(n)}$ for the
+unconstrained vector $\hat{\mathbf{p}}^{\dagger}_{(n)}$
 is computed by solving the following linear system:
 \begin{equation}\label{eq:linear-system}
-\mathbf{Q}_{(\kappa)}^{-1} \left[\mathbf{Q}_{(k)} \mathbf{H}^{\dagger}(\hat{\mathbf{p}}_{(\kappa)}) \mathbf{Q}_{(\kappa)} + \lambda_{(\kappa)} \mathbf{I}_{M} \right] 
-\mathbf{Q}_{(\kappa)}^{-1} \boldsymbol{\Delta} \hat{\mathbf{p}}^{\dagger}_{(\kappa)} 
-= -\boldsymbol{\nabla}\Gamma(\hat{\mathbf{p}}_{(\kappa)}) \: ,
+\mathbf{Q}_{(n)}^{-1} \left[\mathbf{Q}_{(n)} \mathbf{H}^{\dagger}(\hat{\mathbf{p}}_{(n)}) \mathbf{Q}_{(n)} + \lambda_{(n)} \mathbf{I}_{M} \right] 
+\mathbf{Q}_{(n)}^{-1} \boldsymbol{\Delta} \hat{\mathbf{p}}^{\dagger}_{(n)} 
+= -\boldsymbol{\nabla}\Gamma(\hat{\mathbf{p}}_{(n)}) \: ,
 \end{equation}
-where $\lambda_{(\kappa)}$ is a positive scalar (known as Marquardt parameter) which is adjusted at each iteration and is associated with the Levenberg-Marquardt method \cite[e.g., ][ p. 240]{silva-2001,aster-etal2019},
+where $\lambda_{(n)}$ is a positive scalar (known as Marquardt parameter) which is adjusted at each iteration and is associated with the Levenberg-Marquardt method \cite[e.g., ][ p. 240]{silva-2001,aster-etal2019},
 $\mathbf{I}_{M}$ is the identity matrix with order $M$, 
-$\boldsymbol{\nabla}\Gamma(\hat{\mathbf{p}}_{(\kappa)})$
-is the gradient of the goal function (eq. \ref{eq:gamma_gradient}), 
-$\mathbf{H}^{\dagger}(\hat{\mathbf{p}}_{(\kappa)})$ is a matrix given by
+$\boldsymbol{\nabla}\Gamma(\hat{\mathbf{p}}_{(n)})$
+is the gradient of the goal function (Eq. \ref{eq:gamma_gradient}), 
+$\mathbf{H}^{\dagger}(\hat{\mathbf{p}}_{(n)})$ is a matrix given by
 \begin{equation}\label{eq:H-dagger}
-\mathbf{H}^{\dagger}(\hat{\mathbf{p}}_{(\kappa)}) = \mathbf{H}(\hat{\mathbf{p}}_{(\kappa)})\mathbf{T}(\hat{\mathbf{p}}_{(\kappa)}) 
+\mathbf{H}^{\dagger}(\hat{\mathbf{p}}_{(n)}) = \mathbf{H}(\hat{\mathbf{p}}_{(n)})\mathbf{T}(\hat{\mathbf{p}}_{(n)}) 
 \end{equation}
-and $\mathbf{Q}_{(\kappa)}$ is a diagonal matrix proposed by \cite{marquardt_algorithm_1963} for scaling the parameter $\lambda_{(\kappa)}$ 
+and $\mathbf{Q}_{(n)}$ is a diagonal matrix proposed by \cite{marquardt_algorithm_1963} for scaling the parameter $\lambda_{(n)}$ 
 at each iteration.
 The element $ll$ of this diagonal matrix is given by
 \begin{equation}\label{eq:Q-matrix}
 q_{ll} = \frac{1}{\sqrt{h^{\dagger}_{ll}}} \: ,
 \end{equation}
-where $h^{\dagger}_{ll}$ is the element $ll$ of the matrix $\mathbf{H}^{\dagger}(\hat{\mathbf{p}}_{(\kappa)})$ (eq. \ref{eq:H-dagger}). 
-In eq. \ref{eq:H-dagger}, $\mathbf{H}(\hat{\mathbf{p}}_{(\kappa)})$ is the Hessian matrix of the goal function (eq. \ref{eq:gamma_hessian}) and $\mathbf{T}(\hat{\mathbf{p}}_{(\kappa)})$ is a diagonal matrix whose element $ll$ is given by
+where $h^{\dagger}_{ll}$ is the element $ll$ of the matrix $\mathbf{H}^{\dagger}(\hat{\mathbf{p}}_{(n)})$ (Eq. \ref{eq:H-dagger}). 
+In Eq. \ref{eq:H-dagger}, $\mathbf{H}(\hat{\mathbf{p}}_{(n)})$ is the Hessian matrix of the goal function (Eq. \ref{eq:gamma_hessian}) and $\mathbf{T}(\hat{\mathbf{p}}_{(n)})$ is a diagonal matrix whose element $ll$ is given by
 \begin{equation}\label{eq:inequality-diag}
 t_{ll} = \frac{(p_{l}^{max} - \hat{p}_{l} + \epsilon)(\hat{p}_{l} - p_{l}^{min} + \epsilon)}{p_{l}^{max} - p_{l}^{min}} \: ,
 \end{equation}
 where $\hat{p}_{l}$ is the $l$th element of the estimated parameter vector 
-$\hat{\mathbf{p}}_{(\kappa)}$ and $\epsilon$ is a small positive number 
+$\hat{\mathbf{p}}_{(n)}$ and $\epsilon$ is a small positive number 
 ($\approx 10^{-2}$) used to prevent null values.
 
-After estimating $\boldsymbol{\Delta} \hat{\mathbf{p}}^{\dagger}_{(\kappa)}$ by 
-solving the linear system (eq. \ref{eq:linear-system}), we update the unconstrained 
+After estimating $\boldsymbol{\Delta} \hat{\mathbf{p}}^{\dagger}_{(n)}$ by 
+solving the linear system (Eq. \ref{eq:linear-system}), we update the unconstrained 
 vector by computing
 \begin{equation}\label{eq:p-k1-dagger}
-\hat{\mathbf{p}}^{\dagger}_{(\kappa + 1)} =
-\hat{\mathbf{p}}^{\dagger}_{(\kappa)} +
-\boldsymbol{\Delta} \hat{\mathbf{p}}^{\dagger}_{(\kappa)} \: .
+\hat{\mathbf{p}}^{\dagger}_{(n + 1)} =
+\hat{\mathbf{p}}^{\dagger}_{(n)} +
+\boldsymbol{\Delta} \hat{\mathbf{p}}^{\dagger}_{(n)} \: .
 \end{equation}
-Next, we compute the elements of an updated parameter vector $\hat{\mathbf{p}}_{(\kappa + 1)}$ by using eq. \ref{eq:inv-inequality-function}.
+Next, we compute the elements of an updated parameter vector $\hat{\mathbf{p}}_{(n + 1)}$ by using Eq. \ref{eq:inv-inequality-function}.
 Finally, we stop the iterative process by evaluating the invariance of the 
-goal function (eq. \ref{eq:gamma}) along successive iterations.
+goal function (Eq. \ref{eq:gamma}) along successive iterations.
 Specifically, we check if the inequality
 \begin{equation}\label{eq:stop-criterion}
- \left| \frac{\Gamma (\hat{\mathbf{p}}_{(\kappa +1)}) - 
- \Gamma (\hat{\mathbf{p}}_{(\kappa)})}
- {\Gamma (\hat{\mathbf{p}}_{(\kappa)})} 
+ \left| \frac{\Gamma (\hat{\mathbf{p}}_{(n +1)}, m_{0}, z_{0}) - 
+ \Gamma (\hat{\mathbf{p}}_{(n)}, m_{0}, z_{0})}
+ {\Gamma (\hat{\mathbf{p}}_{(n)}, m_{0}, z_{0})} 
  \right| \le \tau
 \end{equation}
 holds, where $\tau$ is a threshold value on the order of $10^{-3}$ to $10^{-4}$. 
 Usually, the inversion algorithm converges at $8$-$12$ iterations.
-In the evaluation of the goal function (eq. \ref{eq:gamma}), we compute the 
-constraint functions $\varphi_{\ell}(\mathbf{p})$ (eqs. \ref{eq:phi1}, \ref{eq:phi2},
+The estimate $\hat{\mathbf{p}}_{(n+1)}$ that is obtained
+at the last iteration and satisfies the inequality constraint defined by
+Eq. \ref{eq:stop-criterion} is the estimated parameter vector
+$\hat{\mathbf{p}}_{(f)}$ minimizing the goal function
+$\Gamma (\mathbf{p}, m_{0}, z_{0})$ (Eq. \ref{eq:gamma}), for the given
+values of depth to the top $z_{0}$ and total-magnetization intensity $m_{0}$.
+In the evaluation of the goal function, we compute the 
+constraint functions $\varphi_{\ell}(\mathbf{p})$ (Eqs \ref{eq:phi1}, \ref{eq:phi2},
 \ref{eq:phi3}, \ref{eq:phi4}, \ref{eq:phi5}, \ref{eq:phi6} and \ref{eq:phi7}), 
 $\ell = 1, \dots, 7$, by using the expressions which are written as sum of 
 terms instead of those defined by sparse matrices.
 
 
-\subsubsection{Choice of weights $\alpha_{1}-\alpha_{7}$}
+\subsubsection{Choice of the weights $\alpha_{\ell}$}
 
-Attributing values to the weights $ \alpha_{\ell} $ (eq. \ref{eq:gamma}) is an important feature of our method. 
+Attributing values to the weights $ \alpha_{\ell} $ (Eq. \ref{eq:gamma}) is an important feature of our method. 
 However, there is no analytical rule to define them and their values can be dependent on the particular characteristics of the type of geological setting where the method is being applied \cite[]{silva-2001}. 
 
-At this point, we draw attention that the weights $ \alpha_{\ell}$ (eq. \ref{eq:gamma}) is a dimensional 
-quantity. 
-Note that the units of the data-misfit function (eq. \ref{eq:misfit}) and the constraint functions 
-(eqs. \ref{eq:phi1}, \ref{eq:phi2}, \ref{eq:phi3}, \ref{eq:phi4}, \ref{eq:phi5}, 
-\ref{eq:phi6} and \ref{eq:phi7}), are $nT^{2}$ and $m^{2}$, respectively.
-Because we set the unit of the goal function (eq. \ref{eq:gamma}) as $nT^{2}$, the unit of the weights 
-$ \alpha_{\ell} $ (eq. \ref{eq:gamma}) is $nT^{2}.m^{-2}$.
+At this point, we draw attention that the weights $ \alpha_{\ell}$ (Eq. \ref{eq:gamma}) are dimensional quantities. 
+Note that the units of the data-misfit function (Eq. \ref{eq:misfit}) and the constraint functions 
+(Eqs \ref{eq:phi1}, \ref{eq:phi2}, \ref{eq:phi3}, \ref{eq:phi4}, \ref{eq:phi5}, 
+\ref{eq:phi6} and \ref{eq:phi7}), are nT$^{2}$ and $m^{2}$, respectively.
+Because we set the unit of the goal function (Eq. \ref{eq:gamma}) as nT$^{2}$, the unit of the weights 
+$ \alpha_{\ell} $ (Eq. \ref{eq:gamma}) is nT$^{2}$m$^{-2}$.
 
-The physical dimensional of the weights $ \alpha_{\ell}$ makes the solution of the inverse problem variable. 
+The physical dimensions of the weights $ \alpha_{\ell}$ makes assignment of 
+their values problem dependent. 
 To make these weights comparable to each other, we normalize the $ \alpha_{\ell} $ 
 values as follows:
 \begin{equation}\label{eq:alphas}
@@ -516,36 +610,36 @@ values as follows:
 \end{equation}
 where $\tilde{\alpha}_\ell$ is a positive scalar and $ E_\phi/E_\ell $ is a normalizing
 factor allowing the $\tilde{\alpha}_\ell$ to be independent of the physical units used.
-In this equation, $ E_\ell $ represents the 
-trace of the Hessian matrix $\mathbf{H}_{\ell}$ (eqs \ref{eq:phi1_hessian}, 
+In Eq. \ref{eq:alphas}, $ E_\ell $ represents the 
+trace of the Hessian matrix $\mathbf{H}_{\ell}$ (Eqs \ref{eq:phi1_hessian}, 
 \ref{eq:phi2_hessian}, \ref{eq:phi3_hessian}, \ref{eq:phi4_hessian}, \ref{eq:phi5_hessian}, 
 \ref{eq:phi6_hessian}, and \ref{eq:phi7_hessian}) of the $\ell$th constraining function 
-$\varphi_{\ell}(\mathbf{p})$ (eqs \ref{eq:phi1}, \ref{eq:phi2}, \ref{eq:phi3}, 
+$\varphi_{\ell}(\mathbf{p})$ (Eqs \ref{eq:phi1}, \ref{eq:phi2}, \ref{eq:phi3}, 
 \ref{eq:phi4}, \ref{eq:phi5}, \ref{eq:phi6}, and \ref{eq:phi7}). 
 The constant $E_\phi$ is the trace of the Hessian matrix 
-$\mathbf{H}_{\phi}(\hat{\mathbf{p}}_{(0)})$ (eq. \ref{eq:phi_hessian}) of the misfit function 
-$\phi(\mathbf{p})$ (eq. \ref{eq:misfit}) computed with the initial approximation $\hat{\mathbf{p}}_{(0)}$ 
-for the parameter vector $ \mathbf{p} $ (eq. \ref{eq:p-vector}) at the beginning of the inversion algorithm. 
+$\mathbf{H}_{\phi}(\hat{\mathbf{p}}_{(0)})$ (Eq. \ref{eq:phi_hessian}) of the misfit function 
+$\phi(\mathbf{p})$ (Eq. \ref{eq:misfit}) computed with the initial approximation $\hat{\mathbf{p}}_{(0)}$ 
+for the parameter vector $ \mathbf{p} $ (Eq. \ref{eq:p-vector}) at the beginning of the inversion algorithm. 
 Note that the trace of the Hessian matrix $\mathbf{H}_{\ell}$ is dimensionless and 
-the trace of the Hessian matrix $\mathbf{H}_{\phi}(\hat{\mathbf{p}}_{(0)})$ has unit of $nT^{2}.m^{-2}$.
-Thus, the positive scalars $\tilde{\alpha}_\ell$ in eq. \ref{eq:alphas} are dimensionless quantities.
+the trace of the Hessian matrix $\mathbf{H}_{\phi}(\hat{\mathbf{p}}_{(0)})$ has unit of nT$^{2}$m$^{-2}$.
+Thus, the positive scalars $\tilde{\alpha}_\ell$ in Eq. \ref{eq:alphas} are dimensionless quantities.
 
 According to this empirical strategy, the weights $ \alpha_{\ell} $ 
-(eq. \ref{eq:gamma}) are redefined using the positive scalars $\tilde{\alpha}_\ell$ 
-(eq. \ref{eq:alphas}), which are independent of the physical units and less dependent 
-on the particular characteristics of the interpretation geological setting.
+(Eq. \ref{eq:gamma}) are redefined using Eq. \ref{eq:alphas}, in which the weights
+$\tilde{\alpha}_\ell$ are positive scalars, independent of physical units and 
+less dependent on the particular characteristics of the
+interpretation geological setting.
 
-
-\subsubsection{Practical considerations}
+%\subsubsection{Practical considerations}
 
 The values attributed to the dimensionless weights $\tilde{\alpha}_{1} - \tilde{\alpha}_{7}$ 
-(eq. \ref{eq:alphas}) significantly impact the estimated models and cannot be 
+(Eq. \ref{eq:alphas}) significantly impact the estimated models and cannot be 
 automatically set without the interpreter’s judgment. 
 Based on our practical experience, we suggest some 
 empirical procedures for setting these parameters.
 
-The parameters $\tilde{\alpha}_1$ and $\tilde{\alpha}_2$ impose prior information on the 
-shape of the horizontal cross-section of the prisms. 
+The parameters $\tilde{\alpha}_1$ and $\tilde{\alpha}_2$ impose prior information 
+on the shape of the horizontal cross-section of the prisms. 
 The first one forces all prisms to have a circular horizontal cross-section, while 
 the second forces all prisms to have a similar horizontal cross-section.
 Generally, their values vary from $10^{-5}$ to $10^{-3}$ and differ from
@@ -564,12 +658,15 @@ used only to obtain stable solutions for the inverse problem.
 Its value is set to be as small as possible.
 The parameter $\tilde{\alpha}_7$ controls the total-vertical extension of the 
 the estimated body. 
-The greater its value, the shallower the estimated depth to the bottom of the source will be 
-and vice versa.
-A general rule is starting with values 
+The greater its value, the shallower the estimated depth to the bottom of the source
+will be and vice versa.
+
+If the data fitting is poor or if the estimated source shows unrealistic shape,
+the dimensionless weights $\tilde{\alpha}_{\ell}$ (Eq. \ref{eq:alphas}) must be
+fine-tuned
+to obtain a realistic solution. After tuning their values, they will be used in all
+inversions without changing along the iterations. 
+Educated guesses for the $\tilde{\alpha}_{\ell}$ values are 
 $\tilde{\alpha}_1 = 10^{-4}$, $\tilde{\alpha}_2 = 10^{-4}$, $\tilde{\alpha}_3 = 10^{-4}$,
 $\tilde{\alpha}_4 = 0$, $\tilde{\alpha}_5 = 0$, $\tilde{\alpha}_6 = 10^{-7}$, 
-$\tilde{\alpha}_7 = 10^{-5}$ and change them to refine the results.
-Finally, we stress that $\tilde{\alpha}_1 - \tilde{\alpha}_7$ (eq. \ref{eq:alphas})
-do not change along the iterations.
-
+$\tilde{\alpha}_7 = 10^{-5}$.

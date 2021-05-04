@@ -3,7 +3,7 @@
 \begin{figure}
     \centering
     \includegraphics[scale=1]{figures/observed_data.png}
-    \caption{Schematic representation (modified from \cite{oliveirajr-barbosa2013}) of (a) total-field anomaly (gray surface) produced by (b) a 3-D anomalous source (dark gray volume). The interpretation model in (b) consists of a set of $L$ vertical, juxtaposed 3-D prisms (light gray) in the vertical direction of a right-handed coordinate system.}
+    \caption{Schematic representation (modified from \cite{oliveirajr-barbosa2013}) of (a) total-field anomaly (gray surface) produced by (b) a 3-D anomalous source (dark gray volume). The interpretation model in (b) consists of a set of $L$ vertical, juxtaposed 3-D prisms (light gray) in the vertical direction of a right-handed coordinate system. At the initial iteration, the interpretation model is defined as a vertical cylinder.}
     \label{fig:obs}
 \end{figure}
 
@@ -22,7 +22,14 @@
     \caption{Simple model simulation. (a) Noise-corrupted total-field anomaly produced by the lopolithic-like body (blue prisms) shown in the panel (b). The black dots represent the observation points. The red circle represents the horizontal projection 
     of the initial approximation $\hat{\mathbf{p}}_{(0)}$
     (red prisms in Fig. \ref{fig:simple_results}b).
-    (b) Perspective view of the simple model (lopolithic intrusion) represented by the blue prisms.
+    (b) Perspective view of the simple model (lopolithic intrusion) represented by the blue prisms. 
+    (c) Discrete map of the goal function $\Gamma(\mathbf{p}, m_0, z_0)$ (Eq.
+    \ref{eq:gamma}) produced by the estimates $\hat{\mathbf{p}}_{(f)}$ obtained with
+    a $6 \times 6$ grid of tentative values for depth to the top $z_0$ and
+    total-magnetization intensity $m_0$.
+    The red triangle pinpoint the true and retrieved 	   
+    values of $m_0$  and $z_0$. (d) RTP anomaly of the total-field anomaly shown in 
+    Fig. \ref{fig:simple_model}a.
 }
     \label{fig:simple_model}
 \end{figure}
@@ -31,7 +38,7 @@
 %	\centering
 %	\includegraphics[scale=.75]{figures/simple_gamma.png}
 %	\caption{Application to the simple model data. 
-%	Discrete mapping of the goal function $\Gamma(\mathbf{p})$ (eq. \ref{eq:gamma}) on the plane $ m_0 \times z_0 $,  
+%	Discrete map of the goal function $\Gamma(\mathbf{p}, m_0, z_0)$ (Eq. \ref{eq:gamma}) on the plane $ m_0 \times z_0 $,  
 %	produced by estimated models with different depths-to-the-top ($ z_0 $) and 
 %	total-magnetization intensities ($ m_0 $). 
 %	The red triangle represents the $m_0$ and $z_0$ of the true source.}
@@ -41,7 +48,7 @@
 \begin{figure}
 	\centering
 	\includegraphics[width=\linewidth]{figures/simple_results.png}
-	\caption{Simple model simulation. (a) Residuals between the  noise-corrupted data (Fig. \ref{fig:simple_model}a) and the predicted data (not shown) produced by the estimated model (red prisms shown in the panels c and d). The inset shows the histogram of the residuals and the Gaussian curve (dashed line) has mean and standard deviation equal to $\mu = -0.04$ nT and $\sigma=7.21$ nT, respectively. (b) Perspective views of the initial approximation (red prisms) and the true model (blue prisms). (c) and (d) Comparison between the estimated source (red prisms) and the true model (blue prisms) in perspective views.}
+	\caption{Simple model simulation. (a) Residuals between the  noise-corrupted data (Fig. \ref{fig:simple_model}a) and the predicted data (not shown) produced by the estimated model (red prisms shown in the panels (c) and (d)). The inset shows the histogram of the residuals and the Gaussian curve (dashed line) has mean and standard deviation equal to $\mu = -0.04$ nT and $\sigma=7.21$ nT, respectively. (b) Perspective views of the initial approximation (red prisms) and the true model (blue prisms). (c) and (d) Comparison between the estimated source (red prisms) and the true model (blue prisms) in perspective views.}
 	\label{fig:simple_results}
 \end{figure}
 
@@ -50,9 +57,9 @@
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{figures/inclined_model_data.png}
-    \caption{Dipping model simulation. (a) Noise-corrupted total-field anomaly produced by the dipping model (blue prisms shown in the panels c and d). The black dots represent the observation points. The red circle represents the horizontal projection 
+    \caption{Dipping model simulation. (a) Noise-corrupted total-field anomaly produced by the dipping model (blue prisms shown in the panels (c) and (d)). The black dots represent the observation points. The red circle represents the horizontal projection 
    	of the initial approximation $\hat{\mathbf{p}}_{(0)}$ 
-   	(red prisms in Fig. \ref{fig:dipping_results}. The blue polygon is the horizontal projection of the simulated dipping source.
+   	(red prisms in Fig. \ref{fig:dipping_results}). The blue polygon is the horizontal projection of the simulated dipping source.
    	(b) Vertical coordinates of the observations simulating an airborne survey. (c) and (d) Perspective views of the dipping model represented by the blue prisms.
 }
     \label{fig:dipping_model}
@@ -61,13 +68,17 @@
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{figures/inclined_rtp.png}
-    \caption{Dipping model simulation. (a) RTP anomaly of the total-field anomaly shown in 
-	Fig. \ref{fig:dipping_model}a. 
-	The red circle and the blue polygon represent the horizontal projections of the 	   initial approximation $\hat{\mathbf{p}}_{(0)}$ and  the simulated dipping source, respectively.
-	(b) Discrete mapping of the goal function (eq. \ref{eq:gamma}) produced by the estimates   	       obtained considering a grid of 6 $\times$ 6 tentative values of 
-	   depth to the top $z_0$ and total-magnetization intensity $m_0$. 
-	   The red triangle  and white diamond pinpoint, respectively, the true and retrieved 	   
-	   values of $m_0$  and $z_0$.     
+    \caption{Dipping model simulation. (a) RTP anomaly of the total-field anomaly
+    shown in Fig. \ref{fig:dipping_model}(a). 
+	The red circle and the blue polygon represent the horizontal projections of
+	the initial approximation $\hat{\mathbf{p}}_{(0)}$ and  the simulated dipping
+	source, respectively.
+	(b) Discrete map of the goal function $\Gamma(\mathbf{p}, m_0, z_0)$ (Eq.
+	\ref{eq:gamma}) produced by the estimates $\hat{\mathbf{p}}_{(f)}$ obtained with
+	a $6 \times 6$ grid of tentative values for depth to the top $z_0$ and
+	total-magnetization intensity $m_0$.
+	The red triangle  and white diamond pinpoint, respectively, the true and
+	retrieved values of $m_0$  and $z_0$.     
 }
     \label{fig:dipping_rtp}
 \end{figure}
@@ -76,9 +87,9 @@
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{figures/inclined-l2-solution.png}
-    \caption{Dipping model simulation. (a) Residuals between the  noise-corrupted data (Fig. \ref{fig:dipping_model}a) and the predicted data (not shown) produced by the estimated model (red prisms shown in the panels c and d) using $m_0$  and $z_0$ pinpointed by the white diamond in Fig. \ref{fig:dipping_rtp}b. The inset shows the histogram of the residuals and the Gaussian curve (dashed line) has mean and standard deviation equal 
+    \caption{Dipping model simulation. (a) Residuals between the  noise-corrupted data (Fig. \ref{fig:dipping_model}a) and the predicted data (not shown) produced by the estimated model (red prisms shown in the panels (c) and (d)) using $m_0$  and $z_0$ pinpointed by the white diamond in Fig. \ref{fig:dipping_rtp}b. The inset shows the histogram of the residuals and the Gaussian curve (dashed line) has mean and standard deviation equal 
     to $\mu = 1.3$ nT and $\sigma=5.6$ nT, respectively. 
-    The gray polygons are the horizontal projections of the estimated source (red prisms in c and d).
+    The gray polygons are the horizontal projections of the estimated source (red prisms in panels (c) and (d)).
      (b) Perspective views of the initial approximation (red prisms) and the true model (blue prisms). 
      (c) and (d) Comparison between the estimated source (red prisms) and the true model (blue prisms) in perspective views.     
 }
@@ -92,10 +103,10 @@
     \centering
     \includegraphics[width=\linewidth]{figures/regional-data-large.png}
     \caption{Dipping model with regional field simulation. (a) Noise-corrupted total-field anomaly composed of a simulated residual field (Fig. \ref{fig:dipping_model}a) due to 
-dipping model (blue prisms shown in Fig. \ref{fig:dipping_model}c and d) and a regional field (shown in b). (b) Simulated regional field through a first-order polynomial. 
-(c) Residual total-field anomaly after subtracting from the original anomaly (shown in a) a
-regional total-field anomaly (shown in d) obtained by a least-squares polynomial fitting. 
-(d)  Regional total-field anomaly approximated by a least-squares polynomial fitting to the original anomaly (shown in a). The magenta rectangle delimits the data to be inverted.
+dipping model (blue prisms shown in Fig. \ref{fig:dipping_model}c and d) and a regional field (shown in panel (b)). (b) Simulated regional field through a first-order polynomial. 
+(c) Residual total-field anomaly after subtracting from the original anomaly (shown in panel (a)) a
+regional total-field anomaly (shown in panel (d)) obtained by a least-squares polynomial fitting. 
+(d)  Regional total-field anomaly approximated by a least-squares polynomial fitting to the original anomaly (shown in panel (a)). The magenta rectangle delimits the data to be inverted.
 }
     \label{fig:dipping_regional_model}
 \end{figure}
@@ -103,16 +114,23 @@ regional total-field anomaly (shown in d) obtained by a least-squares polynomial
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{figures/regional_rtp.png}
-    \caption{Dipping model with regional field simulation. (a) Residual total-field anomaly to be inverted over the area delimited by the  magenta rectangle 
-    in Fig. \ref{fig:dipping_regional_model}c. 
+    \caption{Dipping model with regional field simulation. (a) Residual total-field
+    anomaly to be inverted over the area delimited by the  magenta rectangle 
+    in Fig. \ref{fig:dipping_regional_model}(c). 
     (b) Differences between the total-field anomaly produced by the dipping model
-(Fig. \ref{fig:dipping_model}a) and the residual total-field anomaly (shown in a) after a regional-residual separation using a least-squares polynomial fitting. 
-(c) RTP anomaly of the  residual total-field anomaly shown in a. 
-(d) Discrete mapping of the goal function (eq. \ref{eq:gamma}) produced by the estimates   	       obtained considering a grid of 6 $\times$ 6 tentative values of 
-	   depth to the top $z_0$ and total-magnetization intensity $m_0$. 
-	   The red triangle  and white diamond pinpoint, respectively, the true and retrieved 	   
-	   values of $m_0$  and $z_0$.   
-	   In the panels a-c, the red circle and the blue polygon represent the horizontal projections 	of the initial approximation $\hat{\mathbf{p}}_{(0)}$ and  the simulated dipping source, respectively.
+    (Fig. \ref{fig:dipping_model}a) and the residual total-field anomaly (shown in
+    panel (a)) after a regional-residual separation using a least-squares polynomial
+    fitting. 
+    (c) RTP anomaly of the  residual total-field anomaly shown in panel (a). 
+    (d) Discrete map of the goal function $\Gamma(\mathbf{p}, m_0, z_0)$ (Eq.
+    \ref{eq:gamma}) produced by the estimates $\hat{\mathbf{p}}_{(f)}$ obtained with
+    a $6 \times 6$ grid of tentative values for depth to the top $z_0$ and
+    total-magnetization intensity $m_0$.
+    The red triangle  and white diamond pinpoint, respectively, the true and
+    retrieved values of $m_0$  and $z_0$.
+    In the panels (a)-(c), the red circle and the blue polygon represent the
+    horizontal projections of the initial approximation $\hat{\mathbf{p}}_{(0)}$ 
+    and the simulated dipping source, respectively.
 }
     \label{fig:dipping_regional_rtp}
 \end{figure}
@@ -121,10 +139,10 @@ regional total-field anomaly (shown in d) obtained by a least-squares polynomial
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{figures/regional-l2-solution.png}
-    \caption{Dipping model with regional field simulation. (a) Residuals between the  noise-corrupted data (Fig. \ref{fig:dipping_regional_rtp}a) and the predicted data (not shown) produced by the estimated model (red prisms shown in the panels c and d) using 
+    \caption{Dipping model with regional field simulation. (a) Residuals between the  noise-corrupted data (Fig. \ref{fig:dipping_regional_rtp}a) and the predicted data (not shown) produced by the estimated model (red prisms shown in the panels (c) and (d)) using 
 $m_0$  and $z_0$ pinpointed by the white diamond in Fig. \ref{fig:dipping_regional_rtp}d.
 The inset shows the histogram of the residuals and the Gaussian curve (dashed line) has mean and standard deviation equal   to $\mu = -4.4$ nT and $\sigma=7.8$ nT, respectively. 
-    The gray polygons are the horizontal projections of the estimated source (red prisms in c and d).
+    The gray polygons are the horizontal projections of the estimated source (red prisms in panels (c) and (d)).
      (b) Perspective views of the initial approximation (red prisms) and the true model (blue prisms). 
      (c) and (d) Comparison between the estimated source (red prisms) and the true model (blue prisms) in perspective views.     
 }
@@ -136,7 +154,7 @@ The inset shows the histogram of the residuals and the Gaussian curve (dashed li
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{figures/complex_model_data.png}
-    \caption{Complex model simulation. (a) Noise-corrupted total-field anomaly produced by the complex model (blue prisms shown in the panels c and d). The black dots represent the observation points. The connected red dots represent the horizontal projection 
+    \caption{Complex model simulation. (a) Noise-corrupted total-field anomaly produced by the complex model (blue prisms shown in the panels (c) and (d)). The black dots represent the observation points. The connected red dots represent the horizontal projection 
    	of the initial approximation $\hat{\mathbf{p}}_{(0)}$ 
    	(red prisms in Fig. \ref{fig:complex_result}b). (b) Vertical coordinates of the observations simulating an airborne survey. (c) and (d) Perspective views of the complex model represented by the blue prisms.
 }
@@ -146,13 +164,17 @@ The inset shows the histogram of the residuals and the Gaussian curve (dashed li
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{figures/complex_rtp.png}
-    \caption{Complex model simulation. (a) RTP anomaly of the total-field anomaly shown in 
-	Fig. \ref{fig:complex_model}a. 
-	The red circle and the blue polygon represent the horizontal projections of the 	   initial approximation $\hat{\mathbf{p}}_{(0)}$ and  the simulated dipping source, respectively.
-	(b) Discrete mapping of the goal function (eq. \ref{eq:gamma}) produced by the estimates   	       obtained considering a grid of 6 $\times$ 6 tentative values of 
-	   depth to the top $z_0$ and total-magnetization intensity $m_0$. 
-	   The red triangle  and white diamond pinpoint, respectively, the true and retrieved 	   
-	   values of $m_0$  and $z_0$.     
+    \caption{Complex model simulation. (a) RTP anomaly of the total-field anomaly
+    shown in Fig. \ref{fig:complex_model}(a). 
+	The red circle and the blue polygon represent the horizontal projections of the
+	initial approximation $\hat{\mathbf{p}}_{(0)}$ and  the simulated dipping source,
+	respectively.
+	(b) Discrete map of the goal function $\Gamma(\mathbf{p}, m_0, z_0)$ (Eq.
+	\ref{eq:gamma}) produced by the estimates $\hat{\mathbf{p}}_{(f)}$ obtained with
+	a $6 \times 6$ grid of tentative values for depth to the top $z_0$ and
+	total-magnetization intensity $m_0$.
+	The red triangle and white diamond pinpoint, respectively, the true and
+	retrieved values of $m_0$ and $z_0$.     
 }
     \label{fig:complex_rtp}
 \end{figure}
@@ -160,7 +182,7 @@ The inset shows the histogram of the residuals and the Gaussian curve (dashed li
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{figures/complex_results.png}
-    \caption{Complex model simulation. (a) Residuals between the noise-corrupted data (Fig. \ref{fig:complex_model}a) and the predicted data (not shown) produced by the estimated model (red prisms in the c and d panels) using $m_0$  and $z_0$ pinpointed by the white diamond in Fig. \ref{fig:complex_rtp}b.
+    \caption{Complex model simulation. (a) Residuals between the noise-corrupted data (Fig. \ref{fig:complex_model}a) and the predicted data (not shown) produced by the estimated model (red prisms panels (c) and (d)) using $m_0$  and $z_0$ pinpointed by the white diamond in Fig. \ref{fig:complex_rtp}b.
     The inset shows the histogram of the residuals and the Gaussian curve (dashed line) has mean and standard deviation equal to $\mu = 0.01$ nT and $\sigma=6.6$ nT, respectively.  (b) Perspective view of the initial approximation (red prisms) and the true model (blue prisms). (c) and (d) Comparison between the estimated source (red prisms) and the true model (blue prisms) in perspective views. 
 }
     \label{fig:complex_result}
@@ -177,7 +199,7 @@ The inset shows the histogram of the residuals and the Gaussian curve (dashed li
     The black dots represent the observation points.
     (b) Regional field using least-squares first-order polynomial fitting. 
     (c) Geometric height of the observation points. (d) Topography of the study area.
-    Both of them are referred to the WGS84 ellipsoid. We have subtracted 
+    Both of these coordinates are referred to the WGS84 ellipsoid. We have subtracted 
     $ 800 $ m from their values. 
     The magenta rectangle delimits the data to be inverted.
     }
@@ -187,14 +209,19 @@ The inset shows the histogram of the residuals and the Gaussian curve (dashed li
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{figures/anitapolis_rtp.png}
-    \caption{Application to field data over the Anit{\'a}polis complex, Brazil. (a) Residual total-field anomaly to be inverted over the area delimited by the  magenta rectangle in Fig. \ref{fig:real_data}. The red circle represents the horizontal projections 	of the initial approximation 
-    $\hat{\mathbf{p}}_{(0)}$.
-    (b) RTP anomaly of the  residual total-field anomaly shown in a. 
-(c) Discrete mapping of the goal function ($ \Gamma(\mathbf{p})$, eq. \ref{eq:gamma}) produced by the estimates  obtained considering a grid of 6 $\times$ 6 tentative values of 
-	   depth to the top $z_0$ and total-magnetization intensity $m_0$. 
-	   The white and magenta diamonds pinpoint, respectively, two pairs of $m_0$  and $z_0$
-	   whose goal functions are close to each other. The magenta diamond pinpoints the estimated model that produces the smallest value of $\Gamma(\mathbf{p})$.
-The white diamond pinpoints an alternative model whose depth to the top is $z_0=0$ indicating a possible outcropping not corroborated by the literature.	 
+    \caption{Application to field data over the Anit{\'a}polis complex, Brazil. 
+    (a) Residual total-field anomaly to be inverted over the area delimited by the 
+    magenta rectangle in Fig. \ref{fig:real_data}. The red circle represents the
+    horizontal projections of the initial approximation $\hat{\mathbf{p}}_{(0)}$.
+    (b) RTP anomaly of the  residual total-field anomaly shown in panel (a).
+    (c) Discrete map of the goal function $\Gamma(\mathbf{p}, m_0, z_0)$ (Eq.
+    \ref{eq:gamma}) produced by the estimates $\hat{\mathbf{p}}_{(f)}$ obtained with
+    a $6 \times 6$ grid of tentative values for depth to the top $z_0$ and
+    total-magnetization intensity $m_0$.
+    The white and magenta diamonds pinpoint, respectively, two pairs of $m_0$ and
+    $z_0$ whose goal functions are close to each other. The magenta diamond pinpoints the estimated model that produces the smallest value of 
+    $\Gamma(\hat{\mathbf{p}}_{(f)}, m_0, z_0)$.
+    The white diamond pinpoints an alternative model whose depth to the top is $z_0=0$ indicating a possible outcropping not corroborated by the literature.	 
 }
     \label{fig:anitapolis_rtp}
 \end{figure}
@@ -206,7 +233,7 @@ The white diamond pinpoints an alternative model whose depth to the top is $z_0=
 	\includegraphics[width=\linewidth]{figures/real_results_magenta_diamond.png}
 	\caption{Application to the field data over the Anit{\'a}polis complex, Brazil.
 	The non-outcropping estimated model producing the smallest goal function 
-	($ \Gamma(\mathbf{p})$, eq. \ref{eq:gamma})	represented by the magenta diamond 
+	($ \Gamma(\hat{\mathbf{p}}_{(f)}, m_0, z_0)$, Eq. \ref{eq:gamma})	represented by the magenta diamond 
 	in Fig. \ref{fig:anitapolis_rtp}c.
 	(a) Residuals between the observed data (Fig. \ref{fig:anitapolis_rtp}a) and the 
 	predicted data (not shown) produced by the estimated model. 

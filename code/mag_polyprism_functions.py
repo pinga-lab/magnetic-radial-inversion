@@ -1941,6 +1941,25 @@ def goal_matrix(n, m, results):
             gamma_matrix[i, j] = results[i*n+j][1][0][-1]
     return gamma_matrix
 
+def goal_matrix_ig(n, m, results):
+    '''
+    Returns the goal function values produced by the initial guesses 
+    for each inversion organized in a matrix
+    
+    input
+    n, m: integer - number of values of depth to the top (z0)
+                    and magnetic intensity (m0)
+    results: list - inversion results from the pickle file
+                    made by multiple inversion notebook
+    output
+    gamma_matrix: 2D array - goal function values    
+    '''
+    gamma_matrix = np.zeros((n,m))
+    for i in range(n):
+        for j in range(m):
+            gamma_matrix[i, j] = results[i*n+j][1][0][0]
+    return gamma_matrix
+
 def misfit_matrix(n, m, results):
     '''
     Returns the misfit function values for each inversion
