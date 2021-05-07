@@ -651,11 +651,10 @@ tends to generate an inclined estimated body.
 
 In comparison to $\tilde{\alpha}_1$, $\tilde{\alpha}_2$ and $\tilde{\alpha}_3$,
 the other parameters usually have smaller values varying from $10^{-8}$ to $10^{-4}$.
-The parameters $\tilde{\alpha}_4$ and $\tilde{\alpha}_5$ are used when a priori
+The parameters $\tilde{\alpha}_4$ and $\tilde{\alpha}_5$ control the shape and position of the shallowest prism of the interpretativ model. They are used when a priori
 information about the source is available at the study area.
-The parameter $\tilde{\alpha}_6$ has a purely mathematical meaning and it is 
-used only to obtain stable solutions for the inverse problem.
-Its value is set to be as small as possible.
+The parameter $\tilde{\alpha}_6$ imposes a minimum volume to the estimated source.
+The value of parameters $\tilde{\alpha}_4$, $\tilde{\alpha}_5$, and $\tilde{\alpha}_6$ are set to be as small as possible.
 The parameter $\tilde{\alpha}_7$ controls the total-vertical extension of the 
 the estimated body. 
 The greater its value, the shallower the estimated depth to the bottom of the source
@@ -668,5 +667,5 @@ to obtain a realistic solution. After tuning their values, they will be used in 
 inversions without changing along the iterations. 
 Educated guesses for the $\tilde{\alpha}_{\ell}$ values are 
 $\tilde{\alpha}_1 = 10^{-4}$, $\tilde{\alpha}_2 = 10^{-4}$, $\tilde{\alpha}_3 = 10^{-4}$,
-$\tilde{\alpha}_4 = 0$, $\tilde{\alpha}_5 = 0$, $\tilde{\alpha}_6 = 10^{-7}$, 
+$\tilde{\alpha}_4 = 10^{-7}$, $\tilde{\alpha}_5 = 10^{-7}$, $\tilde{\alpha}_6 = 10^{-7}$, 
 $\tilde{\alpha}_7 = 10^{-5}$.
