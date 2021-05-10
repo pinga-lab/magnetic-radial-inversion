@@ -6,7 +6,6 @@ from fatiando.gravmag import polyprism
 from fatiando.mesher import PolygonalPrism
 from fatiando.constants import CM, T2NT
 from copy import deepcopy
-from math import factorial
 
 ### Functions for the foward problem using fatiando
 
