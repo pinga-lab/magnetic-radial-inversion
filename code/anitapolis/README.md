@@ -21,9 +21,9 @@ for running the inversion algorithm.
 ### Calculations:
 
 * [multiple_inversion.ipynb](http://nbviewer.jupyter.org/github/pinga-lab/magnetic-radial-inversion/blob/master/code/anitapolis/multiple_inversion.ipynb):
-  Perform the inversion for a grid of tentative values of $m_0$ and $z_0$.
+  Perform the inversion for a grid of tentative values of m_0 and z_0.
 * [single_inversion.ipynb](http://nbviewer.jupyter.org/github/pinga-lab/magnetic-radial-inversion/blob/master/code/anitapolis/single_inversion.ipynb):
-  Perform the inversion for a pair of $$m_0$$ and $z_0$.
+  Perform the inversion for a pair of m_0 and z_0.
 * [RTP_anomaly.ipynb](http://nbviewer.jupyter.org/github/pinga-lab/magnetic-radial-inversion/blob/master/code/anitapolis/RTP_anomaly.ipynb):
   Calculates the RTP anomaly and plots the figure.
 * [regional_separation.ipynb](http://nbviewer.jupyter.org/github/pinga-lab/magnetic-radial-inversion/blob/master/code/anitapolis/regional_separation.ipynb):

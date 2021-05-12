@@ -19,9 +19,9 @@ observations.
 * [data.ipynb](http://nbviewer.jupyter.org/github/pinga-lab/magnetic-radial-inversion/blob/master/code/complex/data.ipynb):
   Calculates the data produced by the true source.
 * [multiple_inversion.ipynb](http://nbviewer.jupyter.org/github/pinga-lab/magnetic-radial-inversion/blob/master/code/complex/multiple_inversion.ipynb):
-  Perform the inversion for a grid of tentative values of $m_0$ and $z_0$.
+  Perform the inversion for a grid of tentative values of m_0 and z_0.
 * [single_inversion.ipynb](http://nbviewer.jupyter.org/github/pinga-lab/magnetic-radial-inversion/blob/master/code/complex/single_inversion.ipynb):
-  Perform the inversion for a pair of $m_0$ and $z_0$.
+  Perform the inversion for a pair of m_0 and z_0.
 * [RTP_anomaly.ipynb](http://nbviewer.jupyter.org/github/pinga-lab/magnetic-radial-inversion/blob/master/code/complex/RTP_anomaly.ipynb):
   Calculates the RTP anomaly.
 
@@ -36,7 +36,7 @@ and the true source.
 * [plot_solutions.ipynb](http://nbviewer.jupyter.org/github/pinga-lab/magnetic-radial-inversion/blob/master/code/complex/plot_solutions.ipynb):
   Plots the results of the inversion.
 * [plot_validation.ipynb](http://nbviewer.jupyter.org/github/pinga-lab/magnetic-radial-inversion/blob/master/code/complex/plot_validation.ipynb):
-  Plots the grid of tentative values of $m_0$ and $z_0$.
+  Plots the grid of tentative values of m_0 and z_0.
 * [single_vizualiation.ipynb](http://nbviewer.jupyter.org/github/pinga-lab/magnetic-radial-inversion/blob/master/code/complex/single_vizualiation.ipynb):
   Plots the results of the single inversion.
 * [giff_figures.ipynb](http://nbviewer.jupyter.org/github/pinga-lab/magnetic-radial-inversion/blob/master/code/complex/giff_figures.ipynb):
