@@ -12,7 +12,7 @@ This repository contains the manuscript and supplementary code and data for the 
 > Brief description of what this paper is about (2-3 sentences). Include a
 > figure as well with the main result of your paper.
 
-![](manuscript/figures/complex.gif)
+![](complex.gif)
 
 **Figure 1:** *Complex model simulation. (a) Residuals between the noise-corrupted data and the predicted data (not shown) produced by the estimated model (red prisms panels (c) and (d)).
     The inset shows the histogram of the residuals and the Gaussian curve (dashed line) has mean and standard deviation equal to $\mu = 0.01$ nT and $\sigma=6.6$ nT, respectively.  (b) Perspective view of the initial approximation (red prisms) and the true model (blue prisms). (c) and (d) Comparison between the estimated source (red prisms) and the true model (blue prisms) in perspective views.*
