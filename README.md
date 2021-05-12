@@ -14,7 +14,7 @@ This repository contains the manuscript and supplementary code and data for the 
 
 ![](complex.gif)
 
-**Figure 1:** *Complex model simulation. The blue prisms represent the true model and the red prisms represent the estimated model.*
+**Figure 1:** *Result for complex model simulation. The blue prisms represent the true model and the red prisms represent the estimated model.*
 
 
 ## Abstract
