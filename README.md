@@ -9,8 +9,8 @@ by
 
 This repository contains the manuscript and supplementary code and data for the article "Magnetic radial inversion for 3-D source geometry estimation" submitted for publication in *Geophysical Journal International*.
 
-> Brief description of what this paper is about (2-3 sentences). Include a
-> figure as well with the main result of your paper.
+**This method estimates the geometry of a 3D magnetic source from total field anomaly data.**
+
 
 ![](complex.gif)
 
@@ -24,7 +24,7 @@ a uniformly magnetized 3-D geological source in the subsurface. The method assum
 the total-magnetization direction is known. 
 We approximate the source by an ensemble of vertically juxtaposed right prisms, all of them with the same total-magnetization vector and depth extent. 
 The horizontal cross-section of each prism is a polygon defined by a given number of
-equi-angularly spaced vertices from $0^{\circ}$ to $360^{\circ}$,  whose polygon vertices 
+equi-angularly spaced vertices from 0º to 360º,  whose polygon vertices 
 are described by polar coordinates with an origin defined by a horizontal location 
 over the top of each prism. 
 Because our method estimates the radii of each polygon vertex  we refer to it as 
@@ -130,6 +130,13 @@ Each cell can be executed using `Shift + Enter`.
 Executing text cells does nothing and executing code cells runs the code
 and produces it's output.
 To execute the whole notebook, run all cells in order.
+
+
+### Archived version at [Zenodo](https://zenodo.org/)
+
+You can also find an archived version of the code at:
+
+[![DOI](https://zenodo.org/badge/63806238.svg)](https://zenodo.org/badge/latestdoi/63806238)
 
 
 ## License
