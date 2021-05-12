@@ -37,7 +37,7 @@ and the elevation of the surface on the study area (not shown in the paper).
 * [plot_solutions.ipynb](http://nbviewer.jupyter.org/github/pinga-lab/magnetic-radial-inversion/blob/master/code/anitapolis/plot_solutions.ipynb):
   Plots the results of the inversion.
 * [plot_validation.ipynb](http://nbviewer.jupyter.org/github/pinga-lab/magnetic-radial-inversion/blob/master/code/anitapolis/plot_validation.ipynb):
-  Plots the $\Gamma$ map.
+  Plots the objective function map.
 * [single_vizualiation.ipynb](http://nbviewer.jupyter.org/github/pinga-lab/magnetic-radial-inversion/blob/master/code/anitapolis/single_vizualiation.ipynb):
   Plots the results of the single inversion.
 

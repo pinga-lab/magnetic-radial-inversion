@@ -32,7 +32,7 @@ observations.
   Plots a figure with the observed data, vertical coordinates of the observations,
 and the true source.
 * [plot_rtp_map.ipynb](http://nbviewer.jupyter.org/github/pinga-lab/magnetic-radial-inversion/blob/master/code/complex/plot_rtp_map.ipynb):
-  Plots the RTP anomaly and $\Gamma$ map.
+  Plots the RTP anomaly and objective function map.
 * [plot_solutions.ipynb](http://nbviewer.jupyter.org/github/pinga-lab/magnetic-radial-inversion/blob/master/code/complex/plot_solutions.ipynb):
   Plots the results of the inversion.
 * [plot_validation.ipynb](http://nbviewer.jupyter.org/github/pinga-lab/magnetic-radial-inversion/blob/master/code/complex/plot_validation.ipynb):
