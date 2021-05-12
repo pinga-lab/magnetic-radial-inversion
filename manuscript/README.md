@@ -11,6 +11,3 @@ pages):
     make wc
 
 The compiled paper is placed in the `output` folder.
-
-*It's also a good idea to mention here what notebook generated the figures in
-the `figures` folder.*
