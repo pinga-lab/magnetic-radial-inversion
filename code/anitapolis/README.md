@@ -5,7 +5,8 @@ The results obtained in this application is in `results`.
 
 ## Data
 
-The magnetic data presented here are a piece of the data provided by the 
+The magnetic data presented here are a processed piece of the raw magnetic
+data provided by the 
 Brazilian Geoligal Service (CPRM - www.cprm.gov.br), which are available 
 in http://geosgb.cprm.gov.br/.
 
