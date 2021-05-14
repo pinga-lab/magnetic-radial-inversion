@@ -11,6 +11,8 @@ aim of the paper and some suplementary functions.
 	processing technique.
 * `plot_functions.py` - contains some functions to plot the results.
 
+* `test_mag_polyprism_functions.py` - tests of the functions using pytest.
+
 
 ## Folders
 
@@ -30,8 +32,6 @@ presented in the manuscript.
 
 * [constraint_functions_example.ipynb](http://nbviewer.jupyter.org/github/pinga-lab/magnetic-radial-inversion/blob/master/code/constraint_functions_example.ipynb):
   Examples of the Hessian matrix of the constraints.
-* [constraints.ipynb](http://nbviewer.jupyter.org/github/pinga-lab/magnetic-radial-inversion/blob/master/code/constraints.ipynb):
-  Theoretical formulation of the constraints and examples.
 
 The `Makefile` has a rule to convert all notebooks to PDF.
 To convert, run the following in this directory:
