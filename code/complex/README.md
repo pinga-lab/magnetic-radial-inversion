@@ -3,6 +3,10 @@
 Here are the notebooks, data, and results for the complex model application.
 The results obtained in this application is in `results`.
 
+![](model.png)
+
+**Figure 1:** *Complex body simulation. The blue prisms represent the true source.*
+
 ## Data
 
 The model and data contents are in `model.pickle` and `data.pickle`, respectively.

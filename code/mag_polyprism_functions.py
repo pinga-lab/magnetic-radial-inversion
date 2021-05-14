@@ -25,6 +25,7 @@ def area_polygon(x, y):
     '''
     assert x.size == y.size, 'x and y must have the same size'
     assert x.shape == y.shape, 'x, y and z must have the same shape'
+    assert x.size == y.size >= 3, 'x and y must have the same size'
 
     x = np.asanyarray(x)
     y = np.asanyarray(y)
@@ -32,7 +33,7 @@ def area_polygon(x, y):
     shift_up = np.arange(-n+1, 1)
     shift_down = np.arange(-1, n-1)
     area = (x * (y.take(shift_up) - y.take(shift_down))).sum() / 2.0
-    return area
+    return abs(area)
 
 def volume_polygon(model):
     '''

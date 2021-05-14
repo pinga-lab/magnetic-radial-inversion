@@ -1,4 +1,4 @@
-Copyright (c) YEAR AUTHORS.
+Copyright (c) Leonardo B. Vital, Vanderlei C. Oliveira Jr, and Valeria C. F. Barbosa.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

@@ -68,7 +68,8 @@ You can download a copy of all the files in this repository by cloning the
 
 or [download a zip archive](https://github.com/pinga-lab/magnetic-radial-inversion/archive/master.zip).
 
-A copy of the repository is also archived at *insert DOI here*
+A copy of the repository is also archived at *[![DOI](https://zenodo.org/badge/63806238.svg)](https://zenodo.org/badge/latestdoi/63806238)
+*
 
 
 ## Dependencies
@@ -131,14 +132,6 @@ Executing text cells does nothing and executing code cells runs the code
 and produces it's output.
 To execute the whole notebook, run all cells in order.
 
-
-### Archived version at [Zenodo](https://zenodo.org/)
-
-You can also find an archived version of the code at:
-
-[![DOI](https://zenodo.org/badge/63806238.svg)](https://zenodo.org/badge/latestdoi/63806238)
-
-
 ## License
 
 All source code is made available under a BSD 3-clause license. You can freely
@@ -147,4 +140,4 @@ to the authors. See `LICENSE.md` for the full license text.
 
 The manuscript text is not open source. The authors reserve the rights to the
 article content, which is currently submitted for publication in the
-JOURNAL NAME.
+**Geophysical Journal Internationa**.
