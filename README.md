@@ -68,8 +68,7 @@ You can download a copy of all the files in this repository by cloning the
 
 or [download a zip archive](https://github.com/pinga-lab/magnetic-radial-inversion/archive/master.zip).
 
-A copy of the repository is also archived at *[![DOI](https://zenodo.org/badge/63806238.svg)](https://zenodo.org/badge/latestdoi/63806238)
-*
+A copy of the repository is also archived at [![DOI](https://zenodo.org/badge/63806238.svg)](https://zenodo.org/badge/latestdoi/63806238).
 
 
 ## Dependencies
